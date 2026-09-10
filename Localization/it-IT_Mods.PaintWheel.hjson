@@ -1,0 +1,425 @@
+Keybinds: {
+	OpenWheel.DisplayName: Apri la ruota dei colori
+	Eyedropper.DisplayName: Contagocce per la vernice
+	QuickToggleLastTwo.DisplayName: Torna alla vernice precedente
+	PreviousPalette.DisplayName: Tavolozza precedente
+	NextPalette.DisplayName: Tavolozza successiva
+	ToggleScrape.DisplayName: Attiva/disattiva modalità raschietto
+	ToggleNoPaint.DisplayName: Attiva/disattiva senza vernice
+}
+
+UI: {
+	AutoPreset: Tutto quello che hai
+	NoCoating: Nessun rivestimento
+	NoPaint: Posiziona i blocchi senza vernice
+	NoPaintResume: Torna a verniciare i blocchi
+	NoPaintOn: Non verniciato
+	NoPaintOff: Verniciato
+	ScrollHint: Scorri o usa le frecce per altre vernici
+	PaletteTitle: Tavolozze
+	PaletteHint: Clicca per cambiare tavolozza
+	PaletteScrollHint: Scorri o clicca sul nome per cambiare tavolozza
+	Empty: esaurita
+	NoPaints: Nessuna vernice caricata
+	NoAutoPaint: I blocchi non vengono verniciati senza la verniciatura automatica
+	SlotPickPaint: Premi {0} per scegliere questa vernice
+	SlotPickCoating: Premi {0} per scegliere questo rivestimento
+	Disabled: Paint Wheel ha avuto un errore e non applica più la tua vernice. I dettagli sono in client.log.
+	NewPalette: Nuova tavolozza da ciò che hai
+	EditPalette: Modifica questa tavolozza
+	DeletePalette: Elimina questa tavolozza
+	EditHint: Clicca un colore per aggiungerlo o toglierlo.
+	DoneEditing: Fatto
+	NewPaletteName: Tavolozza
+	EditingHeader: Modifica di {0}
+
+	Scrape: {
+		Enter: Modalità raschietto
+		Header: Modalità raschietto
+		BlocksAndWalls: Blocchi e muri
+		BlocksOnly: Solo blocchi
+		WallsOnly: Solo muri
+		Exit: Torna ai colori
+		NoScraper: Non hai un raschietto per vernice
+	}
+}
+
+Configs: {
+	PaintWheelConfig: {
+		DisplayName: Impostazioni
+
+		Language: {
+			Label: Lingua
+			Tooltip:
+				'''
+				La lingua del testo di questa mod. Automatico segue l'impostazione del gioco; le altre fanno
+				parlare la mod in quella lingua qualunque sia quella del gioco. Il filippino è in elenco perché
+				Terraria non ha quella lingua da seguire.
+				Ha effetto al salvataggio. Questa pagina ridisegna le sue voci alla prossima apertura.
+				'''
+		}
+
+		Headers: {
+			Input: Comandi
+			Shape: Selettore
+			Presets: Preimpostazioni
+		}
+
+		OpenWithRightClick: {
+			Label: Apri con il tasto destro
+			Tooltip:
+				'''
+				Il tasto destro con uno strumento da verniciatura apre la ruota invece di usarlo.
+				Disattivalo se un'altra mod ha bisogno del tasto destro; la scorciatoia resta.
+				'''
+		}
+
+		OpenMode: {
+			Label: Comportamento del tasto destro
+			Tooltip: Se il selettore resta aperto solo mentre tieni premuto, o rimane finché non hai finito.
+		}
+
+		RequirePaintTool: {
+			Label: Solo con uno strumento da verniciatura
+			Tooltip:
+				'''
+				Limita la ruota e le sue scorciatoie agli strumenti da verniciatura (e ai blocchi in mano
+				con lo spruzzatore equipaggiato).
+				'''
+		}
+
+		PlaySounds: {
+			Label: Riproduci i suoni
+			Tooltip: Un ticchettio passando tra i colori e un suono alla conferma.
+		}
+
+		Layout: {
+			Label: Forma del selettore
+			Tooltip: Un anello di colori attorno al cursore, o una colonna di fasce accanto.
+		}
+
+		Appearance: {
+			Label: Dimensioni e aspetto
+			Tooltip: Quanto è grande il selettore e cosa disegna.
+		}
+
+		Supply: {
+			Label: Indicatore di scorte
+			Tooltip: Come ogni colore mostra quanta vernice ti resta.
+		}
+
+		Advanced: {
+			Label: Avanzate
+			Tooltip: Comportamento della verniciatura, rivestimenti e la via d'uscita per i conflitti tra mod.
+		}
+
+		Presets: {
+			Label: Preimpostazioni
+			Tooltip:
+				'''
+				Tavolozze salvate, scelte dall'elenco che si apre cliccando al centro della ruota.
+				C'è sempre una tavolozza che si riempie da sola con tutto quello che hai addosso.
+				'''
+		}
+	}
+
+	AppearanceSettings: {
+		Tooltip: ""
+
+		Headers: {
+			Wheel: Ruota
+			Bar: Barra
+		}
+
+		ShowItemIcons: {
+			Label: Mostra le icone degli oggetti
+			Tooltip:
+				'''
+				Disegna il barattolo sopra il suo colore. Disattivato di base: quello che scegli è il
+				colore stesso.
+				'''
+		}
+
+		ShowBackgroundPanel: {
+			Label: Disegna il pannello di sfondo
+			Tooltip:
+				'''
+				Disattivato di base: i colori si leggono meglio direttamente sul mondo. Attivalo per il
+				solito pannello traslucido di Terraria dietro di essi.
+				'''
+		}
+
+		WheelRadius: {
+			Label: Raggio della ruota
+			Tooltip:
+				'''
+				Distanza dal cursore ai colori, in pixel. Vale come minimo: un anello pieno si allarga
+				quanto serve perché i colori non si tocchino.
+				'''
+		}
+
+		SwatchSize: {
+			Label: Dimensione dei colori
+			Tooltip: Diametro di ogni cerchio di colore, in pixel.
+		}
+
+		DeadZoneRadius: {
+			Label: Zona morta centrale
+			Tooltip: Rilasciare entro questo raggio annulla e tiene la vernice che avevi già.
+		}
+
+		MaxSwatches: {
+			Label: Colori per anello
+			Tooltip:
+				'''
+				Oltre dodici il gesto non è più preciso, quindi dodici è il limite. Il resto passa alla
+				pagina successiva invece di sparire.
+				'''
+		}
+
+		OpenAnimationTicks: {
+			Label: Durata dell'animazione
+			Tooltip: Quanto ci mette la ruota ad aprirsi. Tienila breve o sembrerà lenta.
+		}
+
+		BarCellWidth: {
+			Label: Larghezza delle fasce
+			Tooltip: Larghezza di ogni fascia di colore nella barra.
+		}
+
+		BarCellHeight: {
+			Label: Altezza delle fasce
+			Tooltip: Altezza di ogni fascia. Le fasce alte si colpiscono più facilmente.
+		}
+
+		BarSwatchesPerPage: {
+			Label: Fasce per pagina
+			Tooltip: Quanti colori stanno in una pagina della barra prima delle frecce.
+		}
+	}
+
+	SupplySettings: {
+		Tooltip: ""
+
+		FadeStartStack: {
+			Label: Inizia a sbiadire a
+			Tooltip:
+				'''
+				Dimensione della pila oltre la quale un colore è considerato pieno. Sotto sbiadisce e il
+				suo anello si svuota. Contata su tutte le caselle, così due mezze pile tornano.
+				'''
+		}
+
+		MinimumSwatchOpacity: {
+			Label: Opacità minima
+			Tooltip: Quanto può diventare pallido un colore quasi esaurito.
+		}
+
+		ShowDepletionRing: {
+			Label: Anello di scorta bassa
+			Tooltip:
+				'''
+				Un anello di puntini attorno a un colore, che si svuota mentre la vernice finisce. Appare
+				solo quando la pila scende sotto Inizia a sbiadire a, così una ruota di pile piene resta
+				pulita. Alza quel valore sopra le tue pile abituali per vederlo su tutti.
+				'''
+		}
+
+		DepletionRingSegments: {
+			Label: Puntini dell'anello
+			Tooltip: Numero di puntini nell'anello. I puntini separati si sposano con lo stile pixel art.
+		}
+
+		HideEmptySwatches: {
+			Label: Nascondi i colori esauriti
+			Tooltip:
+				'''
+				Disattivato di base: un colore esaurito tiene il suo posto, così la ruota non si sposta
+				sotto la mano mentre costruisci. Attivalo per toglierli.
+				'''
+		}
+	}
+
+	AdvancedSettings: {
+		Tooltip: ""
+
+		OverrideMode: {
+			Label: Metodo di scelta della vernice
+			Tooltip:
+				'''
+				Come la mod impone il colore scelto al codice di verniciatura del gioco.
+				La deviazione è l'impostazione di base e non tocca mai l'inventario.
+				'''
+		}
+
+		FallBackToAnyPaintWhenEmpty: {
+			Label: Usa un'altra vernice quando finisce
+			Tooltip:
+				'''
+				Disattivato di base. Quando il colore scelto finisce, la verniciatura si ferma invece di
+				consumare di nascosto un altro colore.
+				'''
+		}
+
+		ShowCoatingRow: {
+			Label: Mostra la fila dei rivestimenti
+			Tooltip: Una fila sotto la ruota per i rivestimenti Illuminante ed Eco, più un interruttore.
+		}
+
+		AutoPaintPlacedTiles: {
+			Label: Vernicia i blocchi mentre li posi
+			Tooltip:
+				'''
+				Disattivato di base, perché è il compito dello spruzzatore, che è un accessorio da
+				comprare. Attivo, ogni blocco e muro che posi prende il tuo colore e consuma vernice come
+				sempre; l'icona dello spruzzatore tra le opzioni di costruzione lo rispegne.
+				'''
+		}
+
+		SmartCoating: {
+			Label: Ordine intelligente del rivestimento
+			Tooltip:
+				'''
+				Con un colore e un rivestimento scelti, applica quello che manca al bersaglio, così
+				tenendo premuto arrivano entrambi. Disattivo, il rivestimento ha sempre la precedenza.
+				'''
+		}
+	}
+
+	PaintPreset: {
+		Tooltip: ""
+
+		Name: {
+			Label: Nome
+			Tooltip: Mostrato sopra la ruota finché questa preimpostazione è scelta.
+		}
+
+		Paints: {
+			Label: Vernici
+			Tooltip: Clicca un colore per aggiungerlo o toglierlo. Il numero è il suo posto nell'anello.
+		}
+	}
+
+	WheelLayoutStyle: {
+		Tooltip: ""
+
+		Wheel: {
+			Label: Ruota
+			Tooltip: Colori in anello attorno al cursore, scelti con un movimento nella loro direzione.
+		}
+
+		Bar: {
+			Label: Barra
+			Tooltip: Colori impilati in una colonna accanto al cursore, scelti percorrendola.
+		}
+
+		Grid: {
+			Label: Griglia
+			Tooltip: Tutti i colori in righe sotto il cursore. Niente è nascosto, quindi una tavolozza piena non ha pagine.
+		}
+	}
+
+	PickerOpenMode: {
+		Tooltip: ""
+
+		Hold: {
+			Label: Tieni premuto per aprire
+			Tooltip:
+				'''
+				Tieni premuto il tasto destro, muoviti verso un colore, rilascia per sceglierlo. Non resta
+				niente sullo schermo e non c'è niente da chiudere.
+				'''
+		}
+
+		Click: {
+			Label: Clicca per aprire
+			Tooltip:
+				'''
+				Un clic destro lascia il selettore aperto, senza tenere premuto. Cliccare un colore lo
+				sceglie e chiude; rivestimenti, tavolozze e modalità raschietto lo lasciano aperto per
+				impostare più cose. Clic destro di nuovo, Esc o un clic fuori lo chiudono.
+				'''
+		}
+	}
+
+	PaintOverrideMode: {
+		Tooltip: ""
+
+		Detour: {
+			Label: Deviazione (consigliata)
+			Tooltip:
+				'''
+				Intercetta la ricerca del gioco che sceglie e consuma la vernice, così il colore applicato
+				e la pila spesa non possono divergere. L'inventario non viene mai riordinato.
+				'''
+		}
+
+		InventorySwap: {
+			Label: Scambio nell'inventario (ripiego)
+			Tooltip:
+				'''
+				Sposta la tua pila nella casella che il gioco sceglierebbe per una frazione di tick e la
+				rimette subito a posto. Usalo solo se un'altra mod ostacola la deviazione.
+				'''
+		}
+	}
+
+	LanguageOverride: {
+		Tooltip: ""
+
+		Automatic: {
+			Label: Automatico
+			Tooltip: ""
+		}
+
+		English: {
+			Label: English
+			Tooltip: ""
+		}
+
+		German: {
+			Label: Deutsch
+			Tooltip: ""
+		}
+
+		Spanish: {
+			Label: Español
+			Tooltip: ""
+		}
+
+		French: {
+			Label: Français
+			Tooltip: ""
+		}
+
+		Italian: {
+			Label: Italiano
+			Tooltip: ""
+		}
+
+		Polish: {
+			Label: Polski
+			Tooltip: ""
+		}
+
+		Portuguese: {
+			Label: Português
+			Tooltip: ""
+		}
+
+		Russian: {
+			Label: Русский
+			Tooltip: ""
+		}
+
+		Chinese: {
+			Label: 简体中文
+			Tooltip: ""
+		}
+
+		Filipino: {
+			Label: Filipino
+			Tooltip: ""
+		}
+	}
+}

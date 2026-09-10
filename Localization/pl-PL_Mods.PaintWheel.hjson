@@ -1,0 +1,422 @@
+Keybinds: {
+	OpenWheel.DisplayName: Otwórz koło farb
+	Eyedropper.DisplayName: Zakraplacz farby
+	QuickToggleLastTwo.DisplayName: Wróć do poprzedniej farby
+	PreviousPalette.DisplayName: Poprzednia paleta
+	NextPalette.DisplayName: Następna paleta
+	ToggleScrape.DisplayName: Przełącz tryb skrobaka
+	ToggleNoPaint.DisplayName: Przełącz brak farby
+}
+
+UI: {
+	AutoPreset: Wszystko, co masz
+	NoCoating: Bez powłoki
+	NoPaint: Stawiaj bloki bez farby
+	NoPaintResume: Znowu maluj bloki
+	NoPaintOn: Bez farby
+	NoPaintOff: Malowane
+	ScrollHint: Przewiń lub kliknij strzałki, by zobaczyć więcej farb
+	PaletteTitle: Palety
+	PaletteHint: Kliknij, by zmienić paletę
+	PaletteScrollHint: Przewiń lub kliknij nazwę, by zmienić paletę
+	Empty: brak
+	NoPaints: Nie wczytano żadnych farb
+	NoAutoPaint: Bloki nie są malowane bez automatycznego malowania
+	SlotPickPaint: Naciśnij {0}, aby wybrać tę farbę
+	SlotPickCoating: Naciśnij {0}, aby wybrać tę powłokę
+	Disabled: Paint Wheel napotkał błąd i przestał nakładać twoją farbę. Szczegóły są w client.log.
+	NewPalette: Nowa paleta z tego, co masz
+	EditPalette: Edytuj tę paletę
+	DeletePalette: Usuń tę paletę
+	EditHint: Kliknij kolor, aby go dodać lub usunąć.
+	DoneEditing: Gotowe
+	NewPaletteName: Paleta
+	EditingHeader: Edycja {0}
+
+	Scrape: {
+		Enter: Tryb skrobaka
+		Header: Tryb skrobaka
+		BlocksAndWalls: Bloki i ściany
+		BlocksOnly: Tylko bloki
+		WallsOnly: Tylko ściany
+		Exit: Powrót do kolorów
+		NoScraper: Nie masz skrobaka do farby
+	}
+}
+
+Configs: {
+	PaintWheelConfig: {
+		DisplayName: Ustawienia
+
+		Language: {
+			Label: Język
+			Tooltip:
+				'''
+				Język tekstów tego moda. Automatycznie oznacza ustawienie gry; pozostałe sprawiają, że mod mówi
+				w danym języku niezależnie od gry. Filipiński jest na liście, bo Terraria nie ma takiego
+				ustawienia języka.
+				Działa po zapisaniu. Ta strona odświeży własne napisy przy następnym otwarciu.
+				'''
+		}
+
+		Headers: {
+			Input: Sterowanie
+			Shape: Wybierak
+			Presets: Zestawy
+		}
+
+		OpenWithRightClick: {
+			Label: Otwieraj prawym przyciskiem
+			Tooltip:
+				'''
+				Prawy przycisk z narzędziem malarskim otwiera koło zamiast go użyć.
+				Wyłącz, jeśli inny mod potrzebuje prawego przycisku; skrót klawiszowy nadal działa.
+				'''
+		}
+
+		OpenMode: {
+			Label: Zachowanie prawego przycisku
+			Tooltip: Czy wybierak jest otwarty tylko po przytrzymaniu, czy zostaje aż skończysz.
+		}
+
+		RequirePaintTool: {
+			Label: Tylko z narzędziem malarskim
+			Tooltip:
+				'''
+				Ogranicza koło i jego skróty do narzędzi malarskich (oraz do bloków w ręce, gdy masz
+				założony rozpylacz farby).
+				'''
+		}
+
+		PlaySounds: {
+			Label: Odtwarzaj dźwięki
+			Tooltip: Cichy tik przy przechodzeniu między kolorami i dźwięk przy zatwierdzeniu.
+		}
+
+		Layout: {
+			Label: Kształt wybieraka
+			Tooltip: Pierścień kolorów wokół kursora albo kolumna pasków obok niego.
+		}
+
+		Appearance: {
+			Label: Rozmiary i wygląd
+			Tooltip: Jak duży jest wybierak i co rysuje.
+		}
+
+		Supply: {
+			Label: Wskaźnik zapasu
+			Tooltip: Jak kolor pokazuje, ile zostało tej farby.
+		}
+
+		Advanced: {
+			Label: Zaawansowane
+			Tooltip: Zachowanie malowania, powłoki i awaryjne wyjście przy konfliktach modów.
+		}
+
+		Presets: {
+			Label: Zestawy
+			Tooltip:
+				'''
+				Zapisane palety, wybierane z listy otwieranej kliknięciem środka koła.
+				Zawsze jest jedna paleta, która sama wypełnia się wszystkim, co niesiesz.
+				'''
+		}
+	}
+
+	AppearanceSettings: {
+		Tooltip: ""
+
+		Headers: {
+			Wheel: Koło
+			Bar: Pasek
+		}
+
+		ShowItemIcons: {
+			Label: Pokaż ikony przedmiotów
+			Tooltip: Rysuje puszkę farby na jej kolorze. Domyślnie wyłączone: wybierasz przecież sam kolor.
+		}
+
+		ShowBackgroundPanel: {
+			Label: Rysuj panel tła
+			Tooltip:
+				'''
+				Domyślnie wyłączone: kolory czyta się lepiej wprost na tle świata. Włącz, by mieć za nimi
+				zwykły półprzezroczysty panel Terrarii.
+				'''
+		}
+
+		WheelRadius: {
+			Label: Promień koła
+			Tooltip:
+				'''
+				Odległość kursora od kolorów, w pikselach. Traktowana jako minimum: pełny pierścień
+				poszerza się tak, by kolory się nie stykały.
+				'''
+		}
+
+		SwatchSize: {
+			Label: Wielkość kolorów
+			Tooltip: Średnica każdego kółka koloru, w pikselach.
+		}
+
+		DeadZoneRadius: {
+			Label: Martwa strefa na środku
+			Tooltip: Puszczenie w tym promieniu anuluje i zostawia farbę, którą już miałeś.
+		}
+
+		MaxSwatches: {
+			Label: Kolorów w pierścieniu
+			Tooltip:
+				'''
+				Powyżej dwunastu ruch przestaje być celny, więc dwanaście to granica. Reszta trafia na
+				następną stronę, zamiast zniknąć.
+				'''
+		}
+
+		OpenAnimationTicks: {
+			Label: Długość animacji otwarcia
+			Tooltip: Jak długo koło się rozwija. Trzymaj krótko, bo inaczej wydaje się ociężałe.
+		}
+
+		BarCellWidth: {
+			Label: Szerokość pasków
+			Tooltip: Szerokość każdego paska koloru w widoku paska.
+		}
+
+		BarCellHeight: {
+			Label: Wysokość pasków
+			Tooltip: Wysokość każdego paska. W wyższe paski łatwiej trafić przy przeciąganiu.
+		}
+
+		BarSwatchesPerPage: {
+			Label: Pasków na stronę
+			Tooltip: Ile kolorów mieści się na jednej stronie paska, zanim wejdą strzałki.
+		}
+	}
+
+	SupplySettings: {
+		Tooltip: ""
+
+		FadeStartStack: {
+			Label: Zaczyna blaknąć przy
+			Tooltip:
+				'''
+				Wielkość stosu, od której kolor uchodzi za pełny. Poniżej blaknie, a jego pierścień się
+				opróżnia. Liczone ze wszystkich pól, więc dwa pół stosy wychodzą poprawnie.
+				'''
+		}
+
+		MinimumSwatchOpacity: {
+			Label: Najmniejsza widoczność
+			Tooltip: Jak blady może się zrobić prawie pusty kolor.
+		}
+
+		ShowDepletionRing: {
+			Label: Pierścień niskiego zapasu
+			Tooltip:
+				'''
+				Pierścień kropek wokół koloru, który opróżnia się w miarę zużywania farby. Pojawia się
+				dopiero, gdy stos spadnie poniżej wartości Zaczyna blaknąć przy, żeby koło pełnych stosów
+				pozostało czytelne. Podnieś tę wartość powyżej swoich zwykłych stosów, by widzieć go
+				wszędzie.
+				'''
+		}
+
+		DepletionRingSegments: {
+			Label: Kropki pierścienia
+			Tooltip: Liczba kropek w pierścieniu. Osobne kropki pasują do stylu pixel art.
+		}
+
+		HideEmptySwatches: {
+			Label: Ukryj puste kolory
+			Tooltip:
+				'''
+				Domyślnie wyłączone: pusty kolor zachowuje miejsce, żeby koło nie przesuwało się pod ręką
+				w trakcie budowania. Włącz, by je usuwać.
+				'''
+		}
+	}
+
+	AdvancedSettings: {
+		Tooltip: ""
+
+		OverrideMode: {
+			Label: Sposób wyboru farby
+			Tooltip:
+				'''
+				Jak mod narzuca twój kolor kodowi malowania w grze.
+				Przekierowanie jest domyślne i nigdy nie rusza ekwipunku.
+				'''
+		}
+
+		FallBackToAnyPaintWhenEmpty: {
+			Label: Użyj innej farby, gdy zabraknie
+			Tooltip:
+				'''
+				Domyślnie wyłączone. Gdy wybrana farba się kończy, malowanie ustaje, zamiast po cichu
+				zużywać inny kolor.
+				'''
+		}
+
+		ShowCoatingRow: {
+			Label: Pokaż rząd powłok
+			Tooltip: Rząd pod kołem na powłokę Świetlistą i Echo, plus przycisk wyłączenia.
+		}
+
+		AutoPaintPlacedTiles: {
+			Label: Maluj bloki przy stawianiu
+			Tooltip:
+				'''
+				Domyślnie wyłączone, bo to zadanie rozpylacza farby, a ten jest akcesorium do kupienia.
+				Włączone sprawia, że każdy stawiany blok i ściana dostaje twój kolor i zużywa farbę jak
+				zwykle; ikona rozpylacza w opcjach budowania wyłącza to z powrotem.
+				'''
+		}
+
+		SmartCoating: {
+			Label: Mądra kolejność powłoki
+			Tooltip:
+				'''
+				Gdy wybrano i kolor, i powłokę, nakładane jest to, czego celowi brakuje, więc trzymanie
+				przycisku załatwia oba. Wyłączone oznacza, że powłoka zawsze idzie pierwsza.
+				'''
+		}
+	}
+
+	PaintPreset: {
+		Tooltip: ""
+
+		Name: {
+			Label: Nazwa
+			Tooltip: Pokazywana nad kołem, gdy ten zestaw jest wybrany.
+		}
+
+		Paints: {
+			Label: Farby
+			Tooltip: Kliknij kolor, by go dodać lub usunąć. Liczba to jego miejsce w pierścieniu.
+		}
+	}
+
+	WheelLayoutStyle: {
+		Tooltip: ""
+
+		Wheel: {
+			Label: Koło
+			Tooltip: Kolory w pierścieniu wokół kursora, wybierane ruchem w ich stronę.
+		}
+
+		Bar: {
+			Label: Pasek
+			Tooltip: Kolory w kolumnie obok kursora, wybierane przesunięciem wzdłuż niej.
+		}
+
+		Grid: {
+			Label: Siatka
+			Tooltip: Wszystkie kolory w rzędach pod kursorem. Nic nie jest ukryte, więc pełna paleta nie potrzebuje stron.
+		}
+	}
+
+	PickerOpenMode: {
+		Tooltip: ""
+
+		Hold: {
+			Label: Przytrzymaj, by otworzyć
+			Tooltip:
+				'''
+				Przytrzymaj prawy przycisk, przesuń w stronę koloru, puść, by wybrać. Nic nie zostaje na
+				ekranie i niczego nie trzeba zamykać.
+				'''
+		}
+
+		Click: {
+			Label: Kliknij, by otworzyć
+			Tooltip:
+				'''
+				Jedno kliknięcie prawym zostawia wybierak otwarty, bez trzymania. Kliknięcie koloru wybiera
+				go i zamyka; powłoki, palety i tryb skrobaka zostawiają go otwartym, byś ustawił kilka
+				rzeczy naraz. Prawy przycisk ponownie, Esc albo kliknięcie obok zamyka go.
+				'''
+		}
+	}
+
+	PaintOverrideMode: {
+		Tooltip: ""
+
+		Detour: {
+			Label: Przekierowanie (zalecane)
+			Tooltip:
+				'''
+				Przechwytuje wyszukiwanie gry, które wybiera i zużywa farbę, więc nałożony kolor i zużyty
+				stos nigdy się nie rozjadą. Ekwipunek nie jest nigdy przestawiany.
+				'''
+		}
+
+		InventorySwap: {
+			Label: Zamiana w ekwipunku (awaryjnie)
+			Tooltip:
+				'''
+				Przekłada twój stos na pole, które wybrałaby gra, na ułamek ticka i od razu odkłada z
+				powrotem. Używaj tylko wtedy, gdy inny mod przeszkadza przekierowaniu.
+				'''
+		}
+	}
+
+	LanguageOverride: {
+		Tooltip: ""
+
+		Automatic: {
+			Label: Automatycznie
+			Tooltip: ""
+		}
+
+		English: {
+			Label: English
+			Tooltip: ""
+		}
+
+		German: {
+			Label: Deutsch
+			Tooltip: ""
+		}
+
+		Spanish: {
+			Label: Español
+			Tooltip: ""
+		}
+
+		French: {
+			Label: Français
+			Tooltip: ""
+		}
+
+		Italian: {
+			Label: Italiano
+			Tooltip: ""
+		}
+
+		Polish: {
+			Label: Polski
+			Tooltip: ""
+		}
+
+		Portuguese: {
+			Label: Português
+			Tooltip: ""
+		}
+
+		Russian: {
+			Label: Русский
+			Tooltip: ""
+		}
+
+		Chinese: {
+			Label: 简体中文
+			Tooltip: ""
+		}
+
+		Filipino: {
+			Label: Filipino
+			Tooltip: ""
+		}
+	}
+}

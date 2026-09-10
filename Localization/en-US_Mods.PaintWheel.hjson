@@ -1,0 +1,425 @@
+Keybinds: {
+	OpenWheel.DisplayName: Open Paint Wheel
+	Eyedropper.DisplayName: Paint Eyedropper
+	QuickToggleLastTwo.DisplayName: Swap To Previous Paint
+	PreviousPalette.DisplayName: Previous Palette
+	NextPalette.DisplayName: Next Palette
+	ToggleScrape.DisplayName: Toggle Scrape Mode
+	ToggleNoPaint.DisplayName: Toggle No Paint
+}
+
+UI: {
+	AutoPreset: Everything you own
+	NoCoating: No coating
+	NoPaint: Place blocks unpainted
+	NoPaintResume: Paint blocks again
+	NoPaintOn: Unpainted
+	NoPaintOff: Painted
+	ScrollHint: Scroll or click the arrows for more paints
+	PaletteTitle: Palettes
+	PaletteHint: Click to switch palette
+	PaletteScrollHint: Scroll or click the name to switch palette
+	Empty: none left
+	NoPaints: No paints loaded
+	NoAutoPaint: Blocks are not painted unless auto-paint is on
+	SlotPickPaint: Press {0} to select this paint
+	SlotPickCoating: Press {0} to select this coating
+	Disabled: Paint Wheel hit an error and has stopped applying your paint. Details are in client.log.
+	NewPalette: New palette from what you carry
+	EditPalette: Edit this palette
+	DeletePalette: Delete this palette
+	EditHint: Click a colour to add or remove it.
+	DoneEditing: Done
+	NewPaletteName: Palette
+	EditingHeader: Editing {0}
+
+	Scrape: {
+		Enter: Scrape mode
+		Header: Scrape mode
+		BlocksAndWalls: Blocks and walls
+		BlocksOnly: Blocks only
+		WallsOnly: Walls only
+		Exit: Back to colours
+		NoScraper: No Paint Scraper to hold
+	}
+}
+
+Configs: {
+	PaintWheelConfig: {
+		DisplayName: Settings
+
+		Language: {
+			Label: Language
+			Tooltip:
+				'''
+				Which language this mod's own text uses. Automatic follows the game's own setting; the rest
+				make the mod speak that language whatever the game is set to. Filipino is on the list because
+				Terraria has no Filipino setting to follow.
+				Takes effect when you save. This page redraws its own labels the next time you open it.
+				'''
+		}
+
+		Headers: {
+			Input: Input
+			Shape: Picker
+			Presets: Presets
+		}
+
+		OpenWithRightClick: {
+			Label: Open with right click
+			Tooltip:
+				'''
+				Right clicking a paint tool opens the wheel instead of swinging it.
+				Turn this off if another mod wants right click on paint tools; the keybind still works.
+				'''
+		}
+
+		OpenMode: {
+			Label: Right click behaviour
+			Tooltip: Whether the picker is held open while you choose, or left open until you are done.
+		}
+
+		RequirePaintTool: {
+			Label: Only while holding a paint tool
+			Tooltip:
+				'''
+				Restricts the wheel and its keybinds to paint tools (and to holding blocks while the
+				Paint Sprayer is equipped).
+				'''
+		}
+
+		PlaySounds: {
+			Label: Play sounds
+			Tooltip: Menu ticks while flicking between swatches, and a grab sound on commit.
+		}
+
+		Layout: {
+			Label: Picker shape
+			Tooltip: A ring of swatches around the cursor, or a column of colour bands beside it.
+		}
+
+		Appearance: {
+			Label: Sizes and cosmetics
+			Tooltip: How big the picker is, and what it draws.
+		}
+
+		Supply: {
+			Label: Supply readout
+			Tooltip: How a swatch shows what is left of that paint.
+		}
+
+		Advanced: {
+			Label: Advanced
+			Tooltip: Painting behaviour, coatings, and the escape hatch for mod conflicts.
+		}
+
+		Presets: {
+			Label: Presets
+			Tooltip:
+				'''
+				Saved palettes, chosen from the list that opens when you click the centre of the wheel.
+				There is always one auto-filled palette holding everything you are carrying.
+				'''
+		}
+	}
+
+	AppearanceSettings: {
+		Tooltip: ""
+
+		Headers: {
+			Wheel: Wheel
+			Bar: Bar
+		}
+
+		ShowItemIcons: {
+			Label: Show item sprites
+			Tooltip:
+				'''
+				Draws the paint item's sprite on top of its colour. Off by default: the colour itself is
+				the thing you are picking.
+				'''
+		}
+
+		ShowBackgroundPanel: {
+			Label: Draw background panel
+			Tooltip:
+				'''
+				Off by default: the swatches read better straight over the world. Turn on for the standard
+				translucent Terraria panel behind them.
+				'''
+		}
+
+		WheelRadius: {
+			Label: Wheel radius
+			Tooltip:
+				'''
+				Distance from the cursor to the swatches, in pixels. Treated as a floor: a full ring widens
+				itself as far as it must to keep the swatches from touching.
+				'''
+		}
+
+		SwatchSize: {
+			Label: Swatch size
+			Tooltip: Diameter of each swatch disc, in pixels.
+		}
+
+		DeadZoneRadius: {
+			Label: Centre dead zone
+			Tooltip: Releasing inside this radius cancels and keeps the paint you already had.
+		}
+
+		MaxSwatches: {
+			Label: Swatches per ring
+			Tooltip:
+				'''
+				More than twelve stops being flickable, so twelve is the cap. Anything past that moves to
+				the next page rather than being dropped.
+				'''
+		}
+
+		OpenAnimationTicks: {
+			Label: Open animation ticks
+			Tooltip: How long the wheel takes to spring out. Keep it short or the wheel feels sluggish.
+		}
+
+		BarCellWidth: {
+			Label: Band width
+			Tooltip: Width of each colour band in the bar layout.
+		}
+
+		BarCellHeight: {
+			Label: Band height
+			Tooltip: Height of each colour band. Taller bands are easier to hit while sweeping.
+		}
+
+		BarSwatchesPerPage: {
+			Label: Bands per page
+			Tooltip: How many colours fit on one page of the bar before the arrows take over.
+		}
+	}
+
+	SupplySettings: {
+		Tooltip: ""
+
+		FadeStartStack: {
+			Label: Fade starts at
+			Tooltip:
+				'''
+				Stack size at which a swatch is considered full. Below this it fades and its ring drains.
+				Counted across every slot holding that paint, so two half stacks read correctly.
+				'''
+		}
+
+		MinimumSwatchOpacity: {
+			Label: Minimum swatch opacity
+			Tooltip: How faint a nearly empty swatch is allowed to get.
+		}
+
+		ShowDepletionRing: {
+			Label: Low supply ring
+			Tooltip:
+				'''
+				A ring of pips around a swatch that drains as that paint runs out. It appears only once
+				the stack drops below Fade starts at, so a wheel of full stacks stays clean. Raise Fade
+				starts at above your usual stack size to see it on every swatch.
+				'''
+		}
+
+		DepletionRingSegments: {
+			Label: Low supply ring segments
+			Tooltip: Number of pips in the ring. Discrete segments keep it looking like pixel art.
+		}
+
+		HideEmptySwatches: {
+			Label: Hide empty swatches
+			Tooltip:
+				'''
+				Off by default: an empty swatch keeps its position so the wheel's layout does not shift
+				under your hand mid-build. Turn on to drop them instead.
+				'''
+		}
+	}
+
+	AdvancedSettings: {
+		Tooltip: ""
+
+		OverrideMode: {
+			Label: Paint override method
+			Tooltip:
+				'''
+				How the mod forces your chosen paint onto vanilla's painting code.
+				Detour is the default and never touches your inventory.
+				'''
+		}
+
+		FallBackToAnyPaintWhenEmpty: {
+			Label: Use any paint when the choice runs out
+			Tooltip:
+				'''
+				Off by default. When your chosen paint runs dry, painting stops rather than silently
+				spending a different colour.
+				'''
+		}
+
+		ShowCoatingRow: {
+			Label: Show coating row
+			Tooltip: A row under the wheel for Illuminant and Echo coating, plus an off switch.
+		}
+
+		AutoPaintPlacedTiles: {
+			Label: Paint blocks as you place them
+			Tooltip:
+				'''
+				Off by default, because it is the Paint Sprayer's job and that is an accessory you buy.
+				On, every block and wall you place is painted with your chosen colour, spending paint as
+				normal, and the Paint Sprayer icon in the builder toggles turns it off again.
+				'''
+		}
+
+		SmartCoating: {
+			Label: Smart coating order
+			Tooltip:
+				'''
+				With a paint and a coating both chosen, apply whichever the target is still missing, so
+				holding the mouse on a tile lands both. Off means the coating always wins.
+				'''
+		}
+	}
+
+	PaintPreset: {
+		Tooltip: ""
+
+		Name: {
+			Label: Name
+			Tooltip: Shown above the wheel while this preset is selected.
+		}
+
+		Paints: {
+			Label: Paints
+			Tooltip: Click a colour to add or remove it. The number is its place in the ring.
+		}
+	}
+
+	WheelLayoutStyle: {
+		Tooltip: ""
+
+		Wheel: {
+			Label: Wheel
+			Tooltip: Swatches in a ring around the cursor, chosen by flicking in a direction.
+		}
+
+		Bar: {
+			Label: Bar
+			Tooltip: Swatches stacked in a column beside the cursor, chosen by sweeping down it.
+		}
+
+		Grid: {
+			Label: Grid
+			Tooltip: Every swatch in rows under the cursor. Nothing is hidden, so a full palette needs no paging.
+		}
+	}
+
+	PickerOpenMode: {
+		Tooltip: ""
+
+		Hold: {
+			Label: Hold to open
+			Tooltip:
+				'''
+				Hold right click, flick toward a colour, release to choose. Nothing is left on screen and
+				nothing needs dismissing.
+				'''
+		}
+
+		Click: {
+			Label: Click to open
+			Tooltip:
+				'''
+				One right click leaves the picker up, no holding. Clicking a colour chooses it and closes;
+				coatings, palettes and scrape mode leave it open so you can set several things at once.
+				Right click again, press Escape, or click away to put it down.
+				'''
+		}
+	}
+
+	PaintOverrideMode: {
+		Tooltip: ""
+
+		Detour: {
+			Label: Detour (recommended)
+			Tooltip:
+				'''
+				Intercepts the vanilla lookup that both picks and consumes paint, so the colour applied
+				and the stack spent can never disagree. Your inventory is never rearranged.
+				'''
+		}
+
+		InventorySwap: {
+			Label: Inventory swap (fallback)
+			Tooltip:
+				'''
+				Swaps your chosen stack into the slot vanilla would pick for a fraction of one tick and
+				swaps it straight back. Use this only if another mod fights the detour.
+				'''
+		}
+	}
+
+	LanguageOverride: {
+		Tooltip: ""
+
+		Automatic: {
+			Label: Automatic
+			Tooltip: ""
+		}
+
+		English: {
+			Label: English
+			Tooltip: ""
+		}
+
+		German: {
+			Label: Deutsch
+			Tooltip: ""
+		}
+
+		Spanish: {
+			Label: Español
+			Tooltip: ""
+		}
+
+		French: {
+			Label: Français
+			Tooltip: ""
+		}
+
+		Italian: {
+			Label: Italiano
+			Tooltip: ""
+		}
+
+		Polish: {
+			Label: Polski
+			Tooltip: ""
+		}
+
+		Portuguese: {
+			Label: Português
+			Tooltip: ""
+		}
+
+		Russian: {
+			Label: Русский
+			Tooltip: ""
+		}
+
+		Chinese: {
+			Label: 简体中文
+			Tooltip: ""
+		}
+
+		Filipino: {
+			Label: Filipino
+			Tooltip: ""
+		}
+	}
+}

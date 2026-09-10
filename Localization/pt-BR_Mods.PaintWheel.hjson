@@ -1,0 +1,425 @@
+Keybinds: {
+	OpenWheel.DisplayName: Abrir a roda de tintas
+	Eyedropper.DisplayName: Conta-gotas de tinta
+	QuickToggleLastTwo.DisplayName: Voltar à tinta anterior
+	PreviousPalette.DisplayName: Paleta anterior
+	NextPalette.DisplayName: Próxima paleta
+	ToggleScrape.DisplayName: Alternar modo raspador
+	ToggleNoPaint.DisplayName: Alternar sem tinta
+}
+
+UI: {
+	AutoPreset: Tudo o que você tem
+	NoCoating: Sem revestimento
+	NoPaint: Colocar blocos sem pintar
+	NoPaintResume: Voltar a pintar os blocos
+	NoPaintOn: Sem tinta
+	NoPaintOff: Pintado
+	ScrollHint: Role ou clique nas setas para ver mais tintas
+	PaletteTitle: Paletas
+	PaletteHint: Clique para trocar de paleta
+	PaletteScrollHint: Role ou clique no nome para trocar de paleta
+	Empty: acabou
+	NoPaints: Nenhuma tinta carregada
+	NoAutoPaint: Os blocos só são pintados com a pintura automática ligada
+	SlotPickPaint: Pressione {0} para escolher esta tinta
+	SlotPickCoating: Pressione {0} para escolher este revestimento
+	Disabled: O Paint Wheel teve um erro e parou de aplicar a sua tinta. Os detalhes estão em client.log.
+	NewPalette: Nova paleta com o que você tem
+	EditPalette: Editar esta paleta
+	DeletePalette: Excluir esta paleta
+	EditHint: Clique em uma cor para adicionar ou remover.
+	DoneEditing: Pronto
+	NewPaletteName: Paleta
+	EditingHeader: Editando {0}
+
+	Scrape: {
+		Enter: Modo raspador
+		Header: Modo raspador
+		BlocksAndWalls: Blocos e paredes
+		BlocksOnly: Só blocos
+		WallsOnly: Só paredes
+		Exit: Voltar às cores
+		NoScraper: Você não tem um raspador de tinta
+	}
+}
+
+Configs: {
+	PaintWheelConfig: {
+		DisplayName: Configurações
+
+		Language: {
+			Label: Idioma
+			Tooltip:
+				'''
+				Qual idioma o texto deste mod usa. Automático segue a configuração do jogo; os outros fazem o
+				mod falar aquele idioma seja qual for o do jogo. O filipino está na lista porque o Terraria não
+				tem esse idioma para seguir.
+				Vale ao salvar. Esta página redesenha os próprios rótulos na próxima vez que você abri-la.
+				'''
+		}
+
+		Headers: {
+			Input: Controles
+			Shape: Seletor
+			Presets: Predefinições
+		}
+
+		OpenWithRightClick: {
+			Label: Abrir com o botão direito
+			Tooltip:
+				'''
+				Clicar com o botão direito segurando uma ferramenta de pintura abre a roda em vez de usá-la.
+				Desligue se outro mod precisar do botão direito; o atalho de teclado continua funcionando.
+				'''
+		}
+
+		OpenMode: {
+			Label: Comportamento do botão direito
+			Tooltip: Se o seletor fica aberto enquanto você segura, ou permanece aberto até você terminar.
+		}
+
+		RequirePaintTool: {
+			Label: Só com ferramenta de pintura na mão
+			Tooltip:
+				'''
+				Limita a roda e seus atalhos às ferramentas de pintura (e a segurar blocos com o
+				pulverizador de tinta equipado).
+				'''
+		}
+
+		PlaySounds: {
+			Label: Tocar sons
+			Tooltip: Um clique ao passar entre as cores e um som ao confirmar.
+		}
+
+		Layout: {
+			Label: Formato do seletor
+			Tooltip: Um anel de cores ao redor do cursor, ou uma coluna de faixas ao lado dele.
+		}
+
+		Appearance: {
+			Label: Tamanhos e aparência
+			Tooltip: O tamanho do seletor e o que ele desenha.
+		}
+
+		Supply: {
+			Label: Indicador de estoque
+			Tooltip: Como cada cor mostra quanto ainda resta daquela tinta.
+		}
+
+		Advanced: {
+			Label: Avançado
+			Tooltip: Comportamento da pintura, revestimentos e a saída de emergência para conflitos entre mods.
+		}
+
+		Presets: {
+			Label: Predefinições
+			Tooltip:
+				'''
+				Paletas salvas, escolhidas na lista que abre ao clicar no centro da roda.
+				Sempre existe uma paleta que se preenche sozinha com tudo o que você está carregando.
+				'''
+		}
+	}
+
+	AppearanceSettings: {
+		Tooltip: ""
+
+		Headers: {
+			Wheel: Roda
+			Bar: Barra
+		}
+
+		ShowItemIcons: {
+			Label: Mostrar os itens
+			Tooltip:
+				'''
+				Desenha a lata de tinta sobre a cor dela. Desligado por padrão: o que você escolhe é a
+				própria cor.
+				'''
+		}
+
+		ShowBackgroundPanel: {
+			Label: Desenhar painel de fundo
+			Tooltip:
+				'''
+				Desligado por padrão: as cores ficam mais legíveis direto sobre o mundo. Ligue para o
+				painel translúcido comum do Terraria atrás delas.
+				'''
+		}
+
+		WheelRadius: {
+			Label: Raio da roda
+			Tooltip:
+				'''
+				Distância do cursor até as cores, em pixels. Tratado como mínimo: um anel cheio se alarga
+				o quanto for preciso para as cores não se encostarem.
+				'''
+		}
+
+		SwatchSize: {
+			Label: Tamanho das cores
+			Tooltip: Diâmetro de cada círculo de cor, em pixels.
+		}
+
+		DeadZoneRadius: {
+			Label: Zona morta central
+			Tooltip: Soltar dentro desse raio cancela e mantém a tinta que você já tinha.
+		}
+
+		MaxSwatches: {
+			Label: Cores por anel
+			Tooltip:
+				'''
+				Acima de doze o gesto deixa de ser preciso, então doze é o limite. O que passa disso vai
+				para a próxima página em vez de sumir.
+				'''
+		}
+
+		OpenAnimationTicks: {
+			Label: Duração da animação
+			Tooltip: Quanto a roda demora para abrir. Deixe curto ou ela parece lenta.
+		}
+
+		BarCellWidth: {
+			Label: Largura das faixas
+			Tooltip: Largura de cada faixa de cor na barra.
+		}
+
+		BarCellHeight: {
+			Label: Altura das faixas
+			Tooltip: Altura de cada faixa. Faixas altas são mais fáceis de acertar ao percorrer.
+		}
+
+		BarSwatchesPerPage: {
+			Label: Faixas por página
+			Tooltip: Quantas cores cabem em uma página da barra antes de usar as setas.
+		}
+	}
+
+	SupplySettings: {
+		Tooltip: ""
+
+		FadeStartStack: {
+			Label: Começa a esmaecer em
+			Tooltip:
+				'''
+				Tamanho de pilha a partir do qual uma cor é considerada cheia. Abaixo disso ela esmaece e
+				o anel dela se esvazia. Contado em todos os espaços, para duas meias pilhas darem certo.
+				'''
+		}
+
+		MinimumSwatchOpacity: {
+			Label: Opacidade mínima
+			Tooltip: Quão fraca uma cor quase no fim pode ficar.
+		}
+
+		ShowDepletionRing: {
+			Label: Anel de estoque baixo
+			Tooltip:
+				'''
+				Um anel de pontos ao redor de uma cor, que se esvazia conforme a tinta acaba. Ele só
+				aparece quando a pilha cai abaixo de Começa a esmaecer em, para que uma roda de pilhas
+				cheias fique limpa. Aumente esse valor acima das suas pilhas normais para vê-lo em todas.
+				'''
+		}
+
+		DepletionRingSegments: {
+			Label: Pontos do anel
+			Tooltip: Quantidade de pontos no anel. Pontos separados combinam com o estilo pixel art.
+		}
+
+		HideEmptySwatches: {
+			Label: Esconder cores acabadas
+			Tooltip:
+				'''
+				Desligado por padrão: uma cor acabada mantém o lugar, para a roda não mudar sob sua mão no
+				meio da construção. Ligue para removê-las.
+				'''
+		}
+	}
+
+	AdvancedSettings: {
+		Tooltip: ""
+
+		OverrideMode: {
+			Label: Método de escolha da tinta
+			Tooltip:
+				'''
+				Como o mod impõe a sua cor ao código de pintura do jogo.
+				O desvio é o padrão e nunca mexe no seu inventário.
+				'''
+		}
+
+		FallBackToAnyPaintWhenEmpty: {
+			Label: Usar outra tinta quando acabar
+			Tooltip:
+				'''
+				Desligado por padrão. Quando a sua cor acaba, a pintura para em vez de gastar outra cor
+				silenciosamente.
+				'''
+		}
+
+		ShowCoatingRow: {
+			Label: Mostrar a fileira de revestimentos
+			Tooltip: Uma fileira sob a roda para os revestimentos Iluminante e Eco, mais um botão de desligar.
+		}
+
+		AutoPaintPlacedTiles: {
+			Label: Pintar os blocos ao colocá-los
+			Tooltip:
+				'''
+				Desligado por padrão, porque esse é o trabalho do pulverizador de tinta, e ele é um
+				acessório que se compra. Ligado, todo bloco e parede que você coloca sai com a sua cor e
+				gasta tinta normalmente; o ícone do pulverizador nas opções de construção desliga de novo.
+				'''
+		}
+
+		SmartCoating: {
+			Label: Ordem inteligente do revestimento
+			Tooltip:
+				'''
+				Com uma cor e um revestimento escolhidos, aplica o que estiver faltando no alvo, então
+				segurar o clique coloca os dois. Desligado, o revestimento sempre vem primeiro.
+				'''
+		}
+	}
+
+	PaintPreset: {
+		Tooltip: ""
+
+		Name: {
+			Label: Nome
+			Tooltip: Aparece acima da roda enquanto esta predefinição estiver escolhida.
+		}
+
+		Paints: {
+			Label: Tintas
+			Tooltip: Clique em uma cor para adicionar ou remover. O número é o lugar dela no anel.
+		}
+	}
+
+	WheelLayoutStyle: {
+		Tooltip: ""
+
+		Wheel: {
+			Label: Roda
+			Tooltip: Cores em anel ao redor do cursor, escolhidas com um movimento na direção delas.
+		}
+
+		Bar: {
+			Label: Barra
+			Tooltip: Cores empilhadas em coluna ao lado do cursor, escolhidas percorrendo-a.
+		}
+
+		Grid: {
+			Label: Grade
+			Tooltip: Todas as cores em fileiras sob o cursor. Nada fica escondido, então uma paleta cheia não precisa de páginas.
+		}
+	}
+
+	PickerOpenMode: {
+		Tooltip: ""
+
+		Hold: {
+			Label: Segurar para abrir
+			Tooltip:
+				'''
+				Segure o botão direito, mova até uma cor e solte para escolher. Nada fica na tela e não há
+				nada para fechar.
+				'''
+		}
+
+		Click: {
+			Label: Clicar para abrir
+			Tooltip:
+				'''
+				Um clique com o botão direito deixa o seletor aberto, sem segurar. Clicar numa cor escolhe
+				e fecha; revestimentos, paletas e o modo raspador deixam aberto para ajustar várias coisas
+				de uma vez. Clique direito de novo, Esc, ou clique fora para fechar.
+				'''
+		}
+	}
+
+	PaintOverrideMode: {
+		Tooltip: ""
+
+		Detour: {
+			Label: Desvio (recomendado)
+			Tooltip:
+				'''
+				Intercepta a busca do jogo que escolhe e consome a tinta, então a cor aplicada e a pilha
+				gasta nunca podem divergir. Seu inventário nunca é reorganizado.
+				'''
+		}
+
+		InventorySwap: {
+			Label: Troca no inventário (alternativa)
+			Tooltip:
+				'''
+				Troca a sua pilha para o espaço que o jogo escolheria por uma fração de tick e devolve na
+				hora. Use só se outro mod atrapalhar o desvio.
+				'''
+		}
+	}
+
+	LanguageOverride: {
+		Tooltip: ""
+
+		Automatic: {
+			Label: Automático
+			Tooltip: ""
+		}
+
+		English: {
+			Label: English
+			Tooltip: ""
+		}
+
+		German: {
+			Label: Deutsch
+			Tooltip: ""
+		}
+
+		Spanish: {
+			Label: Español
+			Tooltip: ""
+		}
+
+		French: {
+			Label: Français
+			Tooltip: ""
+		}
+
+		Italian: {
+			Label: Italiano
+			Tooltip: ""
+		}
+
+		Polish: {
+			Label: Polski
+			Tooltip: ""
+		}
+
+		Portuguese: {
+			Label: Português
+			Tooltip: ""
+		}
+
+		Russian: {
+			Label: Русский
+			Tooltip: ""
+		}
+
+		Chinese: {
+			Label: 简体中文
+			Tooltip: ""
+		}
+
+		Filipino: {
+			Label: Filipino
+			Tooltip: ""
+		}
+	}
+}

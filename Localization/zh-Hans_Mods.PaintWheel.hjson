@@ -1,0 +1,386 @@
+Keybinds: {
+	OpenWheel.DisplayName: 打开油漆轮盘
+	Eyedropper.DisplayName: 油漆吸管
+	QuickToggleLastTwo.DisplayName: 切回上一种油漆
+	PreviousPalette.DisplayName: 上一个调色板
+	NextPalette.DisplayName: 下一个调色板
+	ToggleScrape.DisplayName: 切换刮除模式
+	ToggleNoPaint.DisplayName: 切换不上漆
+}
+
+UI: {
+	AutoPreset: 你身上的全部
+	NoCoating: 不加涂层
+	NoPaint: 放置方块时不上漆
+	NoPaintResume: 恢复给方块上漆
+	NoPaintOn: 不上漆
+	NoPaintOff: 上漆
+	ScrollHint: 滚动滚轮或点击箭头查看更多油漆
+	PaletteTitle: 调色板
+	PaletteHint: 点击切换调色板
+	PaletteScrollHint: 滚动滚轮或点击名称切换调色板
+	Empty: 已用完
+	NoPaints: 未载入任何油漆
+	NoAutoPaint: 未开启自动上漆时，方块不会被上色
+	SlotPickPaint: 按 {0} 选择这种油漆
+	SlotPickCoating: 按 {0} 选择这种涂层
+	Disabled: Paint Wheel 出现错误，已停止应用你选择的油漆。详情见 client.log。
+	NewPalette: 用身上的油漆新建调色板
+	EditPalette: 编辑这个调色板
+	DeletePalette: 删除这个调色板
+	EditHint: 点击颜色即可加入或移除。
+	DoneEditing: 完成
+	NewPaletteName: 调色板
+	EditingHeader: 正在编辑 {0}
+
+	Scrape: {
+		Enter: 刮除模式
+		Header: 刮除模式
+		BlocksAndWalls: 方块和墙壁
+		BlocksOnly: 仅方块
+		WallsOnly: 仅墙壁
+		Exit: 返回选色
+		NoScraper: 身上没有油漆刮刀
+	}
+}
+
+Configs: {
+	PaintWheelConfig: {
+		DisplayName: 设置
+
+		Language: {
+			Label: 语言
+			Tooltip: 自动表示跟随游戏的语言设置。菲律宾语单独列出，因为泰拉瑞亚本身没有这个语言选项。
+		}
+
+		Headers: {
+			Input: 操作
+			Shape: 选色界面
+			Presets: 预设
+		}
+
+		OpenWithRightClick: {
+			Label: 右键打开
+			Tooltip:
+				'''
+				手持油漆工具时右键会打开轮盘，而不是使用工具。
+				如果别的模组需要右键，可以关掉这一项；快捷键仍然可用。
+				'''
+		}
+
+		OpenMode: {
+			Label: 右键行为
+			Tooltip: 是按住时才显示，还是一直留在屏幕上直到你选完。
+		}
+
+		RequirePaintTool: {
+			Label: 仅在手持油漆工具时
+			Tooltip: 把轮盘和它的快捷键限制在油漆工具上（装备喷漆器时手持方块也算）。
+		}
+
+		PlaySounds: {
+			Label: 播放音效
+			Tooltip: 在颜色之间移动时的轻响，以及确认时的提示音。
+		}
+
+		Layout: {
+			Label: 选色界面形状
+			Tooltip: 围绕光标的一圈色块，或是光标旁边的一列色条。
+		}
+
+		Appearance: {
+			Label: 尺寸与外观
+			Tooltip: 界面有多大，以及它会画出什么。
+		}
+
+		Supply: {
+			Label: 存量显示
+			Tooltip: 色块如何显示这种油漆还剩多少。
+		}
+
+		Advanced: {
+			Label: 高级
+			Tooltip: 上漆行为、涂层，以及模组冲突时的备用方案。
+		}
+
+		Presets: {
+			Label: 预设
+			Tooltip:
+				'''
+				已保存的调色板，点击轮盘中心即可在列表里选择。
+				其中始终有一个会自动装入你身上携带的所有油漆。
+				'''
+		}
+	}
+
+	AppearanceSettings: {
+		Tooltip: ""
+
+		Headers: {
+			Wheel: 轮盘
+			Bar: 色条
+		}
+
+		ShowItemIcons: {
+			Label: 显示物品图标
+			Tooltip: 在颜色上叠加油漆桶的图标。默认关闭：你要挑的本来就是颜色本身。
+		}
+
+		ShowBackgroundPanel: {
+			Label: 绘制背景面板
+			Tooltip: 默认关闭：色块直接叠在世界上更清楚。开启后会在它们后面加上泰拉瑞亚常见的半透明面板。
+		}
+
+		WheelRadius: {
+			Label: 轮盘半径
+			Tooltip: 光标到色块的距离，单位为像素。这是下限：色块排满时，轮盘会自动扩大到互不相碰为止。
+		}
+
+		SwatchSize: {
+			Label: 色块大小
+			Tooltip: 每个圆形色块的直径，单位为像素。
+		}
+
+		DeadZoneRadius: {
+			Label: 中心死区
+			Tooltip: 在这个半径内松手会取消选择，保留原来的油漆。
+		}
+
+		MaxSwatches: {
+			Label: 每圈色块数
+			Tooltip: 超过十二个就很难甩手选中，所以上限是十二。多出来的会翻到下一页，而不是被丢掉。
+		}
+
+		OpenAnimationTicks: {
+			Label: 展开动画时长
+			Tooltip: 轮盘弹出所需的时间。请保持短一些，否则会显得迟钝。
+		}
+
+		BarCellWidth: {
+			Label: 色条宽度
+			Tooltip: 色条布局中每条颜色的宽度。
+		}
+
+		BarCellHeight: {
+			Label: 色条高度
+			Tooltip: 每条颜色的高度。条越高，划过时越容易选中。
+		}
+
+		BarSwatchesPerPage: {
+			Label: 每页色条数
+			Tooltip: 在需要用箭头翻页之前，一页色条能放下多少种颜色。
+		}
+	}
+
+	SupplySettings: {
+		Tooltip: ""
+
+		FadeStartStack: {
+			Label: 开始变淡的数量
+			Tooltip:
+				'''
+				达到这个堆叠数即视为充足。低于它，色块会变淡，外圈也会随之减少。
+				数量按所有格子合计，所以两个半堆也能正确显示。
+				'''
+		}
+
+		MinimumSwatchOpacity: {
+			Label: 最低不透明度
+			Tooltip: 快用完的色块最多可以淡到什么程度。
+		}
+
+		ShowDepletionRing: {
+			Label: 存量不足指示环
+			Tooltip:
+				'''
+				色块周围的一圈小点，会随着这种油漆减少而变空。只有当堆叠数低于“开始变淡的数量”时才出现，
+				这样满堆叠的轮盘看起来才干净。把那个数值调到高于你平时的堆叠量，就能在每个色块上都看到它。
+				'''
+		}
+
+		DepletionRingSegments: {
+			Label: 指示环点数
+			Tooltip: 环上小点的数量。分立的点更贴合像素风格。
+		}
+
+		HideEmptySwatches: {
+			Label: 隐藏已用完的颜色
+			Tooltip: 默认关闭：用完的颜色会保留原位，这样建造途中轮盘不会在手下变动。开启则改为直接移除。
+		}
+	}
+
+	AdvancedSettings: {
+		Tooltip: ""
+
+		OverrideMode: {
+			Label: 油漆选取方式
+			Tooltip:
+				'''
+				模组用什么方式让游戏的上漆代码使用你选的颜色。
+				拦截是默认方式，完全不会动你的物品栏。
+				'''
+		}
+
+		FallBackToAnyPaintWhenEmpty: {
+			Label: 用完后改用其他油漆
+			Tooltip: 默认关闭。你选的油漆用完时会停止上漆，而不是悄悄消耗另一种颜色。
+		}
+
+		ShowCoatingRow: {
+			Label: 显示涂层一行
+			Tooltip: 轮盘下方的一行，包含发光涂层、回声涂层，以及一个关闭选项。
+		}
+
+		AutoPaintPlacedTiles: {
+			Label: 放置方块时自动上漆
+			Tooltip:
+				'''
+				默认关闭，因为这本来是喷漆器的作用，而那是要买的饰品。
+				开启后，你放下的每个方块和墙壁都会带上所选颜色，并照常消耗油漆；
+				建造快捷开关里的喷漆器图标可以再把它关掉。
+				'''
+		}
+
+		SmartCoating: {
+			Label: 智能涂层顺序
+			Tooltip:
+				'''
+				同时选了颜色和涂层时，优先补上目标还缺的那一样，这样按住鼠标就能两样都上。
+				关闭则始终先上涂层。
+				'''
+		}
+	}
+
+	PaintPreset: {
+		Tooltip: ""
+
+		Name: {
+			Label: 名称
+			Tooltip: 选中这个预设时显示在轮盘上方。
+		}
+
+		Paints: {
+			Label: 油漆
+			Tooltip: 点击颜色可以添加或移除。数字是它在轮盘中的位置。
+		}
+	}
+
+	WheelLayoutStyle: {
+		Tooltip: ""
+
+		Wheel: {
+			Label: 轮盘
+			Tooltip: 色块围绕光标排成一圈，朝某个方向甩动即可选中。
+		}
+
+		Bar: {
+			Label: 色条
+			Tooltip: 色块在光标旁排成一列，沿着它滑动即可选中。
+		}
+
+		Grid: {
+			Label: 网格
+			Tooltip: 所有颜色在光标下排成几行。没有任何东西被隐藏，因此完整的调色板不需要翻页。
+		}
+	}
+
+	PickerOpenMode: {
+		Tooltip: ""
+
+		Hold: {
+			Label: 按住打开
+			Tooltip: 按住右键，朝某个颜色甩动，松手即选中。屏幕上不会留下任何东西，也不需要再关闭。
+		}
+
+		Click: {
+			Label: 点击打开
+			Tooltip:
+				'''
+				点一下右键界面就会留在屏幕上，不用一直按住。点击颜色会选中并关闭；
+				涂层、调色板和刮除模式则会保持打开，方便你一次设置多项。
+				再按一次右键、按 Esc，或点击别处即可收起。
+				'''
+		}
+	}
+
+	PaintOverrideMode: {
+		Tooltip: ""
+
+		Detour: {
+			Label: 拦截（推荐）
+			Tooltip:
+				'''
+				拦截游戏中同时负责挑选和消耗油漆的那次查找，因此涂上的颜色和消耗的堆叠绝不会对不上。
+				物品栏永远不会被重新排列。
+				'''
+		}
+
+		InventorySwap: {
+			Label: 物品栏交换（备用）
+			Tooltip:
+				'''
+				在极短的一瞬间把你选的那堆油漆换到游戏会挑中的格子，随即换回来。
+				只有当别的模组干扰拦截时才需要使用。
+				'''
+		}
+	}
+
+	LanguageOverride: {
+		Tooltip: ""
+
+		Automatic: {
+			Label: 自动
+			Tooltip: ""
+		}
+
+		English: {
+			Label: English
+			Tooltip: ""
+		}
+
+		German: {
+			Label: Deutsch
+			Tooltip: ""
+		}
+
+		Spanish: {
+			Label: Español
+			Tooltip: ""
+		}
+
+		French: {
+			Label: Français
+			Tooltip: ""
+		}
+
+		Italian: {
+			Label: Italiano
+			Tooltip: ""
+		}
+
+		Polish: {
+			Label: Polski
+			Tooltip: ""
+		}
+
+		Portuguese: {
+			Label: Português
+			Tooltip: ""
+		}
+
+		Russian: {
+			Label: Русский
+			Tooltip: ""
+		}
+
+		Chinese: {
+			Label: 简体中文
+			Tooltip: ""
+		}
+
+		Filipino: {
+			Label: Filipino
+			Tooltip: ""
+		}
+	}
+}

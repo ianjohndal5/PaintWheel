@@ -1,0 +1,426 @@
+Keybinds: {
+	OpenWheel.DisplayName: Farbrad öffnen
+	Eyedropper.DisplayName: Farbpipette
+	QuickToggleLastTwo.DisplayName: Zur vorherigen Farbe wechseln
+	PreviousPalette.DisplayName: Vorherige Palette
+	NextPalette.DisplayName: Nächste Palette
+	ToggleScrape.DisplayName: Schabmodus umschalten
+	ToggleNoPaint.DisplayName: Ohne Farbe umschalten
+}
+
+UI: {
+	AutoPreset: Alles, was du dabeihast
+	NoCoating: Keine Beschichtung
+	NoPaint: Blöcke unbemalt setzen
+	NoPaintResume: Blöcke wieder bemalen
+	NoPaintOn: Unbemalt
+	NoPaintOff: Bemalt
+	ScrollHint: Scrolle oder klicke die Pfeile für weitere Farben
+	PaletteTitle: Paletten
+	PaletteHint: Klicken, um die Palette zu wechseln
+	PaletteScrollHint: Scrolle oder klicke den Namen, um die Palette zu wechseln
+	Empty: nichts übrig
+	NoPaints: Keine Farben geladen
+	NoAutoPaint: Blöcke werden nur bemalt, wenn Auto-Bemalen aktiv ist
+	SlotPickPaint: Mit {0} diese Farbe auswählen
+	SlotPickCoating: Mit {0} diese Beschichtung auswählen
+	Disabled: Paint Wheel hatte einen Fehler und wendet deine Farbe nicht mehr an. Details stehen in client.log.
+	NewPalette: Neue Palette aus deinem Vorrat
+	EditPalette: Diese Palette bearbeiten
+	DeletePalette: Diese Palette löschen
+	EditHint: Klicke eine Farbe an, um sie hinzuzufügen oder zu entfernen.
+	DoneEditing: Fertig
+	NewPaletteName: Palette
+	EditingHeader: Bearbeiten: {0}
+
+	Scrape: {
+		Enter: Schabmodus
+		Header: Schabmodus
+		BlocksAndWalls: Blöcke und Wände
+		BlocksOnly: Nur Blöcke
+		WallsOnly: Nur Wände
+		Exit: Zurück zu den Farben
+		NoScraper: Kein Farbschaber vorhanden
+	}
+}
+
+Configs: {
+	PaintWheelConfig: {
+		DisplayName: Einstellungen
+
+		Language: {
+			Label: Sprache
+			Tooltip:
+				'''
+				Welche Sprache der Text dieser Mod nutzt. Automatisch folgt der Einstellung des Spiels; alles
+				andere lässt die Mod in dieser Sprache sprechen, egal was im Spiel eingestellt ist. Filipino
+				steht in der Liste, weil Terraria diese Sprache nicht kennt.
+				Wird beim Speichern übernommen. Diese Seite zeigt ihre neuen Beschriftungen beim nächsten Öffnen.
+				'''
+		}
+
+		Headers: {
+			Input: Steuerung
+			Shape: Auswahlmenü
+			Presets: Vorlagen
+		}
+
+		OpenWithRightClick: {
+			Label: Mit Rechtsklick öffnen
+			Tooltip:
+				'''
+				Ein Rechtsklick mit einem Malwerkzeug öffnet das Rad, statt zuzuschlagen.
+				Ausschalten, wenn eine andere Mod den Rechtsklick braucht; die Tastenbelegung bleibt.
+				'''
+		}
+
+		OpenMode: {
+			Label: Verhalten beim Rechtsklick
+			Tooltip: Ob das Menü nur gehalten offen bleibt oder offen stehen bleibt, bis du fertig bist.
+		}
+
+		RequirePaintTool: {
+			Label: Nur mit Malwerkzeug in der Hand
+			Tooltip:
+				'''
+				Beschränkt Rad und Tasten auf Malwerkzeuge (und auf Blöcke in der Hand, wenn der
+				Farbsprüher ausgerüstet ist).
+				'''
+		}
+
+		PlaySounds: {
+			Label: Töne abspielen
+			Tooltip: Ein Ticken beim Wechseln zwischen Farbfeldern und ein Ton beim Bestätigen.
+		}
+
+		Layout: {
+			Label: Form des Menüs
+			Tooltip: Ein Ring aus Farbfeldern um den Zeiger oder eine Spalte aus Farbbändern daneben.
+		}
+
+		Appearance: {
+			Label: Größen und Optik
+			Tooltip: Wie groß das Menü ist und was es zeichnet.
+		}
+
+		Supply: {
+			Label: Vorratsanzeige
+			Tooltip: Wie ein Farbfeld zeigt, wie viel von der Farbe noch übrig ist.
+		}
+
+		Advanced: {
+			Label: Erweitert
+			Tooltip: Malverhalten, Beschichtungen und die Notlösung für Mod-Konflikte.
+		}
+
+		Presets: {
+			Label: Vorlagen
+			Tooltip:
+				'''
+				Gespeicherte Paletten, wählbar über die Liste in der Mitte des Rades.
+				Eine Palette füllt sich immer automatisch mit allem, was du dabeihast.
+				'''
+		}
+	}
+
+	AppearanceSettings: {
+		Tooltip: ""
+
+		Headers: {
+			Wheel: Rad
+			Bar: Leiste
+		}
+
+		ShowItemIcons: {
+			Label: Gegenstandsbilder zeigen
+			Tooltip:
+				'''
+				Zeichnet das Bild der Farbdose über ihre Farbe. Standardmäßig aus: die Farbe selbst ist
+				das, was du auswählst.
+				'''
+		}
+
+		ShowBackgroundPanel: {
+			Label: Hintergrundfläche zeichnen
+			Tooltip:
+				'''
+				Standardmäßig aus: die Farbfelder lesen sich direkt über der Welt besser. Einschalten für
+				die übliche durchscheinende Terraria-Fläche dahinter.
+				'''
+		}
+
+		WheelRadius: {
+			Label: Radius des Rades
+			Tooltip:
+				'''
+				Abstand vom Zeiger zu den Farbfeldern in Pixeln. Gilt als Mindestwert: ein voller Ring
+				wird so weit größer, wie es nötig ist, damit sich die Felder nicht berühren.
+				'''
+		}
+
+		SwatchSize: {
+			Label: Größe der Farbfelder
+			Tooltip: Durchmesser jedes Farbfelds in Pixeln.
+		}
+
+		DeadZoneRadius: {
+			Label: Tote Zone in der Mitte
+			Tooltip: Loslassen innerhalb dieses Radius bricht ab und behält die bisherige Farbe.
+		}
+
+		MaxSwatches: {
+			Label: Farbfelder pro Ring
+			Tooltip:
+				'''
+				Über zwölf lässt sich nicht mehr zielsicher auswählen, darum ist zwölf die Grenze. Alles
+				darüber wandert auf die nächste Seite, statt wegzufallen.
+				'''
+		}
+
+		OpenAnimationTicks: {
+			Label: Dauer der Öffnungsanimation
+			Tooltip: Wie lange das Rad zum Aufklappen braucht. Kurz halten, sonst wirkt es träge.
+		}
+
+		BarCellWidth: {
+			Label: Breite der Bänder
+			Tooltip: Breite jedes Farbbands in der Leistenansicht.
+		}
+
+		BarCellHeight: {
+			Label: Höhe der Bänder
+			Tooltip: Höhe jedes Farbbands. Höhere Bänder trifft man beim Ziehen leichter.
+		}
+
+		BarSwatchesPerPage: {
+			Label: Bänder pro Seite
+			Tooltip: Wie viele Farben auf eine Seite der Leiste passen, bevor die Pfeile übernehmen.
+		}
+	}
+
+	SupplySettings: {
+		Tooltip: ""
+
+		FadeStartStack: {
+			Label: Verblassen ab
+			Tooltip:
+				'''
+				Stapelgröße, ab der ein Farbfeld als voll gilt. Darunter verblasst es und sein Ring leert
+				sich. Über alle Plätze zusammengezählt, damit zwei halbe Stapel stimmen.
+				'''
+		}
+
+		MinimumSwatchOpacity: {
+			Label: Geringste Deckkraft
+			Tooltip: Wie blass ein fast leeres Farbfeld höchstens werden darf.
+		}
+
+		ShowDepletionRing: {
+			Label: Ring bei knappem Vorrat
+			Tooltip:
+				'''
+				Ein Ring aus Punkten um ein Farbfeld, der sich leert, während die Farbe zur Neige geht.
+				Er erscheint erst, wenn der Stapel unter Verblassen ab fällt, damit volle Stapel das Rad
+				nicht überladen. Setze Verblassen ab höher als deine übliche Stapelgröße, um ihn überall
+				zu sehen.
+				'''
+		}
+
+		DepletionRingSegments: {
+			Label: Punkte im Vorratsring
+			Tooltip: Anzahl der Punkte im Ring. Einzelne Punkte passen besser zur Pixeloptik.
+		}
+
+		HideEmptySwatches: {
+			Label: Leere Farbfelder ausblenden
+			Tooltip:
+				'''
+				Standardmäßig aus: ein leeres Feld behält seinen Platz, damit sich das Rad beim Bauen
+				nicht unter der Hand verschiebt. Einschalten, um sie stattdessen zu entfernen.
+				'''
+		}
+	}
+
+	AdvancedSettings: {
+		Tooltip: ""
+
+		OverrideMode: {
+			Label: Methode der Farbwahl
+			Tooltip:
+				'''
+				Wie die Mod deine Farbe der Malroutine des Spiels aufzwingt.
+				Umleitung ist der Standard und fasst dein Inventar nie an.
+				'''
+		}
+
+		FallBackToAnyPaintWhenEmpty: {
+			Label: Andere Farbe nehmen, wenn leer
+			Tooltip:
+				'''
+				Standardmäßig aus. Geht die gewählte Farbe aus, hört das Malen auf, statt still eine
+				andere Farbe zu verbrauchen.
+				'''
+		}
+
+		ShowCoatingRow: {
+			Label: Beschichtungsreihe zeigen
+			Tooltip: Eine Reihe unter dem Rad für Leucht- und Echo-Beschichtung samt Ausschalter.
+		}
+
+		AutoPaintPlacedTiles: {
+			Label: Blöcke beim Setzen bemalen
+			Tooltip:
+				'''
+				Standardmäßig aus, denn das ist die Aufgabe des Farbsprühers, und den kauft man sich.
+				An bedeutet: jeder gesetzte Block und jede Wand bekommt deine Farbe und verbraucht sie
+				wie sonst auch; das Farbsprüher-Symbol bei den Bauhilfen schaltet es wieder aus.
+				'''
+		}
+
+		SmartCoating: {
+			Label: Kluge Reihenfolge der Beschichtung
+			Tooltip:
+				'''
+				Sind Farbe und Beschichtung gewählt, wird immer das aufgetragen, was dem Ziel noch fehlt,
+				sodass Draufhalten beides erledigt. Aus heißt: die Beschichtung hat immer Vorrang.
+				'''
+		}
+	}
+
+	PaintPreset: {
+		Tooltip: ""
+
+		Name: {
+			Label: Name
+			Tooltip: Wird über dem Rad angezeigt, solange diese Vorlage gewählt ist.
+		}
+
+		Paints: {
+			Label: Farben
+			Tooltip: Klicke eine Farbe an, um sie hinzuzufügen oder zu entfernen. Die Zahl ist ihr Platz im Ring.
+		}
+	}
+
+	WheelLayoutStyle: {
+		Tooltip: ""
+
+		Wheel: {
+			Label: Rad
+			Tooltip: Farbfelder im Ring um den Zeiger, gewählt durch eine Bewegung in ihre Richtung.
+		}
+
+		Bar: {
+			Label: Leiste
+			Tooltip: Farbfelder in einer Spalte neben dem Zeiger, gewählt durch Ziehen nach unten.
+		}
+
+		Grid: {
+			Label: Raster
+			Tooltip: Alle Farbfelder in Reihen unter dem Zeiger. Nichts ist verdeckt, eine volle Palette braucht also keine Seiten.
+		}
+	}
+
+	PickerOpenMode: {
+		Tooltip: ""
+
+		Hold: {
+			Label: Gedrückt halten
+			Tooltip:
+				'''
+				Rechte Maustaste halten, zur Farbe ziehen, loslassen. Es bleibt nichts auf dem Bildschirm
+				stehen, das man wegklicken müsste.
+				'''
+		}
+
+		Click: {
+			Label: Mit einem Klick öffnen
+			Tooltip:
+				'''
+				Ein Rechtsklick lässt das Menü stehen, ohne Halten. Ein Klick auf eine Farbe wählt sie und
+				schließt; Beschichtungen, Paletten und der Schabmodus lassen es offen, damit du mehreres
+				einstellen kannst. Erneut rechtsklicken, Esc drücken oder daneben klicken schließt es.
+				'''
+		}
+	}
+
+	PaintOverrideMode: {
+		Tooltip: ""
+
+		Detour: {
+			Label: Umleitung (empfohlen)
+			Tooltip:
+				'''
+				Fängt die Abfrage ab, die im Spiel Farbe auswählt und verbraucht, sodass aufgetragene
+				Farbe und verbrauchter Stapel nie auseinandergehen. Dein Inventar bleibt unberührt.
+				'''
+		}
+
+		InventorySwap: {
+			Label: Inventartausch (Notlösung)
+			Tooltip:
+				'''
+				Tauscht deinen Stapel für den Bruchteil eines Ticks auf den Platz, den das Spiel wählen
+				würde, und sofort wieder zurück. Nur nötig, wenn eine Mod die Umleitung stört.
+				'''
+		}
+	}
+
+	LanguageOverride: {
+		Tooltip: ""
+
+		Automatic: {
+			Label: Automatisch
+			Tooltip: ""
+		}
+
+		English: {
+			Label: English
+			Tooltip: ""
+		}
+
+		German: {
+			Label: Deutsch
+			Tooltip: ""
+		}
+
+		Spanish: {
+			Label: Español
+			Tooltip: ""
+		}
+
+		French: {
+			Label: Français
+			Tooltip: ""
+		}
+
+		Italian: {
+			Label: Italiano
+			Tooltip: ""
+		}
+
+		Polish: {
+			Label: Polski
+			Tooltip: ""
+		}
+
+		Portuguese: {
+			Label: Português
+			Tooltip: ""
+		}
+
+		Russian: {
+			Label: Русский
+			Tooltip: ""
+		}
+
+		Chinese: {
+			Label: 简体中文
+			Tooltip: ""
+		}
+
+		Filipino: {
+			Label: Filipino
+			Tooltip: ""
+		}
+	}
+}
