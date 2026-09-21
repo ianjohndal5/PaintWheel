@@ -222,3 +222,14 @@ buildIgnore = README.md, tools/*, Properties/*
 `tools/checkloc.py` checks the localization files for drift between languages. It, this README and
 `Properties/` are excluded from the shipped `.tmod` via `buildIgnore` — they are developer-facing
 only.
+
+## License
+
+Paint Wheel is licensed under the [Mozilla Public License 2.0](LICENSE).
+
+You are free to use, modify and redistribute it, including as part of a larger
+work released under different terms. If you modify a file covered by this
+license and distribute the result, that file's source must remain available
+under the MPL.
+
+Copyright (c) 2026 Ian John L. Dal (SugarDark)
