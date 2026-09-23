@@ -6,6 +6,10 @@ Keybinds: {
 	NextPalette.DisplayName: Nächste Palette
 	ToggleScrape.DisplayName: Schabmodus umschalten
 	ToggleNoPaint.DisplayName: Ohne Farbe umschalten
+	PreviousPaint.DisplayName: Vorherige Farbe
+	NextPaint.DisplayName: Nächste Farbe
+	SwapPaintTool.DisplayName: Pinsel und Farbroller tauschen
+	TogglePaintBoth.DisplayName: Blöcke und Wände malen umschalten
 }
 
 UI: {
@@ -32,6 +36,27 @@ UI: {
 	DoneEditing: Fertig
 	NewPaletteName: Palette
 	EditingHeader: Bearbeiten: {0}
+	ConfirmDelete: Zum Löschen erneut klicken
+	PaletteHintNew: Klicken für Paletten
+	RanOut: "{0} ist aufgebraucht"
+	PaintBoth: Blöcke und Wände mit jedem Werkzeug malen
+	PaintBothResume: Zurück zu einer Hälfte je Werkzeug
+	PaintBothOn: Blöcke und Wände
+	PaintBothOff: Eine Hälfte je Werkzeug
+	NoToolToSwap: Kein {0} zum Halten
+	NewEmptyPalette: Neue leere Palette
+	RenamePalette: Diese Palette umbenennen
+	RenameHint: Enter übernimmt, Escape bricht ab
+	NothingToShow: Keine Farbe zur Auswahl
+	CloseInventory: Schließe das Inventar, um Paint Wheel zu öffnen
+
+	Keys: {
+		MouseLeft: der linken Maustaste
+		MouseRight: der rechten Maustaste
+		MouseMiddle: der mittleren Maustaste
+		Mouse4: Maustaste 4
+		Mouse5: Maustaste 5
+	}
 
 	Scrape: {
 		Enter: Schabmodus
@@ -39,6 +64,7 @@ UI: {
 		BlocksAndWalls: Blöcke und Wände
 		BlocksOnly: Nur Blöcke
 		WallsOnly: Nur Wände
+		CoatingsOnly: Nur Beschichtungen
 		Exit: Zurück zu den Farben
 		NoScraper: Kein Farbschaber vorhanden
 	}
@@ -62,7 +88,7 @@ Configs: {
 		Headers: {
 			Input: Steuerung
 			Shape: Auswahlmenü
-			Presets: Vorlagen
+			Presets: Paletten
 		}
 
 		OpenWithRightClick: {
@@ -95,7 +121,11 @@ Configs: {
 
 		Layout: {
 			Label: Form des Menüs
-			Tooltip: Ein Ring aus Farbfeldern um den Zeiger oder eine Spalte aus Farbbändern daneben.
+			Tooltip:
+				'''
+				Ein Ring aus Farbfeldern um den Zeiger, eine Spalte aus Farbbändern daneben
+				oder ein Raster mit allen Farbfeldern auf einmal.
+				'''
 		}
 
 		Appearance: {
@@ -114,10 +144,10 @@ Configs: {
 		}
 
 		Presets: {
-			Label: Vorlagen
+			Label: Paletten
 			Tooltip:
 				'''
-				Gespeicherte Paletten, wählbar über die Liste in der Mitte des Rades.
+				Gespeicherte Paletten, wählbar über die Liste in der Mitte des Rades oder am Palettennamen darüber.
 				Eine Palette füllt sich immer automatisch mit allem, was du dabeihast.
 				'''
 		}
@@ -146,6 +176,29 @@ Configs: {
 				'''
 				Standardmäßig aus: die Farbfelder lesen sich direkt über der Welt besser. Einschalten für
 				die übliche durchscheinende Terraria-Fläche dahinter.
+				'''
+		}
+
+		ShowQuickKeys: {
+			Label: Zifferntasten auf Farbfeldern zeigen
+			Tooltip:
+				'''
+				Solange das Rad offen ist, wählen die Zifferntasten die ersten zehn Farbfelder oder Zeilen statt
+				der Schnellleiste. Das zeigt, welche Taste was wählt - so wie die Schnellleiste ihre eigenen.
+				'''
+		}
+
+		ShowStackCounts: {
+			Label: Stapelgrößen zeigen
+			Tooltip: Wie viel du von jeder Farbe dabeihast, auf ihrem Farbfeld - wo ein Inventarplatz seinen Stapel zeigt.
+		}
+
+		ShowCursorReadout: {
+			Label: Deine Farbe neben dem Zeiger zeigen
+			Tooltip:
+				'''
+				Eine kleine Markierung am Zeiger, wo das Spiel nichts anzeigt: die Farbe, die ein gesetzter Block
+				vom Farbsprüher bekommt, der Schalter für Blöcke und Wände an Pinsel oder Roller, und was der Schaber nimmt.
 				'''
 		}
 
@@ -179,7 +232,11 @@ Configs: {
 
 		OpenAnimationTicks: {
 			Label: Dauer der Öffnungsanimation
-			Tooltip: Wie lange das Rad zum Aufklappen braucht. Kurz halten, sonst wirkt es träge.
+			Tooltip:
+				'''
+				Wie lange das Rad zum Aufklappen braucht, in Ticks: 60 sind eine Sekunde, 0 ist sofort.
+				Kurz halten, sonst wirkt es träge.
+				'''
 		}
 
 		BarCellWidth: {
@@ -292,7 +349,7 @@ Configs: {
 
 		Name: {
 			Label: Name
-			Tooltip: Wird über dem Rad angezeigt, solange diese Vorlage gewählt ist.
+			Tooltip: Wird über dem Rad angezeigt, solange diese Palette gewählt ist.
 		}
 
 		Paints: {

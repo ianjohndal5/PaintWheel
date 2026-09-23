@@ -6,6 +6,10 @@ Keybinds: {
 	NextPalette.DisplayName: Next Palette
 	ToggleScrape.DisplayName: Toggle Scrape Mode
 	ToggleNoPaint.DisplayName: Toggle No Paint
+	PreviousPaint.DisplayName: Previous Paint
+	NextPaint.DisplayName: Next Paint
+	SwapPaintTool.DisplayName: Swap Brush And Roller
+	TogglePaintBoth.DisplayName: Toggle Paint Blocks And Walls
 }
 
 UI: {
@@ -32,6 +36,27 @@ UI: {
 	DoneEditing: Done
 	NewPaletteName: Palette
 	EditingHeader: Editing {0}
+	ConfirmDelete: Click again to delete
+	PaletteHintNew: Click for palettes
+	RanOut: Out of {0}
+	PaintBoth: Paint blocks and walls with either tool
+	PaintBothResume: Back to one half per tool
+	PaintBothOn: Blocks and walls
+	PaintBothOff: One half per tool
+	NoToolToSwap: No {0} to hold
+	NewEmptyPalette: New empty palette
+	RenamePalette: Rename this palette
+	RenameHint: Enter to keep, Escape to cancel
+	NothingToShow: No paint to choose from
+	CloseInventory: Close the inventory to open Paint Wheel
+
+	Keys: {
+		MouseLeft: the left mouse button
+		MouseRight: the right mouse button
+		MouseMiddle: the middle mouse button
+		Mouse4: mouse button 4
+		Mouse5: mouse button 5
+	}
 
 	Scrape: {
 		Enter: Scrape mode
@@ -39,6 +64,7 @@ UI: {
 		BlocksAndWalls: Blocks and walls
 		BlocksOnly: Blocks only
 		WallsOnly: Walls only
+		CoatingsOnly: Coatings only
 		Exit: Back to colours
 		NoScraper: No Paint Scraper to hold
 	}
@@ -62,7 +88,7 @@ Configs: {
 		Headers: {
 			Input: Input
 			Shape: Picker
-			Presets: Presets
+			Presets: Palettes
 		}
 
 		OpenWithRightClick: {
@@ -95,7 +121,11 @@ Configs: {
 
 		Layout: {
 			Label: Picker shape
-			Tooltip: A ring of swatches around the cursor, or a column of colour bands beside it.
+			Tooltip:
+				'''
+				A ring of swatches around the cursor, a column of colour bands beside it, or a grid of every
+				swatch at once.
+				'''
 		}
 
 		Appearance: {
@@ -114,11 +144,11 @@ Configs: {
 		}
 
 		Presets: {
-			Label: Presets
+			Label: Palettes
 			Tooltip:
 				'''
-				Saved palettes, chosen from the list that opens when you click the centre of the wheel.
-				There is always one auto-filled palette holding everything you are carrying.
+				Saved palettes, chosen from the list that opens when you click the centre of the wheel or the palette
+				name above it. There is always one auto-filled palette holding everything you are carrying.
 				'''
 		}
 	}
@@ -146,6 +176,29 @@ Configs: {
 				'''
 				Off by default: the swatches read better straight over the world. Turn on for the standard
 				translucent Terraria panel behind them.
+				'''
+		}
+
+		ShowQuickKeys: {
+			Label: Show number keys on swatches
+			Tooltip:
+				'''
+				While the picker is up, the number keys pick the first ten swatches or rows instead of the
+				hotbar. This shows which key picks which, the way the hotbar shows its own.
+				'''
+		}
+
+		ShowStackCounts: {
+			Label: Show stack counts
+			Tooltip: How much of each paint you carry, on its swatch - where an inventory slot shows its stack.
+		}
+
+		ShowCursorReadout: {
+			Label: Show your paint beside the cursor
+			Tooltip:
+				'''
+				A small mark by the cursor where the game shows nothing to go by: the paint a placed block gets from
+				the Paint Sprayer, the paint-both switch on a brush or roller, and what a restricted scraper takes.
 				'''
 		}
 
@@ -178,8 +231,12 @@ Configs: {
 		}
 
 		OpenAnimationTicks: {
-			Label: Open animation ticks
-			Tooltip: How long the wheel takes to spring out. Keep it short or the wheel feels sluggish.
+			Label: Open animation length
+			Tooltip:
+				'''
+				How long the wheel takes to spring out, in ticks: 60 is one second, 0 is instant.
+				Keep it short or the wheel feels sluggish.
+				'''
 		}
 
 		BarCellWidth: {
@@ -291,7 +348,7 @@ Configs: {
 
 		Name: {
 			Label: Name
-			Tooltip: Shown above the wheel while this preset is selected.
+			Tooltip: Shown above the wheel while this palette is selected.
 		}
 
 		Paints: {

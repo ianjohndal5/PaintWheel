@@ -6,6 +6,10 @@ Keybinds: {
 	NextPalette.DisplayName: 下一个调色板
 	ToggleScrape.DisplayName: 切换刮除模式
 	ToggleNoPaint.DisplayName: 切换不上漆
+	PreviousPaint.DisplayName: 上一种油漆
+	NextPaint.DisplayName: 下一种油漆
+	SwapPaintTool.DisplayName: 切换漆刷与滚刷
+	TogglePaintBoth.DisplayName: 切换同时漆方块与墙
 }
 
 UI: {
@@ -32,6 +36,27 @@ UI: {
 	DoneEditing: 完成
 	NewPaletteName: 调色板
 	EditingHeader: 正在编辑 {0}
+	ConfirmDelete: 再次点击以删除
+	PaletteHintNew: 点击查看调色板
+	RanOut: "{0}已用完"
+	PaintBoth: 用任一工具给方块和墙上漆
+	PaintBothResume: 恢复为每种工具只漆一半
+	PaintBothOn: 方块和墙
+	PaintBothOff: 每种工具一半
+	NoToolToSwap: 没有可拿的{0}
+	NewEmptyPalette: 新建空调色板
+	RenamePalette: 重命名这个调色板
+	RenameHint: 回车保存，Esc 取消
+	NothingToShow: 没有可选的油漆
+	CloseInventory: 关闭物品栏才能打开 Paint Wheel
+
+	Keys: {
+		MouseLeft: 鼠标左键
+		MouseRight: 鼠标右键
+		MouseMiddle: 鼠标中键
+		Mouse4: 鼠标侧键 4
+		Mouse5: 鼠标侧键 5
+	}
 
 	Scrape: {
 		Enter: 刮除模式
@@ -39,6 +64,7 @@ UI: {
 		BlocksAndWalls: 方块和墙壁
 		BlocksOnly: 仅方块
 		WallsOnly: 仅墙壁
+		CoatingsOnly: 仅涂层
 		Exit: 返回选色
 		NoScraper: 身上没有油漆刮刀
 	}
@@ -56,7 +82,7 @@ Configs: {
 		Headers: {
 			Input: 操作
 			Shape: 选色界面
-			Presets: 预设
+			Presets: 调色板
 		}
 
 		OpenWithRightClick: {
@@ -85,7 +111,7 @@ Configs: {
 
 		Layout: {
 			Label: 选色界面形状
-			Tooltip: 围绕光标的一圈色块，或是光标旁边的一列色条。
+			Tooltip: 围绕光标的一圈色块、光标旁边的一列色条，或一次显示所有色块的网格。
 		}
 
 		Appearance: {
@@ -104,10 +130,10 @@ Configs: {
 		}
 
 		Presets: {
-			Label: 预设
+			Label: 调色板
 			Tooltip:
 				'''
-				已保存的调色板，点击轮盘中心即可在列表里选择。
+				已保存的调色板，点击轮盘中心或上方的调色板名称即可在列表里选择。
 				其中始终有一个会自动装入你身上携带的所有油漆。
 				'''
 		}
@@ -129,6 +155,29 @@ Configs: {
 		ShowBackgroundPanel: {
 			Label: 绘制背景面板
 			Tooltip: 默认关闭：色块直接叠在世界上更清楚。开启后会在它们后面加上泰拉瑞亚常见的半透明面板。
+		}
+
+		ShowQuickKeys: {
+			Label: 在色块上显示数字键
+			Tooltip:
+				'''
+				轮盘打开时，数字键会选择前十个色块或行，而不是切换快捷栏。
+				这里会像快捷栏一样显示每个键对应哪一个。
+				'''
+		}
+
+		ShowStackCounts: {
+			Label: 显示堆叠数量
+			Tooltip: 在色块上显示每种油漆的携带数量，位置和物品栏格子的堆叠数一样。
+		}
+
+		ShowCursorReadout: {
+			Label: 在光标旁显示当前油漆
+			Tooltip:
+				'''
+				在游戏不显示信息的地方，于光标旁显示一个小标记：放置的方块会从喷漆器获得的油漆、
+				漆刷或滚刷的方块与墙开关，以及受限刮刀会刮掉什么。
+				'''
 		}
 
 		WheelRadius: {
@@ -153,7 +202,11 @@ Configs: {
 
 		OpenAnimationTicks: {
 			Label: 展开动画时长
-			Tooltip: 轮盘弹出所需的时间。请保持短一些，否则会显得迟钝。
+			Tooltip:
+				'''
+				轮盘弹出所需的时间，单位为帧：60 帧为一秒，0 为立即。
+				请保持短一些，否则会显得迟钝。
+				'''
 		}
 
 		BarCellWidth: {
@@ -256,7 +309,7 @@ Configs: {
 
 		Name: {
 			Label: 名称
-			Tooltip: 选中这个预设时显示在轮盘上方。
+			Tooltip: 选中这个调色板时显示在轮盘上方。
 		}
 
 		Paints: {

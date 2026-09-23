@@ -1,0 +1,489 @@
+Keybinds: {
+	OpenWheel.DisplayName: Buksan ang Paint Wheel
+	Eyedropper.DisplayName: Kunin ang Kulay
+	QuickToggleLastTwo.DisplayName: Balik sa Nakaraang Pintura
+	PreviousPalette.DisplayName: Nakaraang Palette
+	NextPalette.DisplayName: Susunod na Palette
+	ToggleScrape.DisplayName: I-toggle ang Scrape Mode
+	ToggleNoPaint.DisplayName: I-toggle ang Walang Pintura
+	PreviousPaint.DisplayName: Nakaraang Pintura
+	NextPaint.DisplayName: Susunod na Pintura
+	SwapPaintTool.DisplayName: Palitan ang Brush at Roller
+	TogglePaintBoth.DisplayName: I-toggle ang Pagpinta ng Blocks at Walls
+}
+
+UI: {
+	AutoPreset: Lahat ng dala mo
+	NoCoating: Walang coating
+	NoPaint: Maglagay ng blocks na walang pintura
+	NoPaintResume: Pinturahan ulit ang blocks
+	NoPaintOn: Walang pintura
+	NoPaintOff: May pintura
+	ScrollHint: Mag-scroll o pindutin ang mga arrow para sa iba pang pintura
+	PaletteTitle: Mga palette
+	PaletteHint: Pindutin para magpalit ng palette
+	PaletteScrollHint: Mag-scroll o pindutin ang pangalan para magpalit ng palette
+	Empty: wala nang natira
+	NoPaints: Walang na-load na pintura
+	NoAutoPaint: Hindi napipinturahan ang blocks kapag naka-off ang auto-paint
+	SlotPickPaint: Pindutin ang {0} para piliin ang pinturang ito
+	SlotPickCoating: Pindutin ang {0} para piliin ang coating na ito
+	Disabled: Nagka-error ang Paint Wheel at hindi na nito inilalagay ang pintura mo. Nasa client.log ang detalye.
+	NewPalette: Bagong palette mula sa dala mo
+	EditPalette: I-edit ang palette na ito
+	DeletePalette: Burahin ang palette na ito
+	EditHint: Pindutin ang kulay para idagdag o tanggalin.
+	DoneEditing: Tapos na
+	NewPaletteName: Palette
+	EditingHeader: Ini-edit ang {0}
+	ConfirmDelete: Pindutin ulit para burahin
+	PaletteHintNew: Pindutin para sa mga palette
+	RanOut: Ubos na ang {0}
+	PaintBoth: Pinturahan ang blocks at walls gamit ang alinmang tool
+	PaintBothResume: Bumalik sa isang bahagi bawat tool
+	PaintBothOn: Blocks at walls
+	PaintBothOff: Isang bahagi bawat tool
+	NoToolToSwap: Walang {0} na mahahawakan
+	NewEmptyPalette: Bagong palette na walang laman
+	RenamePalette: Palitan ang pangalan ng palette na ito
+	RenameHint: Enter para itago, Escape para kanselahin
+	NothingToShow: Walang pinturang mapipili
+	CloseInventory: Isara ang inventory para mabuksan ang Paint Wheel
+
+	Keys: {
+		MouseLeft: kaliwang button ng mouse
+		MouseRight: kanang button ng mouse
+		MouseMiddle: gitnang button ng mouse
+		Mouse4: button 4 ng mouse
+		Mouse5: button 5 ng mouse
+	}
+
+	Scrape: {
+		Enter: Scrape mode
+		Header: Scrape mode
+		BlocksAndWalls: Blocks at walls
+		BlocksOnly: Blocks lang
+		WallsOnly: Walls lang
+		CoatingsOnly: Coating lang
+		Exit: Balik sa mga kulay
+		NoScraper: Walang Paint Scraper na mahahawakan
+	}
+}
+
+Configs: {
+	PaintWheelConfig: {
+		DisplayName: Mga Setting
+
+		Language: {
+			Label: Wika
+			Tooltip:
+				'''
+				Kung anong wika ang gagamitin ng teksto ng mod na ito. Ang Automatic ay sumusunod sa setting ng
+				laro; ang iba ay pinagsasalita ang mod sa wikang iyon kahit ano pa ang wika ng laro. Nasa listahan
+				ang Filipino dahil walang ganoong setting ang Terraria na masusundan.
+				Iniiral kapag nag-save. Ipapakita ng pahinang ito ang sarili nitong mga label sa susunod mong
+				pagbukas.
+				'''
+		}
+
+		Headers: {
+			Input: Kontrol
+			Shape: Pampili ng kulay
+			Presets: Mga palette
+		}
+
+		OpenWithRightClick: {
+			Label: Buksan gamit ang right click
+			Tooltip:
+				'''
+				Kapag may hawak kang paint tool, bubuksan ng right click ang wheel imbes na gamitin ito.
+				I-off kung kailangan ng ibang mod ang right click; gagana pa rin ang keybind.
+				'''
+		}
+
+		OpenMode: {
+			Label: Kilos ng right click
+			Tooltip: Kung hawak lang bukas ang pampili, o mananatiling nakabukas hanggang matapos ka.
+		}
+
+		RequirePaintTool: {
+			Label: Kapag may hawak lang na paint tool
+			Tooltip:
+				'''
+				Nililimitahan ang wheel at mga keybind nito sa mga paint tool (at sa hawak na blocks kapag
+				naka-equip ang Paint Sprayer).
+				'''
+		}
+
+		PlaySounds: {
+			Label: Magpatugtog ng tunog
+			Tooltip: May maliit na tunog sa paglipat-lipat ng kulay, at tunog sa pagpili.
+		}
+
+		Layout: {
+			Label: Hugis ng pampili
+			Tooltip:
+				'''
+				Bilog na hanay ng kulay sa paligid ng cursor, hanay ng mga guhit sa tabi nito,
+				o grid ng lahat ng kulay nang sabay-sabay.
+				'''
+		}
+
+		Appearance: {
+			Label: Laki at itsura
+			Tooltip: Kung gaano kalaki ang pampili at kung ano ang ipinapakita nito.
+		}
+
+		Supply: {
+			Label: Pagpapakita ng natitira
+			Tooltip: Kung paano ipinapakita ng kulay kung ilan pa ang natitirang pintura.
+		}
+
+		Advanced: {
+			Label: Advanced
+			Tooltip: Kilos ng pagpipintura, mga coating, at ang paraan kung sakaling may kaaway na mod.
+		}
+
+		Presets: {
+			Label: Mga palette
+			Tooltip:
+				'''
+				Mga nakasave na palette, pipiliin sa listahang lalabas kapag pinindot mo ang gitna ng wheel o ang
+				pangalan ng palette sa itaas nito. Laging may isang palette na kusang napupuno ng lahat ng dala mo.
+				'''
+		}
+	}
+
+	AppearanceSettings: {
+		Tooltip: ""
+
+		Headers: {
+			Wheel: Wheel
+			Bar: Bar
+		}
+
+		ShowItemIcons: {
+			Label: Ipakita ang sprite ng item
+			Tooltip:
+				'''
+				Iginuguhit ang lata ng pintura sa ibabaw ng kulay nito. Naka-off bilang default: ang kulay mismo ang
+				pinipili mo.
+				'''
+		}
+
+		ShowBackgroundPanel: {
+			Label: Iguhit ang panel sa likod
+			Tooltip:
+				'''
+				Naka-off bilang default: mas malinaw ang mga kulay kapag diretso sa mundo. I-on para sa karaniwang
+				malabong panel ng Terraria sa likod nila.
+				'''
+		}
+
+		ShowQuickKeys: {
+			Label: Ipakita ang number keys sa mga kulay
+			Tooltip:
+				'''
+				Habang bukas ang wheel, pinipili ng number keys ang unang sampung kulay o row sa halip na ang
+				hotbar. Ipinapakita nito kung aling key ang pumipili ng alin, gaya ng sa hotbar.
+				'''
+		}
+
+		ShowStackCounts: {
+			Label: Ipakita ang dami
+			Tooltip: Kung gaano karami ang dala mo sa bawat pintura, sa kulay nito - kung saan ipinapakita ng slot ang stack.
+		}
+
+		ShowCursorReadout: {
+			Label: Ipakita ang pintura mo sa tabi ng cursor
+			Tooltip:
+				'''
+				Maliit na marka sa tabi ng cursor kung saan walang ipinapakita ang laro: ang pinturang makukuha ng
+				block mula sa Paint Sprayer, ang switch ng blocks at walls sa brush o roller, at ang kinukuha ng scraper.
+				'''
+		}
+
+		WheelRadius: {
+			Label: Radius ng wheel
+			Tooltip:
+				'''
+				Layo ng cursor sa mga kulay, sa pixel. Ito ang pinakamaliit na halaga: lumalaki ang buong bilog
+				hanggang hindi na magdikit ang mga kulay.
+				'''
+		}
+
+		SwatchSize: {
+			Label: Laki ng kulay
+			Tooltip: Diyametro ng bawat bilog na kulay, sa pixel.
+		}
+
+		DeadZoneRadius: {
+			Label: Dead zone sa gitna
+			Tooltip: Ang pagbitaw sa loob ng radius na ito ay kanselado, at mananatili ang dati mong pintura.
+		}
+
+		MaxSwatches: {
+			Label: Kulay bawat bilog
+			Tooltip:
+				'''
+				Higit sa labindalawa, mahirap nang tamaan sa isang galaw, kaya labindalawa ang hangganan. Ang sobra
+				ay pupunta sa susunod na pahina imbes na mawala.
+				'''
+		}
+
+		OpenAnimationTicks: {
+			Label: Haba ng animation sa pagbukas
+			Tooltip:
+				'''
+				Gaano katagal bumukas ang wheel, sa ticks: 60 ay isang segundo, 0 ay agad-agad.
+				Panatilihing maikli, kung hindi ay mabagal ang pakiramdam.
+				'''
+		}
+
+		BarCellWidth: {
+			Label: Lapad ng guhit
+			Tooltip: Lapad ng bawat guhit ng kulay sa bar.
+		}
+
+		BarCellHeight: {
+			Label: Taas ng guhit
+			Tooltip: Taas ng bawat guhit. Mas madaling tamaan ang mas makakapal na guhit.
+		}
+
+		BarSwatchesPerPage: {
+			Label: Guhit bawat pahina
+			Tooltip: Ilang kulay ang kasya sa isang pahina ng bar bago gamitin ang mga arrow.
+		}
+	}
+
+	SupplySettings: {
+		Tooltip: ""
+
+		FadeStartStack: {
+			Label: Nagsisimulang lumabo sa
+			Tooltip:
+				'''
+				Dami ng stack kung saan itinuturing na puno ang isang kulay. Sa ilalim nito ay lumalabo ito at
+				nauubos ang singsing nito. Binibilang sa lahat ng slot, kaya tama pa rin ang dalawang kalahating
+				stack.
+				'''
+		}
+
+		MinimumSwatchOpacity: {
+			Label: Pinakamababang opacity
+			Tooltip: Gaano kalabo ang pinapayagan sa kulay na halos ubos na.
+		}
+
+		ShowDepletionRing: {
+			Label: Singsing kapag kaunti na
+			Tooltip:
+				'''
+				Singsing ng maliliit na tuldok sa paligid ng kulay na unti-unting nauubos kasabay ng pintura.
+				Lumalabas lang ito kapag bumaba ang stack sa ilalim ng Nagsisimulang lumabo sa, para manatiling
+				malinis ang wheel kapag puno ang lahat. Itaas ang halagang iyon nang lampas sa karaniwan mong stack
+				para makita ito sa bawat kulay.
+				'''
+		}
+
+		DepletionRingSegments: {
+			Label: Bilang ng tuldok sa singsing
+			Tooltip: Ilang tuldok ang nasa singsing. Bagay sa pixel art ang hiwa-hiwalay na tuldok.
+		}
+
+		HideEmptySwatches: {
+			Label: Itago ang ubos nang kulay
+			Tooltip:
+				'''
+				Naka-off bilang default: nananatili sa pwesto ang ubos nang kulay para hindi gumalaw ang wheel sa
+				ilalim ng kamay mo habang nagtatayo. I-on para tanggalin na lang sila.
+				'''
+		}
+	}
+
+	AdvancedSettings: {
+		Tooltip: ""
+
+		OverrideMode: {
+			Label: Paraan ng pagpili ng pintura
+			Tooltip:
+				'''
+				Kung paano ipinipilit ng mod ang piniling kulay mo sa code ng laro.
+				Ang Detour ang default at hindi nito ginagalaw ang inventory mo.
+				'''
+		}
+
+		FallBackToAnyPaintWhenEmpty: {
+			Label: Gumamit ng ibang pintura kapag ubos na
+			Tooltip:
+				'''
+				Naka-off bilang default. Kapag naubos ang piniling pintura, hihinto ang pagpipintura imbes na
+				tahimik na gumamit ng ibang kulay.
+				'''
+		}
+
+		ShowCoatingRow: {
+			Label: Ipakita ang hanay ng coating
+			Tooltip: Isang hanay sa ilalim ng wheel para sa Illuminant at Echo coating, kasama ang pang-off.
+		}
+
+		AutoPaintPlacedTiles: {
+			Label: Pinturahan ang blocks habang inilalagay
+			Tooltip:
+				'''
+				Naka-off bilang default, dahil trabaho ito ng Paint Sprayer na binibili mo bilang accessory. Kapag
+				naka-on, bawat block at wall na ilalagay mo ay may kulay mo na at gumagamit ng pintura gaya ng dati;
+				ang icon ng Paint Sprayer sa builder toggles ang mag-o-off nito ulit.
+				'''
+		}
+
+		SmartCoating: {
+			Label: Matalinong sunod-sunod na coating
+			Tooltip:
+				'''
+				Kapag may piniling pintura at coating, ilalagay muna ang kulang pa sa target, kaya sa isang
+				pagpindot lang ay pareho nang mailalagay. Kapag naka-off, laging una ang coating.
+				'''
+		}
+	}
+
+	PaintPreset: {
+		Tooltip: ""
+
+		Name: {
+			Label: Pangalan
+			Tooltip: Lumalabas sa ibabaw ng wheel habang pinili ang palette na ito.
+		}
+
+		Paints: {
+			Label: Mga pintura
+			Tooltip: Pindutin ang kulay para idagdag o tanggalin. Ang numero ay pwesto nito sa bilog.
+		}
+	}
+
+	WheelLayoutStyle: {
+		Tooltip: ""
+
+		Wheel: {
+			Label: Wheel
+			Tooltip: Mga kulay na nakabilog sa paligid ng cursor, pipiliin sa pamamagitan ng galaw papunta rito.
+		}
+
+		Bar: {
+			Label: Bar
+			Tooltip: Mga kulay na nakahanay sa tabi ng cursor, pipiliin sa pamamagitan ng pagbaba rito.
+		}
+
+		Grid: {
+			Label: Grid
+			Tooltip:
+				'''
+				Lahat ng kulay nakahanay sa ilalim ng cursor. Walang nakatago, kaya hindi na kailangang mag-page ang
+				buong palette.
+				'''
+		}
+	}
+
+	PickerOpenMode: {
+		Tooltip: ""
+
+		Hold: {
+			Label: Pindutin nang matagal
+			Tooltip:
+				'''
+				Pindutin nang matagal ang right click, igalaw papunta sa kulay, bitawan para piliin. Walang natitira
+				sa screen at walang kailangang isara.
+				'''
+		}
+
+		Click: {
+			Label: Isang click para buksan
+			Tooltip:
+				'''
+				Isang right click lang at mananatiling bukas ang pampili, hindi na kailangang hawakan. Ang pagpindot
+				sa kulay ang pipili at magsasara; ang mga coating, palette at scrape mode ay iniiwang bukas para
+				makapag-set ka ng marami nang sabay. Right click ulit, Escape, o pindot sa labas para isara.
+				'''
+		}
+	}
+
+	PaintOverrideMode: {
+		Tooltip: ""
+
+		Detour: {
+			Label: Detour (inirerekomenda)
+			Tooltip:
+				'''
+				Hinaharang nito ang paghahanap ng laro na siya ring pumipili at umuubos ng pintura, kaya hindi
+				magkakaiba ang kulay na nailagay at ang stack na nagamit. Hindi kailanman inaayos ang inventory mo.
+				'''
+		}
+
+		InventorySwap: {
+			Label: Inventory swap (pamalit)
+			Tooltip:
+				'''
+				Ipinapalit ang stack mo sa slot na pipiliin sana ng laro sa napakaikling sandali, tapos ibinabalik
+				agad. Gamitin lang ito kung may ibang mod na sumasalungat sa Detour.
+				'''
+		}
+	}
+
+	LanguageOverride: {
+		Tooltip: ""
+
+		Automatic: {
+			Label: Automatic
+			Tooltip: ""
+		}
+
+		English: {
+			Label: English
+			Tooltip: ""
+		}
+
+		German: {
+			Label: Deutsch
+			Tooltip: ""
+		}
+
+		Spanish: {
+			Label: Español
+			Tooltip: ""
+		}
+
+		French: {
+			Label: Français
+			Tooltip: ""
+		}
+
+		Italian: {
+			Label: Italiano
+			Tooltip: ""
+		}
+
+		Polish: {
+			Label: Polski
+			Tooltip: ""
+		}
+
+		Portuguese: {
+			Label: Português
+			Tooltip: ""
+		}
+
+		Russian: {
+			Label: Русский
+			Tooltip: ""
+		}
+
+		Chinese: {
+			Label: 简体中文
+			Tooltip: ""
+		}
+
+		Filipino: {
+			Label: Filipino
+			Tooltip: ""
+		}
+	}
+}

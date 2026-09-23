@@ -6,6 +6,10 @@ Keybinds: {
 	NextPalette.DisplayName: Następna paleta
 	ToggleScrape.DisplayName: Przełącz tryb skrobaka
 	ToggleNoPaint.DisplayName: Przełącz brak farby
+	PreviousPaint.DisplayName: Poprzednia farba
+	NextPaint.DisplayName: Następna farba
+	SwapPaintTool.DisplayName: Zamień pędzel i wałek
+	TogglePaintBoth.DisplayName: Przełącz malowanie bloków i ścian
 }
 
 UI: {
@@ -32,6 +36,27 @@ UI: {
 	DoneEditing: Gotowe
 	NewPaletteName: Paleta
 	EditingHeader: Edycja {0}
+	ConfirmDelete: Kliknij ponownie, by usunąć
+	PaletteHintNew: Kliknij, by zobaczyć palety
+	RanOut: Brak: {0}
+	PaintBoth: Maluj bloki i ściany dowolnym narzędziem
+	PaintBothResume: Wróć do jednej połowy na narzędzie
+	PaintBothOn: Bloki i ściany
+	PaintBothOff: Jedna połowa na narzędzie
+	NoToolToSwap: Brak: {0}
+	NewEmptyPalette: Nowa pusta paleta
+	RenamePalette: Zmień nazwę tej palety
+	RenameHint: Enter zapisuje, Esc anuluje
+	NothingToShow: Brak farby do wyboru
+	CloseInventory: Zamknij ekwipunek, by otworzyć Paint Wheel
+
+	Keys: {
+		MouseLeft: lewy przycisk myszy
+		MouseRight: prawy przycisk myszy
+		MouseMiddle: środkowy przycisk myszy
+		Mouse4: przycisk myszy 4
+		Mouse5: przycisk myszy 5
+	}
 
 	Scrape: {
 		Enter: Tryb skrobaka
@@ -39,6 +64,7 @@ UI: {
 		BlocksAndWalls: Bloki i ściany
 		BlocksOnly: Tylko bloki
 		WallsOnly: Tylko ściany
+		CoatingsOnly: Tylko powłoki
 		Exit: Powrót do kolorów
 		NoScraper: Nie masz skrobaka do farby
 	}
@@ -62,7 +88,7 @@ Configs: {
 		Headers: {
 			Input: Sterowanie
 			Shape: Wybierak
-			Presets: Zestawy
+			Presets: Palety
 		}
 
 		OpenWithRightClick: {
@@ -95,7 +121,7 @@ Configs: {
 
 		Layout: {
 			Label: Kształt wybieraka
-			Tooltip: Pierścień kolorów wokół kursora albo kolumna pasków obok niego.
+			Tooltip: Pierścień kolorów wokół kursora, kolumna pasków obok niego albo siatka ze wszystkimi kolorami naraz.
 		}
 
 		Appearance: {
@@ -114,10 +140,10 @@ Configs: {
 		}
 
 		Presets: {
-			Label: Zestawy
+			Label: Palety
 			Tooltip:
 				'''
-				Zapisane palety, wybierane z listy otwieranej kliknięciem środka koła.
+				Zapisane palety, wybierane z listy otwieranej kliknięciem środka koła lub nazwy palety nad nim.
 				Zawsze jest jedna paleta, która sama wypełnia się wszystkim, co niesiesz.
 				'''
 		}
@@ -142,6 +168,29 @@ Configs: {
 				'''
 				Domyślnie wyłączone: kolory czyta się lepiej wprost na tle świata. Włącz, by mieć za nimi
 				zwykły półprzezroczysty panel Terrarii.
+				'''
+		}
+
+		ShowQuickKeys: {
+			Label: Pokazuj klawisze cyfr na kolorach
+			Tooltip:
+				'''
+				Gdy koło jest otwarte, klawisze cyfr wybierają pierwsze dziesięć kolorów lub wierszy zamiast
+				paska szybkiego dostępu. To pokazuje, który klawisz co wybiera, tak jak pasek pokazuje swoje.
+				'''
+		}
+
+		ShowStackCounts: {
+			Label: Pokazuj liczbę sztuk
+			Tooltip: Ile masz każdej farby, na jej kolorze - tam, gdzie miejsce w ekwipunku pokazuje swój stos.
+		}
+
+		ShowCursorReadout: {
+			Label: Pokazuj farbę obok kursora
+			Tooltip:
+				'''
+				Mały znak przy kursorze tam, gdzie gra nic nie pokazuje: farba, którą stawiany blok dostaje z
+				rozpylacza, przełącznik bloków i ścian na pędzlu lub wałku oraz to, co zdejmuje skrobaczka.
 				'''
 		}
 
@@ -175,7 +224,11 @@ Configs: {
 
 		OpenAnimationTicks: {
 			Label: Długość animacji otwarcia
-			Tooltip: Jak długo koło się rozwija. Trzymaj krótko, bo inaczej wydaje się ociężałe.
+			Tooltip:
+				'''
+				Jak długo koło się rozwija, w tickach: 60 to jedna sekunda, 0 to natychmiast.
+				Trzymaj krótko, bo inaczej wydaje się ociężałe.
+				'''
 		}
 
 		BarCellWidth: {
@@ -288,7 +341,7 @@ Configs: {
 
 		Name: {
 			Label: Nazwa
-			Tooltip: Pokazywana nad kołem, gdy ten zestaw jest wybrany.
+			Tooltip: Pokazywana nad kołem, gdy ta paleta jest wybrana.
 		}
 
 		Paints: {

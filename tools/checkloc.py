@@ -14,16 +14,25 @@ English line, not a key name or a crash. That is a gap to fill, not a bug to blo
     * placeholders ({0}, {1}, ...) differing from English - a dropped {0} loses the
       keybind name the line exists to show
     * a blank value where English has text - blank draws as nothing at all
+    * a bare value hjson would misread - opening with { [ or ', starting with # or //, or
+      just true/false/null - which stops the file loading or loses the entry; quote it.
+      Checked in en-US too, since every language falls back to it
 
   OUTSTANDING (reported, exit code 0):
     * keys missing from a translation - shows English until translated
     * keys a translation has that English does not - dead weight, never read
     * values identical to English - usually untranslated, sometimes correct
       ("Grid", "Palette"), so judge them rather than trusting the count
+    * lines longer than 110 characters - tooltips are drawn without wrapping, so a
+      long line runs off the screen; break it the way the English file does
 
-Filipino lives in Localization/fil-PH.json instead of an hjson, because Terraria has no
-Filipino culture. It is applied at runtime by Common/Translations.cs and is checked here
-alongside the rest.
+Filipino is an hjson like the rest, but Terraria has no Filipino culture, so tModLoader's
+own loader skips it and Common/Systems/TranslationSystem.cs applies it at runtime instead.
+It is checked here alongside the rest.
+
+The game reads these files with the Hjson library. parse_hjson below covers only what
+these files use: nested blocks, dotted names, quoted empties, triple-quoted blocks, and
+the comments tModLoader's own localization updater writes.
 """
 
 import json
@@ -34,17 +43,36 @@ import sys
 BASE = "en-US"
 PREFIX = "Mods.PaintWheel."
 LOCALIZATION = pathlib.Path("Localization")
+MAX_LINE = 110
+UNSAFE = "\x00unsafe:"
+
+
+def unsafe_value(raw):
+    """True for a bare value Hjson would not read as the text written."""
+    if not raw:
+        return False
+    if raw.startswith('"'):
+        return not (len(raw) >= 2 and raw.endswith('"'))  # text after the closing quote
+    return (raw[0] in "{['" or raw.startswith(("#", "//", "/*"))
+            or raw in ("true", "false", "null"))
 
 
 def parse_hjson(text):
-    """The slice of hjson these files use. Mirrors ParseHjson in Common/Translations.cs."""
-    entries, path, lines, i = {}, [], text.replace("\r\n", "\n").split("\n"), 0
+    """The slice of hjson these files use, comments included."""
+    entries, path, lines, i = {}, [], text.lstrip("\ufeff").replace("\r\n", "\n").split("\n"), 0
 
     while i < len(lines):
         line = lines[i].strip()
         i += 1
 
-        if not line or line.startswith("#"):
+        if not line or line.startswith(("#", "//")):
+            continue
+
+        # A block comment, which tModLoader uses to park a multi-line entry nobody has translated.
+        if line.startswith("/*"):
+            while "*/" not in line and i < len(lines):
+                line = lines[i].strip()
+                i += 1
             continue
 
         if line == "}":
@@ -62,6 +90,11 @@ def parse_hjson(text):
             path.append(name)
             continue
 
+        # Values the game's Hjson parser reads as something other than plain text, which either stop
+        # the whole file loading or quietly lose the entry: "{0} left" unquoted opens an object, a
+        # leading # or // starts a comment, and so on. Flagged, not fixed.
+        unsafe = unsafe_value(value)
+
         if not value and i < len(lines) and lines[i].strip() == "'''":
             block = []
             i += 1
@@ -72,6 +105,9 @@ def parse_hjson(text):
             value = "\n".join(block)
         elif len(value) >= 2 and value[0] == '"' and value[-1] == '"':
             value = value[1:-1]
+
+        if unsafe:
+            value = UNSAFE + value
 
         entries[".".join(path + [name])] = value
 
@@ -102,11 +138,15 @@ def main():
         return 2
 
     base = load(base_path)
+    base_unsafe = sorted(k for k, v in base.items() if v.startswith(UNSAFE))
+    base = {k: v.removeprefix(UNSAFE) for k, v in base.items()}
     others = sorted(p for p in LOCALIZATION.iterdir()
                     if p.name != base_path.name and p.suffix in {".hjson", ".json"})
 
     print(f"{BASE}: {len(base)} keys\n")
-    failed = False
+    failed = bool(base_unsafe)
+    if base_unsafe:
+        print("FAIL " + report(f"{base_path.name}: bare value hjson misreads - quote it", base_unsafe) + "\n")
 
     outstanding = 0
 
@@ -122,7 +162,12 @@ def main():
         same = sorted(k for k, v in entries.items()
                       if k in base and v.strip() and v == base[k])
 
+        unsafe = sorted(k for k, v in entries.items() if v.startswith(UNSAFE))
+        entries = {k: v.removeprefix(UNSAFE) for k, v in entries.items()}
+
         breaks = [report("placeholders differ", marks)] if marks else []
+        if unsafe:
+            breaks.append(report("bare value hjson misreads (starts with { [ ' # // or is true/false/null) - quote it", unsafe))
         if blank:
             breaks.append(report("blank", blank))
 
@@ -133,6 +178,10 @@ def main():
             notes.append(report("unknown", extra))
         if same:
             notes.append(f"same as English: {len(same)}")
+
+        long_lines = sorted(k for k, v in entries.items() if any(len(part) > MAX_LINE for part in v.split("\n")))
+        if long_lines:
+            notes.append(report(f"lines over {MAX_LINE} characters, will run off screen", long_lines))
 
         failed |= bool(breaks)
         outstanding += len(missing) + len(extra)

@@ -6,6 +6,10 @@ Keybinds: {
 	NextPalette.DisplayName: Paleta siguiente
 	ToggleScrape.DisplayName: Alternar modo raspador
 	ToggleNoPaint.DisplayName: Alternar sin pintura
+	PreviousPaint.DisplayName: Pintura anterior
+	NextPaint.DisplayName: Pintura siguiente
+	SwapPaintTool.DisplayName: Cambiar pincel y rodillo
+	TogglePaintBoth.DisplayName: Alternar pintar bloques y paredes
 }
 
 UI: {
@@ -32,6 +36,27 @@ UI: {
 	DoneEditing: Listo
 	NewPaletteName: Paleta
 	EditingHeader: Editando {0}
+	ConfirmDelete: Haz clic otra vez para borrar
+	PaletteHintNew: Haz clic para ver las paletas
+	RanOut: Sin {0}
+	PaintBoth: Pintar bloques y paredes con cualquier herramienta
+	PaintBothResume: Volver a una mitad por herramienta
+	PaintBothOn: Bloques y paredes
+	PaintBothOff: Una mitad por herramienta
+	NoToolToSwap: No hay {0} para sostener
+	NewEmptyPalette: Nueva paleta vacía
+	RenamePalette: Renombrar esta paleta
+	RenameHint: Intro para guardar, Esc para cancelar
+	NothingToShow: No hay pintura para elegir
+	CloseInventory: Cierra el inventario para abrir Paint Wheel
+
+	Keys: {
+		MouseLeft: el botón izquierdo del ratón
+		MouseRight: el botón derecho del ratón
+		MouseMiddle: el botón central del ratón
+		Mouse4: el botón 4 del ratón
+		Mouse5: el botón 5 del ratón
+	}
 
 	Scrape: {
 		Enter: Modo raspador
@@ -39,6 +64,7 @@ UI: {
 		BlocksAndWalls: Bloques y paredes
 		BlocksOnly: Solo bloques
 		WallsOnly: Solo paredes
+		CoatingsOnly: Solo recubrimientos
 		Exit: Volver a los colores
 		NoScraper: No llevas un raspador de pintura
 	}
@@ -62,7 +88,7 @@ Configs: {
 		Headers: {
 			Input: Controles
 			Shape: Selector
-			Presets: Preajustes
+			Presets: Paletas
 		}
 
 		OpenWithRightClick: {
@@ -95,7 +121,11 @@ Configs: {
 
 		Layout: {
 			Label: Forma del selector
-			Tooltip: Un anillo de colores alrededor del cursor, o una columna de franjas a su lado.
+			Tooltip:
+				'''
+				Un anillo de colores alrededor del cursor, una columna de franjas a su lado
+				o una cuadrícula con todos los colores a la vez.
+				'''
 		}
 
 		Appearance: {
@@ -114,11 +144,11 @@ Configs: {
 		}
 
 		Presets: {
-			Label: Preajustes
+			Label: Paletas
 			Tooltip:
 				'''
-				Paletas guardadas, elegidas en la lista que se abre al pulsar el centro de la rueda.
-				Siempre hay una paleta que se rellena sola con todo lo que llevas encima.
+				Paletas guardadas, elegidas en la lista que se abre al pulsar el centro de la rueda o el nombre de
+				la paleta encima. Siempre hay una paleta que se rellena sola con todo lo que llevas encima.
 				'''
 		}
 	}
@@ -146,6 +176,29 @@ Configs: {
 				'''
 				Desactivado por defecto: los colores se leen mejor directamente sobre el mundo. Actívalo
 				para el panel translúcido habitual de Terraria detrás de ellos.
+				'''
+		}
+
+		ShowQuickKeys: {
+			Label: Mostrar teclas numéricas en los colores
+			Tooltip:
+				'''
+				Con la rueda abierta, las teclas numéricas eligen los diez primeros colores o filas en vez de la
+				barra rápida. Esto muestra qué tecla elige cada uno, como la barra rápida muestra los suyos.
+				'''
+		}
+
+		ShowStackCounts: {
+			Label: Mostrar cantidades
+			Tooltip: Cuánto llevas de cada pintura, sobre su color, donde una casilla del inventario muestra su montón.
+		}
+
+		ShowCursorReadout: {
+			Label: Mostrar tu pintura junto al cursor
+			Tooltip:
+				'''
+				Una pequeña marca junto al cursor donde el juego no muestra nada: la pintura que un bloque recibe
+				del pulverizador, el interruptor de bloques y paredes del pincel o rodillo, y qué quita el rascador.
 				'''
 		}
 
@@ -179,7 +232,11 @@ Configs: {
 
 		OpenAnimationTicks: {
 			Label: Duración de la animación
-			Tooltip: Lo que tarda la rueda en desplegarse. Mantenlo corto o se sentirá lenta.
+			Tooltip:
+				'''
+				Lo que tarda la rueda en desplegarse, en ticks: 60 es un segundo, 0 es al instante.
+				Mantenlo corto o se sentirá lenta.
+				'''
 		}
 
 		BarCellWidth: {
@@ -293,7 +350,7 @@ Configs: {
 
 		Name: {
 			Label: Nombre
-			Tooltip: Se muestra sobre la rueda mientras este preajuste está elegido.
+			Tooltip: Se muestra sobre la rueda mientras esta paleta está elegida.
 		}
 
 		Paints: {
