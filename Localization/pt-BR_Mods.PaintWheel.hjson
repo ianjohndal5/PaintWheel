@@ -6,6 +6,10 @@ Keybinds: {
 	NextPalette.DisplayName: Próxima paleta
 	ToggleScrape.DisplayName: Alternar modo raspador
 	ToggleNoPaint.DisplayName: Alternar sem tinta
+	PreviousPaint.DisplayName: Tinta anterior
+	NextPaint.DisplayName: Próxima tinta
+	SwapPaintTool.DisplayName: Trocar pincel e rolo
+	TogglePaintBoth.DisplayName: Alternar pintar blocos e paredes
 }
 
 UI: {
@@ -32,6 +36,27 @@ UI: {
 	DoneEditing: Pronto
 	NewPaletteName: Paleta
 	EditingHeader: Editando {0}
+	ConfirmDelete: Clique de novo para excluir
+	PaletteHintNew: Clique para ver as paletas
+	RanOut: "{0} acabou"
+	PaintBoth: Pintar blocos e paredes com qualquer ferramenta
+	PaintBothResume: Voltar a uma metade por ferramenta
+	PaintBothOn: Blocos e paredes
+	PaintBothOff: Uma metade por ferramenta
+	NoToolToSwap: Nenhum {0} para segurar
+	NewEmptyPalette: Nova paleta vazia
+	RenamePalette: Renomear esta paleta
+	RenameHint: Enter para manter, Esc para cancelar
+	NothingToShow: Nenhuma tinta para escolher
+	CloseInventory: Feche o inventário para abrir o Paint Wheel
+
+	Keys: {
+		MouseLeft: o botão esquerdo do mouse
+		MouseRight: o botão direito do mouse
+		MouseMiddle: o botão do meio do mouse
+		Mouse4: o botão 4 do mouse
+		Mouse5: o botão 5 do mouse
+	}
 
 	Scrape: {
 		Enter: Modo raspador
@@ -39,6 +64,7 @@ UI: {
 		BlocksAndWalls: Blocos e paredes
 		BlocksOnly: Só blocos
 		WallsOnly: Só paredes
+		CoatingsOnly: Só revestimentos
 		Exit: Voltar às cores
 		NoScraper: Você não tem um raspador de tinta
 	}
@@ -62,7 +88,7 @@ Configs: {
 		Headers: {
 			Input: Controles
 			Shape: Seletor
-			Presets: Predefinições
+			Presets: Paletas
 		}
 
 		OpenWithRightClick: {
@@ -95,7 +121,11 @@ Configs: {
 
 		Layout: {
 			Label: Formato do seletor
-			Tooltip: Um anel de cores ao redor do cursor, ou uma coluna de faixas ao lado dele.
+			Tooltip:
+				'''
+				Um anel de cores ao redor do cursor, uma coluna de faixas ao lado dele,
+				ou uma grade com todas as cores de uma vez.
+				'''
 		}
 
 		Appearance: {
@@ -114,11 +144,11 @@ Configs: {
 		}
 
 		Presets: {
-			Label: Predefinições
+			Label: Paletas
 			Tooltip:
 				'''
-				Paletas salvas, escolhidas na lista que abre ao clicar no centro da roda.
-				Sempre existe uma paleta que se preenche sozinha com tudo o que você está carregando.
+				Paletas salvas, escolhidas na lista que abre ao clicar no centro da roda ou no nome da paleta
+				acima dela. Sempre existe uma paleta que se preenche sozinha com tudo o que você está carregando.
 				'''
 		}
 	}
@@ -146,6 +176,29 @@ Configs: {
 				'''
 				Desligado por padrão: as cores ficam mais legíveis direto sobre o mundo. Ligue para o
 				painel translúcido comum do Terraria atrás delas.
+				'''
+		}
+
+		ShowQuickKeys: {
+			Label: Mostrar teclas numéricas nas cores
+			Tooltip:
+				'''
+				Com a roda aberta, as teclas numéricas escolhem as dez primeiras cores ou linhas em vez da barra
+				rápida. Isto mostra qual tecla escolhe o quê, como a barra rápida mostra as dela.
+				'''
+		}
+
+		ShowStackCounts: {
+			Label: Mostrar quantidades
+			Tooltip: Quanto você carrega de cada tinta, na sua cor, onde um espaço do inventário mostra sua pilha.
+		}
+
+		ShowCursorReadout: {
+			Label: Mostrar sua tinta ao lado do cursor
+			Tooltip:
+				'''
+				Uma pequena marca junto ao cursor onde o jogo não mostra nada: a tinta que um bloco recebe do
+				pulverizador, o interruptor de blocos e paredes no pincel ou rolo, e o que o raspador tira.
 				'''
 		}
 
@@ -179,7 +232,11 @@ Configs: {
 
 		OpenAnimationTicks: {
 			Label: Duração da animação
-			Tooltip: Quanto a roda demora para abrir. Deixe curto ou ela parece lenta.
+			Tooltip:
+				'''
+				Quanto a roda demora para abrir, em ticks: 60 é um segundo, 0 é instantâneo.
+				Deixe curto ou ela parece lenta.
+				'''
 		}
 
 		BarCellWidth: {
@@ -291,7 +348,7 @@ Configs: {
 
 		Name: {
 			Label: Nome
-			Tooltip: Aparece acima da roda enquanto esta predefinição estiver escolhida.
+			Tooltip: Aparece acima da roda enquanto esta paleta estiver escolhida.
 		}
 
 		Paints: {

@@ -6,6 +6,10 @@ Keybinds: {
 	NextPalette.DisplayName: Palette suivante
 	ToggleScrape.DisplayName: Basculer le mode grattoir
 	ToggleNoPaint.DisplayName: Basculer sans peinture
+	PreviousPaint.DisplayName: Peinture précédente
+	NextPaint.DisplayName: Peinture suivante
+	SwapPaintTool.DisplayName: Échanger pinceau et rouleau
+	TogglePaintBoth.DisplayName: Basculer peindre blocs et murs
 }
 
 UI: {
@@ -32,6 +36,27 @@ UI: {
 	DoneEditing: Terminé
 	NewPaletteName: Palette
 	EditingHeader: Modification de {0}
+	ConfirmDelete: Cliquez encore pour supprimer
+	PaletteHintNew: Cliquez pour voir les palettes
+	RanOut: Plus de {0}
+	PaintBoth: Peindre blocs et murs avec l'un ou l'autre outil
+	PaintBothResume: Revenir à une moitié par outil
+	PaintBothOn: Blocs et murs
+	PaintBothOff: Une moitié par outil
+	NoToolToSwap: Aucun {0} à tenir
+	NewEmptyPalette: Nouvelle palette vide
+	RenamePalette: Renommer cette palette
+	RenameHint: Entrée pour garder, Échap pour annuler
+	NothingToShow: Aucune peinture à choisir
+	CloseInventory: Fermez l'inventaire pour ouvrir Paint Wheel
+
+	Keys: {
+		MouseLeft: le bouton gauche de la souris
+		MouseRight: le bouton droit de la souris
+		MouseMiddle: le bouton central de la souris
+		Mouse4: le bouton 4 de la souris
+		Mouse5: le bouton 5 de la souris
+	}
 
 	Scrape: {
 		Enter: Mode grattoir
@@ -39,6 +64,7 @@ UI: {
 		BlocksAndWalls: Blocs et murs
 		BlocksOnly: Blocs seulement
 		WallsOnly: Murs seulement
+		CoatingsOnly: Revêtements seulement
 		Exit: Retour aux couleurs
 		NoScraper: Aucun grattoir à peinture
 	}
@@ -62,7 +88,7 @@ Configs: {
 		Headers: {
 			Input: Commandes
 			Shape: Sélecteur
-			Presets: Préréglages
+			Presets: Palettes
 		}
 
 		OpenWithRightClick: {
@@ -95,7 +121,11 @@ Configs: {
 
 		Layout: {
 			Label: Forme du sélecteur
-			Tooltip: Un anneau de couleurs autour du curseur, ou une colonne de bandes à côté.
+			Tooltip:
+				'''
+				Un anneau de couleurs autour du curseur, une colonne de bandes à côté,
+				ou une grille de toutes les couleurs à la fois.
+				'''
 		}
 
 		Appearance: {
@@ -114,11 +144,11 @@ Configs: {
 		}
 
 		Presets: {
-			Label: Préréglages
+			Label: Palettes
 			Tooltip:
 				'''
-				Palettes enregistrées, choisies dans la liste qui s'ouvre au centre de la roue.
-				Une palette se remplit toujours automatiquement avec tout ce que vous portez.
+				Palettes enregistrées, choisies dans la liste qui s'ouvre au centre de la roue ou sur le nom de la
+				palette au-dessus. Une palette se remplit toujours automatiquement avec tout ce que vous portez.
 				'''
 		}
 	}
@@ -146,6 +176,29 @@ Configs: {
 				'''
 				Désactivé par défaut : les couleurs se lisent mieux directement sur le monde. Activez pour
 				le panneau translucide habituel de Terraria derrière elles.
+				'''
+		}
+
+		ShowQuickKeys: {
+			Label: Afficher les touches numériques sur les pastilles
+			Tooltip:
+				'''
+				Tant que la roue est ouverte, les touches numériques choisissent les dix premières pastilles ou
+				lignes au lieu de la barre d'accès rapide. Ceci montre quelle touche choisit quoi, comme la barre.
+				'''
+		}
+
+		ShowStackCounts: {
+			Label: Afficher les quantités
+			Tooltip: Combien vous portez de chaque peinture, sur sa pastille, là où un emplacement montre sa pile.
+		}
+
+		ShowCursorReadout: {
+			Label: Afficher votre peinture près du curseur
+			Tooltip:
+				'''
+				Une petite marque près du curseur là où le jeu n'affiche rien : la peinture qu'un bloc posé reçoit
+				du pulvérisateur, l'interrupteur blocs et murs du pinceau ou du rouleau, et ce que prend le grattoir.
 				'''
 		}
 
@@ -179,7 +232,11 @@ Configs: {
 
 		OpenAnimationTicks: {
 			Label: Durée de l'animation
-			Tooltip: Le temps que met la roue à se déployer. Gardez-le court, sinon elle paraît lente.
+			Tooltip:
+				'''
+				Le temps que met la roue à se déployer, en ticks : 60 font une seconde, 0 est instantané.
+				Gardez-le court, sinon elle paraît lente.
+				'''
 		}
 
 		BarCellWidth: {
@@ -293,7 +350,7 @@ Configs: {
 
 		Name: {
 			Label: Nom
-			Tooltip: Affiché au-dessus de la roue tant que ce préréglage est choisi.
+			Tooltip: Affiché au-dessus de la roue tant que cette palette est choisie.
 		}
 
 		Paints: {

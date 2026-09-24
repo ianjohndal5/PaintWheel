@@ -6,6 +6,10 @@ Keybinds: {
 	NextPalette.DisplayName: Tavolozza successiva
 	ToggleScrape.DisplayName: Attiva/disattiva modalità raschietto
 	ToggleNoPaint.DisplayName: Attiva/disattiva senza vernice
+	PreviousPaint.DisplayName: Vernice precedente
+	NextPaint.DisplayName: Vernice successiva
+	SwapPaintTool.DisplayName: Scambia pennello e rullo
+	TogglePaintBoth.DisplayName: Attiva/disattiva vernice su blocchi e muri
 }
 
 UI: {
@@ -32,6 +36,27 @@ UI: {
 	DoneEditing: Fatto
 	NewPaletteName: Tavolozza
 	EditingHeader: Modifica di {0}
+	ConfirmDelete: Clicca di nuovo per eliminare
+	PaletteHintNew: Clicca per vedere le tavolozze
+	RanOut: Non hai più {0}
+	PaintBoth: Vernicia blocchi e muri con qualsiasi attrezzo
+	PaintBothResume: Torna a una metà per attrezzo
+	PaintBothOn: Blocchi e muri
+	PaintBothOff: Una metà per attrezzo
+	NoToolToSwap: Nessun {0} da impugnare
+	NewEmptyPalette: Nuova tavolozza vuota
+	RenamePalette: Rinomina questa tavolozza
+	RenameHint: Invio per tenere, Esc per annullare
+	NothingToShow: Nessuna vernice da scegliere
+	CloseInventory: Chiudi l'inventario per aprire Paint Wheel
+
+	Keys: {
+		MouseLeft: il tasto sinistro del mouse
+		MouseRight: il tasto destro del mouse
+		MouseMiddle: il tasto centrale del mouse
+		Mouse4: il tasto 4 del mouse
+		Mouse5: il tasto 5 del mouse
+	}
 
 	Scrape: {
 		Enter: Modalità raschietto
@@ -39,6 +64,7 @@ UI: {
 		BlocksAndWalls: Blocchi e muri
 		BlocksOnly: Solo blocchi
 		WallsOnly: Solo muri
+		CoatingsOnly: Solo rivestimenti
 		Exit: Torna ai colori
 		NoScraper: Non hai un raschietto per vernice
 	}
@@ -62,7 +88,7 @@ Configs: {
 		Headers: {
 			Input: Comandi
 			Shape: Selettore
-			Presets: Preimpostazioni
+			Presets: Tavolozze
 		}
 
 		OpenWithRightClick: {
@@ -95,7 +121,11 @@ Configs: {
 
 		Layout: {
 			Label: Forma del selettore
-			Tooltip: Un anello di colori attorno al cursore, o una colonna di fasce accanto.
+			Tooltip:
+				'''
+				Un anello di colori attorno al cursore, una colonna di fasce accanto,
+				o una griglia con tutti i colori insieme.
+				'''
 		}
 
 		Appearance: {
@@ -114,11 +144,11 @@ Configs: {
 		}
 
 		Presets: {
-			Label: Preimpostazioni
+			Label: Tavolozze
 			Tooltip:
 				'''
-				Tavolozze salvate, scelte dall'elenco che si apre cliccando al centro della ruota.
-				C'è sempre una tavolozza che si riempie da sola con tutto quello che hai addosso.
+				Tavolozze salvate, scelte dall'elenco che si apre cliccando al centro della ruota o sul nome della
+				tavolozza sopra. C'è sempre una tavolozza che si riempie da sola con tutto quello che hai addosso.
 				'''
 		}
 	}
@@ -146,6 +176,29 @@ Configs: {
 				'''
 				Disattivato di base: i colori si leggono meglio direttamente sul mondo. Attivalo per il
 				solito pannello traslucido di Terraria dietro di essi.
+				'''
+		}
+
+		ShowQuickKeys: {
+			Label: Mostra i tasti numerici sui colori
+			Tooltip:
+				'''
+				Con la ruota aperta, i tasti numerici scelgono i primi dieci colori o righe invece della barra
+				rapida. Questo mostra quale tasto sceglie cosa, come la barra rapida mostra i suoi.
+				'''
+		}
+
+		ShowStackCounts: {
+			Label: Mostra le quantità
+			Tooltip: Quanta vernice di ogni tipo hai, sul suo colore, dove uno slot dell'inventario mostra la sua pila.
+		}
+
+		ShowCursorReadout: {
+			Label: Mostra la tua vernice accanto al cursore
+			Tooltip:
+				'''
+				Un piccolo segno accanto al cursore dove il gioco non mostra nulla: la vernice che un blocco riceve
+				dallo spruzzatore, l'interruttore blocchi e muri su pennello o rullo, e cosa toglie il raschietto.
 				'''
 		}
 
@@ -179,7 +232,11 @@ Configs: {
 
 		OpenAnimationTicks: {
 			Label: Durata dell'animazione
-			Tooltip: Quanto ci mette la ruota ad aprirsi. Tienila breve o sembrerà lenta.
+			Tooltip:
+				'''
+				Quanto ci mette la ruota ad aprirsi, in tick: 60 sono un secondo, 0 è istantaneo.
+				Tienila breve o sembrerà lenta.
+				'''
 		}
 
 		BarCellWidth: {
@@ -291,7 +348,7 @@ Configs: {
 
 		Name: {
 			Label: Nome
-			Tooltip: Mostrato sopra la ruota finché questa preimpostazione è scelta.
+			Tooltip: Mostrato sopra la ruota finché questa tavolozza è scelta.
 		}
 
 		Paints: {
