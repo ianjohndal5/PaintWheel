@@ -4,7 +4,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using PaintWheel.Common.Configs;
 using PaintWheel.Common.Painting;
-using PaintWheel.Common.Players;
 using PaintWheel.Common.Systems;
 using ReLogic.Localization.IME;
 using ReLogic.OS;
@@ -15,25 +14,11 @@ using Terraria.Localization;
 
 namespace PaintWheel.Common.UI.Picker;
 
-/// <summary>What a row in one of the lists does when chosen.</summary>
+/// <summary>What a row does when chosen. One kind today; a new list's rows would add theirs here.</summary>
 internal enum RowKind
 {
 	/// <summary>Switches to a palette.</summary>
 	Palette,
-
-	/// <summary>Sets what the scraper may strip.</summary>
-	ScrapeTarget,
-
-	/// <summary>Leaves scrape mode, back to the colours.</summary>
-	ExitScrape,
-}
-
-/// <summary>What activating a row did, which decides the sound and whether the picker stays up.</summary>
-internal enum RowResult
-{
-	Failed,
-	Handled,
-	CloseAfter,
 }
 
 /// <summary>One row of a list, built fresh whenever what it shows changes.</summary>
@@ -45,9 +30,6 @@ internal sealed class MenuRow
 	/// <summary>Which palette a palette row switches to.</summary>
 	public int Index = -1;
 
-	/// <summary>Which target a scrape row sets.</summary>
-	public ScrapeMode Mode;
-
 	/// <summary>Index into the config presets, or -1 for a palette that cannot be edited.</summary>
 	public int Preset = -1;
 	public bool Current;
@@ -58,8 +40,9 @@ internal sealed class MenuRow
 }
 
 /// <summary>
-/// The lists that cover the swatches - palettes and scrape targets. One list of rows, so hit testing,
-/// drawing and activation cannot disagree about what row three is.
+/// The palette list that covers the swatches. One list of rows, so hit testing, drawing and activation
+/// cannot disagree about what row three is. (Scrape mode's choices are a wheel of their own: see
+/// <see cref="ScrapeWheel"/>.)
 /// </summary>
 internal static class PickerMenu
 {
@@ -101,48 +84,22 @@ internal static class PickerMenu
 	{
 		Rows.Clear();
 
-		if (which == PickerOverlay.Palettes) {
-			for (int i = 0; i < PickerContent.Palettes.Count; i++) {
-				Rows.Add(new MenuRow {
-					Kind = RowKind.Palette,
-					Index = i,
-					Label = PickerContent.Palettes[i].Name,
-					Current = i == PickerContent.PaletteIndex,
-					Preview = PickerContent.Palettes[i],
-					Count = PickerContent.Palettes[i].Paints.Count,
-
-					// Only a saved palette can be edited or thrown away; the automatic one is neither.
-					Preset = PickerContent.Palettes[i].Preset,
-				});
-			}
-
+		if (which != PickerOverlay.Palettes)
 			return;
+
+		for (int i = 0; i < PickerContent.Palettes.Count; i++) {
+			Rows.Add(new MenuRow {
+				Kind = RowKind.Palette,
+				Index = i,
+				Label = PickerContent.Palettes[i].Name,
+				Current = i == PickerContent.PaletteIndex,
+				Preview = PickerContent.Palettes[i],
+				Count = PickerContent.Palettes[i].Paints.Count,
+
+				// Only a saved palette can be edited or thrown away; the automatic one is neither.
+				Preset = PickerContent.Palettes[i].Preset,
+			});
 		}
-
-		if (which != PickerOverlay.Scrape)
-			return;
-
-		ScrapeMode current = PaintSelection.Scrape;
-
-		AddScrapeRow(ScrapeMode.BlocksAndWalls, "BlocksAndWalls", current);
-		AddScrapeRow(ScrapeMode.BlocksOnly, "BlocksOnly", current);
-		AddScrapeRow(ScrapeMode.WallsOnly, "WallsOnly", current);
-		AddScrapeRow(ScrapeMode.CoatingsOnly, "CoatingsOnly", current);
-
-		Rows.Add(new MenuRow {
-			Kind = RowKind.ExitScrape,
-			Label = Language.GetTextValue("Mods.PaintWheel.UI.Scrape.Exit"),
-		});
-	}
-
-	private static void AddScrapeRow(ScrapeMode mode, string key, ScrapeMode current)
-	{
-		Rows.Add(new MenuRow {
-			Kind = RowKind.ScrapeTarget,
-			Mode = mode,
-			Label = Language.GetTextValue("Mods.PaintWheel.UI.Scrape." + key),
-			Current = mode == current,
-		});
 	}
 
 	private const float RowTextScale = 0.82f;
@@ -252,7 +209,7 @@ internal static class PickerMenu
 	/// </summary>
 	private static float RowWidthNeeded(MenuRow row)
 		=> LeftPad + WheelDrawing.MeasureText(row.Label, RowTextScale).X + CountWidth(row)
-			+ TrailingRoom(row.Preview is not null) + ActionRoom(row) + RowRightPad + 2f;
+			+ TrailingRoom + ActionRoom(row) + RowRightPad + 2f;
 
 	/// <summary>Three buttons on a saved palette - edit its colours, rename it, throw it away.</summary>
 	private static int ActionCount(MenuRow row) => row.Preset >= 0 ? 3 : 0;
@@ -261,18 +218,16 @@ internal static class PickerMenu
 
 	/// <summary>Room left for the name once the count and the trailing space are taken out.</summary>
 	private static float NameRoom(Rectangle row, MenuRow entry)
-		=> row.Width - LeftPad - RowRightPad - TrailingRoom(entry.Preview is not null)
-			- CountWidth(entry) - ActionRoom(entry);
+		=> row.Width - LeftPad - RowRightPad - TrailingRoom - CountWidth(entry) - ActionRoom(entry);
 
 	private static float CountWidth(MenuRow row)
 		=> row.Count > 0 ? RowCountGap + WheelDrawing.MeasureText(row.Count.ToString(), RowCountScale).X : 0f;
 
 	/// <summary>
-	/// Room kept at the right of a row for the preview dots, or the chevron. Shared by measuring and
-	/// drawing so a name can be trimmed to exactly what is left.
+	/// Room kept at the right of a row for the preview dots. Shared by measuring and drawing so a name
+	/// can be trimmed to exactly what is left.
 	/// </summary>
-	private static float TrailingRoom(bool previews)
-		=> previews ? RowPreviewDots * (WheelLayout.MenuRowHeight * 0.42f + 3f) + 10f : 22f;
+	private static float TrailingRoom => RowPreviewDots * (WheelLayout.MenuRowHeight * 0.42f + 3f) + 10f;
 
 	internal static Vector2 MenuCenter(in WheelLayout.Geometry geometry)
 		=> WheelLayout.ClampMenuCenter(geometry.MenuCenter, Shape, Main.screenWidth, Main.screenHeight);
@@ -433,8 +388,6 @@ internal static class PickerMenu
 
 			if (entry.Preview is not null)
 				DrawPalettePreview(spriteBatch, entry, row, opacity);
-			else if (entry.Kind != RowKind.ScrapeTarget)
-				DrawRowChevron(spriteBatch, row, hovered, opacity);
 
 			DrawRowActions(spriteBatch, entry, row, hovered, opacity);
 		}
@@ -551,60 +504,43 @@ internal static class PickerMenu
 			return;
 
 		Rectangle band = WheelLayout.MenuTitle(center, menu);
-		bool palettes = PaintPicker.DrawOverlay == PickerOverlay.Palettes;
-
-		string title = Language.GetTextValue(palettes
-			? "Mods.PaintWheel.UI.PaletteTitle"
-			: "Mods.PaintWheel.UI.Scrape.Header");
 
 		// The band doubles as the readout for the buttons, which are too small to label themselves.
-		if (palettes) {
-			if (IsRenaming)
-				title = Language.GetTextValue("Mods.PaintWheel.UI.RenameHint");
-			else if (PickerInput.HoveredPlus)
-				title = Language.GetTextValue(PaintInventory.OwnsAnyPaint(Main.LocalPlayer)
-					? "Mods.PaintWheel.UI.NewPalette"
-					: "Mods.PaintWheel.UI.NewEmptyPalette");
-			else if (PickerInput.HoveredAction == ActionEdit)
-				title = Language.GetTextValue("Mods.PaintWheel.UI.EditPalette");
-			else if (PickerInput.HoveredAction == ActionRename)
-				title = Language.GetTextValue("Mods.PaintWheel.UI.RenamePalette");
-			else if (PickerInput.HoveredAction == ActionDelete)
-				title = Language.GetTextValue(PickerInput.ArmedDelete >= 0
-					? "Mods.PaintWheel.UI.ConfirmDelete"
-					: "Mods.PaintWheel.UI.DeletePalette");
-		}
+		string title;
+		if (IsRenaming)
+			title = Language.GetTextValue("Mods.PaintWheel.UI.RenameHint");
+		else if (PickerInput.HoveredPlus)
+			title = Language.GetTextValue(PaintInventory.OwnsAnyPaint(Main.LocalPlayer)
+				? "Mods.PaintWheel.UI.NewPalette"
+				: "Mods.PaintWheel.UI.NewEmptyPalette");
+		else if (PickerInput.HoveredAction == ActionEdit)
+			title = Language.GetTextValue("Mods.PaintWheel.UI.EditPalette");
+		else if (PickerInput.HoveredAction == ActionRename)
+			title = Language.GetTextValue("Mods.PaintWheel.UI.RenamePalette");
+		else if (PickerInput.HoveredAction == ActionDelete)
+			title = Language.GetTextValue(PickerInput.ArmedDelete >= 0
+				? "Mods.PaintWheel.UI.ConfirmDelete"
+				: "Mods.PaintWheel.UI.DeletePalette");
+		else
+			title = Language.GetTextValue("Mods.PaintWheel.UI.PaletteTitle");
 
-		// Trimmed to the band, less the "+" on the palette list, so a long translation cannot run out of it.
-		float room = band.Width - 14f - (palettes ? WheelLayout.MenuActionSize + 4f : 0f);
+		// Trimmed to the band, less the "+", so a long translation cannot run out of it.
+		float room = band.Width - 14f - (WheelLayout.MenuActionSize + 4f);
 		title = WheelDrawing.Truncate(title, 0.78f, room);
 
 		WheelDrawing.DrawTextLeft(spriteBatch, title, new Vector2(band.X + 10f, band.Center.Y - 1f),
 			Main.OurFavoriteColor, opacity, 0.78f);
 
-		if (palettes) {
-			Rectangle add = WheelLayout.MenuTitleAction(center, menu);
+		Rectangle add = WheelLayout.MenuTitleAction(center, menu);
 
-			if (PickerInput.HoveredPlus)
-				WheelDrawing.DrawRect(spriteBatch, add, Color.White * (opacity * 0.16f));
+		if (PickerInput.HoveredPlus)
+			WheelDrawing.DrawRect(spriteBatch, add, Color.White * (opacity * 0.16f));
 
-			Color plus = Color.White * (opacity * (PickerInput.HoveredPlus ? 1f : 0.65f));
-			DrawButton(spriteBatch, UITextures.Plus, add, plus, () => WheelDrawing.DrawPlus(spriteBatch, add.Center.ToVector2(), add.Width * 0.5f, plus));
-		}
+		Color plus = Color.White * (opacity * (PickerInput.HoveredPlus ? 1f : 0.65f));
+		DrawButton(spriteBatch, UITextures.Plus, add, plus, () => WheelDrawing.DrawPlus(spriteBatch, add.Center.ToVector2(), add.Width * 0.5f, plus));
 
 		WheelDrawing.DrawRect(spriteBatch, new Rectangle(band.X + 4, band.Bottom - 1, band.Width - 8, 1),
 			Color.Black * (opacity * 0.35f));
-	}
-
-	/// <summary>A small arrow on rows that lead somewhere rather than setting something.</summary>
-	private static void DrawRowChevron(SpriteBatch spriteBatch, Rectangle row, bool hovered, float opacity)
-	{
-		// Pointing back, since the one row that has it - back to colours - leaves the list.
-		var at = new Vector2(row.Right - 12f, row.Center.Y);
-
-		WheelDrawing.DrawTriangle(spriteBatch, at + Vector2.One, 10f, -1, Color.Black * (opacity * 0.5f));
-		WheelDrawing.DrawTriangle(spriteBatch, at, 10f, -1,
-			(hovered ? Color.White : new Color(198, 202, 228)) * opacity);
 	}
 
 	/// <summary>A few dots of what a palette holds, so rows are told apart by colour, not just name.</summary>

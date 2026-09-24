@@ -48,7 +48,7 @@ UI: {
 	RenamePalette: Rename this palette
 	RenameHint: Enter to keep, Escape to cancel
 	NothingToShow: No paint to choose from
-	CloseInventory: Close the inventory to open Paint Wheel
+	PaintToolNeeded: Paint tool needed
 
 	Keys: {
 		MouseLeft: the left mouse button
@@ -392,9 +392,9 @@ Configs: {
 			Label: Click to open
 			Tooltip:
 				'''
-				One right click leaves the picker up, no holding. Clicking a colour chooses it and closes;
-				coatings, palettes and scrape mode leave it open so you can set several things at once.
-				Right click again, press Escape, or click away to put it down.
+				One right click leaves the picker up, no holding. Clicking a colour or a scrape option chooses it
+				and closes; coatings, palettes and the scraper button leave it open so you can set several things at
+				once. Right click again or press Escape to put it down.
 				'''
 		}
 	}

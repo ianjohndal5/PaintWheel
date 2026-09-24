@@ -45,6 +45,9 @@ internal static class PickerInput
 	internal static bool HoveredPlus;
 	internal static bool HoveredDone;
 
+	/// <summary>On the scrape wheel: an option, <see cref="WheelLayout.ScrapeBack"/> for the disc in the middle, or -1.</summary>
+	internal static int HoveredScrape = -1;
+
 	/// <summary>True while the cursor is anywhere over an open list's panel, rows or not.</summary>
 	internal static bool HoveredPanel;
 
@@ -88,6 +91,7 @@ internal static class PickerInput
 		HoveredCenter = false;
 		HoveredHeader = false;
 		HoveredPanel = false;
+		HoveredScrape = -1;
 		ArmedDelete = -1;
 	}
 
@@ -178,23 +182,35 @@ internal static class PickerInput
 			return;
 		}
 
-		if (PaintPicker.Overlay != PickerOverlay.None) {
-			if (HoveredRow >= 0) {
-				RowResult result = PaintPicker.ActivateRow(HoveredRow, config);
-				PaintPicker.Play(result == RowResult.Failed ? SoundID.MenuClose : SoundID.Grab, config);
+		// The scrape wheel. An option is the choice that finishes the job here, as a colour is on the
+		// colour wheel, so it closes the picker even when it was left up - and, as there, a click in any
+		// direction lands on the option that way. The middle goes back to the colours and keeps the
+		// picker up to choose one.
+		if (PaintPicker.Overlay == PickerOverlay.Scrape) {
+			if (HoveredScrape == WheelLayout.ScrapeBack) {
+				PaintPicker.Play(PaintPicker.BackToColours(config) ? SoundID.Grab : SoundID.MenuClose, config);
+			}
+			else if (HoveredScrape >= 0) {
+				bool chosen = PaintPicker.ChooseScrapeTarget(HoveredScrape);
+				PaintPicker.Play(chosen ? SoundID.Grab : SoundID.MenuClose, config);
 
-				if (result == RowResult.CloseAfter && !PaintPicker.Sticky)
+				if (chosen)
 					PaintPicker.CloseSilently();
 			}
-			else if (!HoveredPanel) {
-				// Clicking off the list backs out: to the swatches if there are any, otherwise away. A
-				// click on the panel between rows is a near miss, not a request to leave.
-				PaintPicker.Play(SoundID.MenuClose, config);
 
-				if (PaintPicker.Overlay == PickerOverlay.Scrape)
-					PaintPicker.CloseSilently();
-				else
-					PaintPicker.Overlay = PickerOverlay.None;
+			Consume();
+			return;
+		}
+
+		if (PaintPicker.Overlay == PickerOverlay.Palettes) {
+			if (HoveredRow >= 0) {
+				PaintPicker.Play(PaintPicker.ActivateRow(HoveredRow, config) ? SoundID.Grab : SoundID.MenuClose, config);
+			}
+			else if (!HoveredPanel) {
+				// Clicking off the list backs out to the swatches. A click on the panel between rows is a
+				// near miss, not a request to leave.
+				PaintPicker.Play(SoundID.MenuClose, config);
+				PaintPicker.Overlay = PickerOverlay.None;
 			}
 
 			Consume();
@@ -332,7 +348,7 @@ internal static class PickerInput
 		int direction = delta > 0 ? -1 : 1;
 		bool shift = Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift);
 
-		// Nothing to scroll through in the scrape list, and changing palette under the editor would
+		// Nothing to scroll through on the scrape wheel, and changing palette under the editor would
 		// leave it editing one you can no longer see. The delta is still swallowed above so the hotbar
 		// does not move underneath either.
 		if (PaintPicker.Overlay is PickerOverlay.Scrape or PickerOverlay.Grid)
@@ -355,6 +371,8 @@ internal static class PickerInput
 	internal static void UpdateHover(PaintWheelConfig config)
 	{
 		Vector2 cursor = Main.MouseScreen;
+		int wasScrape = HoveredScrape;
+		HoveredScrape = -1;
 
 		if (!CursorMoved && Vector2.DistanceSquared(cursor, OpenCursor) > MovedThreshold * MovedThreshold)
 			CursorMoved = true;
@@ -395,6 +413,24 @@ internal static class PickerInput
 
 			HoveredCell = cell;
 			HoveredRow = -1;
+			HoveredSwatch = -1;
+			HoveredCoating = -1;
+			HoveredArrow = -1;
+			return;
+		}
+
+		if (PaintPicker.Overlay == PickerOverlay.Scrape) {
+			int target = ScrapeWheel.HitTest(settings, cursor, CursorMoved);
+
+			// Ticks on reaching an option, as on a swatch.
+			if (target >= 0 && target != wasScrape)
+				PaintPicker.Play(SoundID.MenuTick, config);
+
+			HoveredScrape = target;
+			HoveredRow = -1;
+			HoveredAction = -1;
+			HoveredPanel = false;
+			HoveredPlus = false;
 			HoveredSwatch = -1;
 			HoveredCoating = -1;
 			HoveredArrow = -1;
@@ -466,6 +502,10 @@ internal static class PickerInput
 			// A radial menu: which way the stick leans is the swatch, whatever the distance.
 			case PickerOverlay.None when settings.Style == WheelLayoutStyle.Wheel:
 				return PaintPicker.Anchor + stick * geometry.Radius;
+
+			// The scrape wheel is one too, whatever shape the picker is.
+			case PickerOverlay.Scrape:
+				return ScrapeWheel.Center + stick * ScrapeWheel.Shape(settings).Radius;
 
 			// The whole picker - header, arrows and bottom row as well as the swatches.
 			case PickerOverlay.None:

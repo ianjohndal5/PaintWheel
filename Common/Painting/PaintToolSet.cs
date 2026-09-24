@@ -58,6 +58,16 @@ public static class PaintToolSet
 	public static bool HoldsPaintingItem(Player player)
 		=> player is not null && (IsPaintTool(player.HeldItem) || (AutoPaints(player) && IsPlaceable(player.HeldItem)));
 
+	/// <summary>
+	/// Whether the picker may open for what is in hand, as far as the inventory goes: always while it is
+	/// shut, and with it open only for a paint tool in hand. Right click there already belongs to the
+	/// slots and to furniture, so a block - or anything "Only while holding a paint tool" off would let
+	/// through - does not open it. The held item, not one owned somewhere: an item carried on the cursor
+	/// is what the player holds while it is there.
+	/// </summary>
+	public static bool InventoryAllows(Player player)
+		=> !Main.playerInventory || (player is not null && IsPaintTool(player.HeldItem));
+
 	/// <summary>Index of the Paint Sprayer's switch in <see cref="Player.builderAccStatus"/>; 0 means on.</summary>
 	private const int BuilderToggleSprayer = 3;
 

@@ -48,7 +48,7 @@ UI: {
 	RenamePalette: Palitan ang pangalan ng palette na ito
 	RenameHint: Enter para itago, Escape para kanselahin
 	NothingToShow: Walang pinturang mapipili
-	CloseInventory: Isara ang inventory para mabuksan ang Paint Wheel
+	PaintToolNeeded: Kailangan ng paint tool
 
 	Keys: {
 		MouseLeft: kaliwang button ng mouse
@@ -400,8 +400,9 @@ Configs: {
 			Tooltip:
 				'''
 				Isang right click lang at mananatiling bukas ang pampili, hindi na kailangang hawakan. Ang pagpindot
-				sa kulay ang pipili at magsasara; ang mga coating, palette at scrape mode ay iniiwang bukas para
-				makapag-set ka ng marami nang sabay. Right click ulit, Escape, o pindot sa labas para isara.
+				sa kulay o sa opsyon ng scrape ang pipili at magsasara; ang mga coating, palette at ang button ng
+				scraper ay iniiwang bukas para makapag-set ka ng marami nang sabay. Right click ulit o Escape para
+				isara.
 				'''
 		}
 	}

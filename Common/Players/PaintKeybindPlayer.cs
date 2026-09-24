@@ -43,7 +43,9 @@ public class PaintKeybindPlayer : ModPlayer
 		// put the sword in the bag.
 		bool toolInHand = CanOpenFromKeybind();
 
-		if (KeybindSystem.OpenWheelKey is { JustPressed: true } && toolInHand)
+		// Over the inventory the key is let through whatever is in hand, so the picker can say what it
+		// needs there rather than doing nothing at all.
+		if (KeybindSystem.OpenWheelKey is { JustPressed: true } && (toolInHand || Main.playerInventory))
 			PaintPicker.RequestOpen(viaKeybind: true);
 
 		if (KeybindSystem.EyedropperKey is { JustPressed: true })

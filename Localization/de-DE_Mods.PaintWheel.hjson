@@ -48,7 +48,7 @@ UI: {
 	RenamePalette: Diese Palette umbenennen
 	RenameHint: Enter übernimmt, Escape bricht ab
 	NothingToShow: Keine Farbe zur Auswahl
-	CloseInventory: Schließe das Inventar, um Paint Wheel zu öffnen
+	PaintToolNeeded: Malwerkzeug benötigt
 
 	Keys: {
 		MouseLeft: der linken Maustaste
@@ -393,9 +393,9 @@ Configs: {
 			Label: Mit einem Klick öffnen
 			Tooltip:
 				'''
-				Ein Rechtsklick lässt das Menü stehen, ohne Halten. Ein Klick auf eine Farbe wählt sie und
-				schließt; Beschichtungen, Paletten und der Schabmodus lassen es offen, damit du mehreres
-				einstellen kannst. Erneut rechtsklicken, Esc drücken oder daneben klicken schließt es.
+				Ein Rechtsklick lässt das Menü stehen, ohne Halten. Ein Klick auf eine Farbe oder eine Schaboption
+				wählt sie und schließt; Beschichtungen, Paletten und der Schaber-Knopf lassen es offen, damit du
+				mehreres einstellen kannst. Erneut rechtsklicken oder Esc drücken schließt es.
 				'''
 		}
 	}

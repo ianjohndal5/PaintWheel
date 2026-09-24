@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -7,6 +8,7 @@ using PaintWheel.Common.Players;
 using PaintWheel.Common.Systems;
 using PaintWheel.Common.UI.Picker;
 using Terraria;
+using Terraria.GameContent.Creative;
 using Terraria.GameInput;
 using Terraria.ModLoader;
 using Terraria.UI;
@@ -14,11 +16,77 @@ using Terraria.UI;
 namespace PaintWheel.Common.UI;
 
 /// <summary>
-/// Hooks the picker into the game's UI pass: its update, its scroll claim and its draw layer. The same
-/// layer draws the eyedropper's dot beside the cursor (see <see cref="PaintHover"/>).
+/// Hooks the picker into the game's UI pass: its update, its scroll claim, its draw layer, and the
+/// guard that keeps the HUD under it from answering the mouse. The same layer draws the eyedropper's
+/// dot beside the cursor (see <see cref="PaintHover"/>).
 /// </summary>
 public class PaintWheelUISystem : ModSystem
 {
+	/// <summary>
+	/// The HUD the picker can open over - the inventory and everything drawn with it, the hotbar, the
+	/// accessory toggles, the buffs, the housing banners, Journey mode's powers - each run with the mouse
+	/// out of its reach while the picker has it. See <see cref="HudShield"/>. tModLoader removes these
+	/// hooks on unload by itself.
+	/// </summary>
+	public override void Load()
+	{
+		if (Main.dedServ)
+			return;
+
+		On_Main.DrawInterface_7_TownNPCHouseBanners += (orig, self) => { using (HudShield.Raise()) orig(self); };
+		On_Main.DrawInterface_25_ResourceBars += (orig, self) => { using (HudShield.Raise()) orig(self); };
+		On_Main.DrawInterface_27_Inventory += (orig, self) => { using (HudShield.Raise()) orig(self); };
+		On_Main.DrawInterface_28_InfoAccs += (orig, self) => { using (HudShield.Raise()) orig(self); };
+		On_Main.DrawInterface_29_SettingsButton += orig => { using (HudShield.Raise()) orig(); };
+		On_Main.DrawInterface_30_Hotbar += (orig, self) => { using (HudShield.Raise()) orig(self); };
+		On_Main.DrawInterface_31_BuilderAccToggles += (orig, self) => { using (HudShield.Raise()) orig(self); };
+		On_Main.DrawInterface_32_GamepadRadialHotbars += orig => { using (HudShield.Raise()) orig(); };
+
+		// Journey mode's panel works out its clicks in the update rather than as it draws, just before
+		// the picker's own update runs.
+		On_CreativeUI.Update += (orig, self, gameTime) => { using (HudShield.Raise()) orig(self, gameTime); };
+	}
+
+	/// <summary>
+	/// Keeps the HUD from acting on a mouse that is working the picker. Vanilla's slots, hotbar and
+	/// toggles read the mouse as they draw, with no idea anything is drawn over them: a click on a swatch
+	/// above a slot would take the item in it too, a right click held to keep the wheel open would pull
+	/// a stack off every slot it crossed, and one over a buff would cancel the buff. So while the picker
+	/// has the mouse they run with it moved off the screen, and it is put back as each finishes. The
+	/// picker's own layer comes after all of them and sees the real position.
+	/// </summary>
+	private readonly struct HudShield : IDisposable
+	{
+		private const int OffScreen = -10000;
+
+		private readonly int x;
+		private readonly int y;
+		private readonly bool raised;
+
+		private HudShield(bool raise)
+		{
+			x = Main.mouseX;
+			y = Main.mouseY;
+			raised = raise;
+
+			if (raise) {
+				Main.mouseX = OffScreen;
+				Main.mouseY = OffScreen;
+			}
+		}
+
+		public static HudShield Raise() => new(PaintPicker.HasMouse);
+
+		public void Dispose()
+		{
+			if (!raised)
+				return;
+
+			Main.mouseX = x;
+			Main.mouseY = y;
+		}
+	}
+
 	public override void UpdateUI(GameTime gameTime)
 	{
 		if (Main.dedServ)

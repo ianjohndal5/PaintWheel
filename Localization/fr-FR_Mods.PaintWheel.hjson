@@ -48,7 +48,7 @@ UI: {
 	RenamePalette: Renommer cette palette
 	RenameHint: Entrée pour garder, Échap pour annuler
 	NothingToShow: Aucune peinture à choisir
-	CloseInventory: Fermez l'inventaire pour ouvrir Paint Wheel
+	PaintToolNeeded: Outil de peinture requis
 
 	Keys: {
 		MouseLeft: le bouton gauche de la souris
@@ -394,9 +394,9 @@ Configs: {
 			Label: Cliquer pour ouvrir
 			Tooltip:
 				'''
-				Un clic droit laisse le sélecteur affiché, sans maintenir. Cliquer une couleur la choisit
-				et referme ; revêtements, palettes et mode grattoir le laissent ouvert pour enchaîner
-				plusieurs réglages. Reclic droit, Échap ou un clic à côté le referment.
+				Un clic droit laisse le sélecteur affiché, sans maintenir. Cliquer une couleur ou une option de
+				grattage la choisit et referme ; revêtements, palettes et le bouton du grattoir le laissent ouvert
+				pour enchaîner plusieurs réglages. Reclic droit ou Échap le referment.
 				'''
 		}
 	}

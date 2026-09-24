@@ -12,9 +12,10 @@ using Terraria.Localization;
 namespace PaintWheel.Common.UI.Picker;
 
 /// <summary>
-/// Everything the picker draws apart from its lists and the editor grid: the wheel, the bar, the grid
-/// layout, the coating row and the text around them. Nothing here decides anything - it reads the state
-/// the update pass left behind.
+/// Everything the picker draws apart from the palette list, the scrape wheel and the editor grid: the
+/// wheel, the bar, the grid layout, the coating row and the text around them - and the discs the scrape
+/// wheel is built from too, so the two wheels are one visual language. Nothing here decides anything -
+/// it reads the state the update pass left behind.
 /// </summary>
 internal static class PickerRenderer
 {
@@ -27,6 +28,9 @@ internal static class PickerRenderer
 	private static readonly Color EmptyDiscFill = new(52, 52, 64);
 	private static readonly Color ScrapeDiscFill = new(64, 58, 48);
 
+	/// <summary>The disc in the middle of a wheel, when it is a button rather than your colour.</summary>
+	internal static readonly Color CenterDiscFill = new(46, 48, 78);
+
 	public static void Draw(SpriteBatch spriteBatch)
 	{
 		if (PaintPicker.Anim <= 0f)
@@ -36,16 +40,16 @@ internal static class PickerRenderer
 		if (config is null)
 			return;
 
-		if (PaintPicker.IsActive)
-			Main.LocalPlayer.mouseInterface = true;
-
 		float opacity = PaintPicker.Anim;
 		float eased = WheelMath.EaseOut(PaintPicker.Anim);
 
 		WheelLayout.Settings settings = PaintPicker.BuildSettings(config, eased);
 		WheelLayout.Geometry geometry = WheelLayout.Compute(settings, PaintPicker.Anchor);
 
-		if (config.Appearance.ShowBackgroundPanel)
+		// The scrape wheel is its own shape, with its own panel, title and name.
+		bool scraping = PaintPicker.DrawOverlay == PickerOverlay.Scrape;
+
+		if (config.Appearance.ShowBackgroundPanel && !scraping)
 			WheelDrawing.DrawPanel(spriteBatch, geometry.Panel, opacity);
 
 		// Only over the swatches: a list carries its own title and marks its own current row, so drawing
@@ -80,7 +84,9 @@ internal static class PickerRenderer
 
 		if (PaintPicker.DrawOverlay == PickerOverlay.Grid)
 			PaletteEditor.DrawGrid(spriteBatch, geometry, opacity);
-		else if (PaintPicker.DrawOverlay != PickerOverlay.None)
+		else if (scraping)
+			ScrapeWheel.Draw(spriteBatch, config, settings, opacity);
+		else if (PaintPicker.DrawOverlay == PickerOverlay.Palettes)
 			PickerMenu.DrawMenu(spriteBatch, geometry, opacity);
 		else
 			DrawHoverText(spriteBatch, config, settings, geometry, opacity);
@@ -187,7 +193,7 @@ internal static class PickerRenderer
 	/// The number key that picks this swatch while the picker is up - 1 to 9 and 0 for the first ten -
 	/// dimmed, so it reads as a hint rather than as part of the colour.
 	/// </summary>
-	private static void DrawKeyHint(SpriteBatch spriteBatch, PaintWheelConfig config, int index, Vector2 at, float opacity)
+	internal static void DrawKeyHint(SpriteBatch spriteBatch, PaintWheelConfig config, int index, Vector2 at, float opacity)
 	{
 		if (!config.Appearance.ShowQuickKeys || index >= 10)
 			return;
@@ -199,7 +205,7 @@ internal static class PickerRenderer
 	/// Halo, rim, fill: the three layers every disc here is built from. The pale halo matters - without
 	/// it a Shadow Paint disc vanishes into a dark background, since nothing is drawn behind the picker.
 	/// </summary>
-	private static void DrawDiscBody(SpriteBatch spriteBatch, Vector2 center, float radius, Color fill,
+	internal static void DrawDiscBody(SpriteBatch spriteBatch, Vector2 center, float radius, Color fill,
 		bool hovered, float opacity)
 	{
 		WheelDrawing.DrawDisc(spriteBatch, center, radius + 1f, HaloColor * (opacity * (hovered ? 0.75f : 0.4f)));
@@ -207,7 +213,7 @@ internal static class PickerRenderer
 		WheelDrawing.DrawDisc(spriteBatch, center, radius - 2f, fill * opacity);
 	}
 
-	private static void DrawDiscMarks(SpriteBatch spriteBatch, Vector2 center, float radius, bool chosen,
+	internal static void DrawDiscMarks(SpriteBatch spriteBatch, Vector2 center, float radius, bool chosen,
 		bool hovered, float opacity)
 	{
 		if (chosen)
@@ -263,7 +269,7 @@ internal static class PickerRenderer
 		}
 		else if (button) {
 			WheelDrawing.DrawDisc(spriteBatch, PaintPicker.Anchor, radius, RimColor * (opacity * 0.85f));
-			WheelDrawing.DrawDisc(spriteBatch, PaintPicker.Anchor, radius - 2f, new Color(46, 48, 78) * opacity);
+			WheelDrawing.DrawDisc(spriteBatch, PaintPicker.Anchor, radius - 2f, CenterDiscFill * opacity);
 		}
 
 		if (button) {
