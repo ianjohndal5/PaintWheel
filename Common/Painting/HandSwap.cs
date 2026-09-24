@@ -19,7 +19,8 @@ public static class HandSwap
 	/// <summary>
 	/// What <see cref="Hold"/> moved, so <see cref="Release"/> can move exactly that back: the slot that
 	/// was selected, the hotbar slot the item went into, the bag slot it came out of (-1 when it was
-	/// already on the hotbar), and the type of the item it displaced into the bag.
+	/// already on the hotbar), and the type of the item that was in hand before - swapped into the bag,
+	/// or only no longer selected - so it can be found again if it has moved since.
 	/// </summary>
 	public readonly record struct Swap(int PreviousSelection, int HandSlot, int BagSlot, int DisplacedType)
 	{
@@ -61,11 +62,12 @@ public static class HandSwap
 			return false;
 
 		int previous = player.selectedItem;
+		int held = previous >= 0 && previous < HotbarSlots ? player.inventory[previous].type : 0;
 
 		// Already on the hotbar: switching to it touches nothing.
 		if (slot < HotbarSlots) {
 			player.selectedItem = slot;
-			swap = new Swap(previous, slot, -1, 0);
+			swap = new Swap(previous, slot, -1, held);
 			return true;
 		}
 

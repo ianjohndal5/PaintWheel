@@ -169,11 +169,11 @@ shape, and opens where your cursor is.
 
 It needs a Paint Scraper, and it takes one into your hand for you: if the scraper is already on your
 hotbar it just switches to that slot, and if it is in your bag it swaps into the slot you were
-holding. Leaving the mode puts both back — unless you have moved either since, in which case your
-inventory is left as you arranged it. The swap-back is remembered for the session only: scrape mode
-itself stays on across a save and reload, but after one, leaving it just switches mode. Apart from
-this, the brush/roller swap key and the *Inventory swap* fallback in Advanced, nothing in the mod
-moves an item.
+holding. Leaving the mode — the middle disc, or the key — puts back what you were holding: the same
+two slots traded back if nothing has moved, otherwise that item from wherever it is now; and if you no
+longer carry it, a brush or roller takes the scraper's place. This is saved with your character, like
+scrape mode itself, so it works after a save and reload too. Apart from this, the brush/roller swap
+key and the *Inventory swap* fallback in Advanced, nothing in the mod moves an item.
 
 ## Settings
 
