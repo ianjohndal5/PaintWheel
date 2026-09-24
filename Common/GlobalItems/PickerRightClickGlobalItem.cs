@@ -14,22 +14,25 @@ namespace PaintWheel.Common.GlobalItems;
 /// </summary>
 public class PickerRightClickGlobalItem : GlobalItem
 {
-	public override bool AltFunctionUse(Item item, Player player)
+	/// <summary>
+	/// The inventory's housing page, the one place right click works on the world itself: on a banner
+	/// it sends that NPC out of its house, and the banners do not mark the mouse as over the UI. So right
+	/// click is left to them there; the keybind still opens the picker.
+	/// </summary>
+	private static bool HousingPageOpen => Main.playerInventory && Main.EquipPage == 1;
+
+	private static bool OpensPicker(Item item, Player player)
 	{
 		PaintWheelConfig config = PaintWheelConfig.Instance;
-		if (config is not null && config.OpenWithRightClick && PaintToolSet.CanOpenFor(item, player))
-			return true;
-
-		return base.AltFunctionUse(item, player);
+		return config is not null && config.OpenWithRightClick && !HousingPageOpen && PaintToolSet.CanOpenFor(item, player);
 	}
+
+	public override bool AltFunctionUse(Item item, Player player)
+		=> OpensPicker(item, player) || base.AltFunctionUse(item, player);
 
 	public override bool CanUseItem(Item item, Player player)
 	{
-		PaintWheelConfig config = PaintWheelConfig.Instance;
-
-		if (config is not null && config.OpenWithRightClick && player.altFunctionUse == 2
-			&& PaintToolSet.CanOpenFor(item, player)) {
-
+		if (player.altFunctionUse == 2 && OpensPicker(item, player)) {
 			if (player.whoAmI == Main.myPlayer)
 				PaintPicker.RequestOpen(viaKeybind: false);
 

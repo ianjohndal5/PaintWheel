@@ -48,7 +48,7 @@ UI: {
 	RenamePalette: Rinomina questa tavolozza
 	RenameHint: Invio per tenere, Esc per annullare
 	NothingToShow: Nessuna vernice da scegliere
-	CloseInventory: Chiudi l'inventario per aprire Paint Wheel
+	PaintToolNeeded: Serve un attrezzo per verniciare
 
 	Keys: {
 		MouseLeft: il tasto sinistro del mouse
@@ -392,9 +392,9 @@ Configs: {
 			Label: Clicca per aprire
 			Tooltip:
 				'''
-				Un clic destro lascia il selettore aperto, senza tenere premuto. Cliccare un colore lo
-				sceglie e chiude; rivestimenti, tavolozze e modalità raschietto lo lasciano aperto per
-				impostare più cose. Clic destro di nuovo, Esc o un clic fuori lo chiudono.
+				Un clic destro lascia il selettore aperto, senza tenere premuto. Cliccare un colore o un'opzione di
+				raschiatura la sceglie e chiude; rivestimenti, tavolozze e il pulsante del raschietto lo lasciano
+				aperto per impostare più cose. Clic destro di nuovo o Esc lo chiudono.
 				'''
 		}
 	}

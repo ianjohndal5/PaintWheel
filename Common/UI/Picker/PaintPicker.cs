@@ -13,11 +13,13 @@ using Terraria.Localization;
 
 namespace PaintWheel.Common.UI.Picker;
 
-/// <summary>Which list, if any, is covering the swatches.</summary>
+/// <summary>Which view, if any, is standing in for the swatches.</summary>
 internal enum PickerOverlay
 {
 	None,
 	Palettes,
+
+	/// <summary>Scrape mode's wheel: what the scraper strips, and the way back to the colours.</summary>
 	Scrape,
 
 	/// <summary>Every paint at once, for building a palette.</summary>
@@ -26,19 +28,20 @@ internal enum PickerOverlay
 
 /// <summary>
 /// The picker's lifecycle: opening, closing, committing, and moving between its views (the swatches,
-/// the palette list, the scrape list and the palette editor). This is the one class the rest of the
+/// the palette list, the scrape wheel and the palette editor). This is the one class the rest of the
 /// mod talks to; the others in this folder each own one part of it:
 /// <list type="bullet">
 /// <item><see cref="PickerContent"/> - what is on offer: palettes, the page on show, the bottom row.</item>
 /// <item><see cref="PickerInput"/> - reading the mouse: what is hovered, what a click or release means.</item>
-/// <item><see cref="PickerMenu"/> - the palette and scrape lists: their rows, size, hit testing and drawing.</item>
+/// <item><see cref="PickerMenu"/> - the palette list: its rows, size, hit testing and drawing.</item>
+/// <item><see cref="ScrapeWheel"/> - scrape mode's own wheel: its options and their drawing.</item>
 /// <item><see cref="PaletteEditor"/> - building a palette in game, and creating and deleting saved ones.</item>
 /// <item><see cref="PickerRenderer"/> - drawing everything else: the swatches, header and bottom row.</item>
 /// <item><see cref="WheelLayout"/>, <see cref="WheelMath"/>, <see cref="WheelPaging"/> - where things go, for
 /// every layout; pure, with no game state.</item>
 /// </list>
 /// Small types live beside their users: <see cref="PickerOverlay"/> here, <see cref="Palette"/> in its own
-/// file, and <see cref="MenuRow"/>, <see cref="RowKind"/> and <see cref="RowResult"/> in PickerMenu.cs.
+/// file, and <see cref="MenuRow"/> and <see cref="RowKind"/> in PickerMenu.cs.
 /// Palettes and pages are separate axes. A palette is a named set of paints, chosen from a list; a page
 /// is one ring's worth of the palette you are on, walked with the arrows or the scroll wheel.
 /// <para/>
@@ -64,7 +67,7 @@ public static class PaintPicker
 	/// <summary>Where the picker is centred, in UI space: the cursor at opening, nudged on screen.</summary>
 	internal static Vector2 Anchor;
 
-	/// <summary>Which list, if any, is covering the swatches right now.</summary>
+	/// <summary>Which view, if any, stands in for the swatches right now.</summary>
 	internal static PickerOverlay Overlay;
 
 	/// <summary>
@@ -76,6 +79,20 @@ public static class PaintPicker
 	/// <summary>An open asked for and not yet started: whether it came from the keybind, or null for none.</summary>
 	private static bool? openRequest;
 
+	/// <summary>
+	/// The view the scrape key asked for with the picker up - the scrape wheel, or back to the colours -
+	/// shown in the next update, like an open: both go up at the cursor, and the key is read in the
+	/// player's update, where the cursor is not yet in UI space.
+	/// </summary>
+	private static PickerOverlay? viewRequest;
+
+	/// <summary>
+	/// Leaving scrape mode from the picker has just put back what was in hand. If that cannot hold the
+	/// picker up, the next update closes it - and says why, which is otherwise left unsaid outside the
+	/// inventory, where nothing about this changed.
+	/// </summary>
+	private static bool handSwappedBack;
+
 	/// <summary>A number key pressed while the picker was up: which swatch or row, or -1 for none.</summary>
 	private static int quickPick = -1;
 	private static int openSuppression;
@@ -83,8 +100,34 @@ public static class PaintPicker
 	/// <summary>True while the picker is accepting input.</summary>
 	public static bool IsActive => active;
 
-	/// <summary>Draws the picker, or nothing while it is fully closed.</summary>
-	public static void Draw(SpriteBatch spriteBatch) => PickerRenderer.Draw(spriteBatch);
+	/// <summary>
+	/// True while the picker has the mouse: while it is up, and after it closes until both buttons are
+	/// let go. Vanilla acts on a button that is merely held - a stack pulled onto the cursor a piece at a
+	/// time, a shop's buy, the craft button, the hotbar, a swing at the world - so neither the press that
+	/// closed the picker nor the right click still held from hold mode may reach any of them.
+	/// </summary>
+	public static bool HasMouse => active || releasePending;
+
+	/// <summary>Set as the picker closes; cleared once both buttons are up.</summary>
+	private static bool releasePending;
+
+	private static void ReleaseWhenLetGo()
+	{
+		if (releasePending && !Main.mouseLeft && !Main.mouseRight)
+			releasePending = false;
+	}
+
+	/// <summary>Draws the picker, or nothing while it is fully closed. Drawn after the HUD it covers.</summary>
+	public static void Draw(SpriteBatch spriteBatch)
+	{
+		// Claimed in the draw as well as the update, since vanilla clears it as each frame starts drawing,
+		// and the HUD under the picker - which would claim it over itself - cannot see the mouse.
+		if (HasMouse && Main.LocalPlayer is Player player)
+			player.mouseInterface = true;
+
+		PickerRenderer.Draw(spriteBatch);
+		ReleaseWhenLetGo();
+	}
 
 	/// <summary>
 	/// Asks for the picker next frame. Deferred because the callers run during the player update, where
@@ -121,7 +164,10 @@ public static class PaintPicker
 		Sticky = false;
 		Anim = 0f;
 		openRequest = null;
+		viewRequest = null;
+		handSwappedBack = false;
 		quickPick = -1;
+		releasePending = false;
 		openSuppression = 0;
 		FramesOpen = 0;
 		ViaKeybind = false;
@@ -152,15 +198,41 @@ public static class PaintPicker
 		if (escapeSwallowed && !Main.keyState.IsKeyDown(Keys.Escape) && !Keyboard.GetState().IsKeyDown(Keys.Escape))
 			escapeSwallowed = false;
 
+		// Closed, but a button that was down for it still is: the world must not take it as a swing either.
+		ReleaseWhenLetGo();
+		if (!active && releasePending && Main.LocalPlayer is Player holder)
+			holder.mouseInterface = true;
+
 		if (active) {
 			PickerMenu.ClaimTextInput();
 
+			bool swappedBack = handSwappedBack;
+			handSwappedBack = false;
+
 			if (ShouldCancel(config)) {
+				// Said when it is what is in hand - over the inventory, or after "Back to colours" put a
+				// block back there - so the picker does not just vanish.
+				if (!EnvironmentBlocked() && (!PaintToolSet.InventoryAllows(Main.LocalPlayer) || (swappedBack && HandBlocked(config))))
+					Refuse("Mods.PaintWheel.UI.PaintToolNeeded");
+
 				Close(commit: false, config);
 			}
 			else {
 				FramesOpen++;
 				Main.LocalPlayer.mouseInterface = true;
+
+				if (viewRequest is PickerOverlay view) {
+					viewRequest = null;
+
+					if (view == PickerOverlay.Scrape && PaintSelection.Scrape != ScrapeMode.Off) {
+						LeaveEditor();
+						PickerMenu.StopRenaming();
+						ShowScrapeWheel(Main.MouseScreen, config);
+					}
+					else if (view == PickerOverlay.None && PaintSelection.Scrape == ScrapeMode.Off) {
+						ShowColours(config);
+					}
+				}
 
 				// Sampled before this tick's clicks, so a closing click leaves the fade showing the list.
 				DrawOverlay = Overlay;
@@ -202,18 +274,24 @@ public static class PaintPicker
 	private static void BeginOpen(bool keybind, PaintWheelConfig config)
 	{
 		// Checked first: opening into a state that cancels on the same tick flashes the picker.
-		if (EnvironmentBlocked(config)) {
-			if (Main.playerInventory)
-				Refuse("Mods.PaintWheel.UI.CloseInventory");
-
+		if (EnvironmentBlocked())
 			return;
-		}
 
 		PickerContent.ScraperAvailable = PaintScraper.HasAny(Main.LocalPlayer);
 
-		// Scrape mode is sticky, but it cannot survive losing the scraper.
+		// Scrape mode is sticky, but it cannot survive losing the scraper. Before the hand is looked at,
+		// since leaving the mode can change what is in it.
 		if (PaintSelection.Scrape != ScrapeMode.Off && !PickerContent.ScraperAvailable)
 			PaintSelection.ExitScrape();
+
+		// The one refusal worth explaining: over the inventory, what is in hand decides.
+		if (!PaintToolSet.InventoryAllows(Main.LocalPlayer)) {
+			Refuse("Mods.PaintWheel.UI.PaintToolNeeded");
+			return;
+		}
+
+		if (HandBlocked(config))
+			return;
 
 		bool scraping = PaintSelection.Scrape != ScrapeMode.Off;
 
@@ -222,7 +300,7 @@ public static class PaintPicker
 		PickerContent.ApplyPage(config);
 
 		// Scrape mode and a carried scraper both count, or a player with no paint could never reach the
-		// list that enters scrape mode.
+		// button that enters scrape mode.
 		if (!scraping && !HasAnythingToShow) {
 			Refuse("Mods.PaintWheel.UI.NothingToShow");
 			return;
@@ -238,6 +316,10 @@ public static class PaintPicker
 		DrawOverlay = Overlay;
 		BuildMenuRows();
 		Anchor = WheelLayout.ClampAnchor(BuildSettings(config, 1f), PickerInput.OpenCursor, Main.screenWidth, Main.screenHeight);
+
+		// Under the cursor itself rather than the anchor, which is placed to fit the bigger colour view.
+		if (scraping)
+			ScrapeWheel.Open(PickerInput.OpenCursor, config);
 
 		active = true;
 		ViaKeybind = keybind;
@@ -280,13 +362,19 @@ public static class PaintPicker
 		bool selected = false;
 
 		if (commit && PickerInput.CursorMoved) {
-			if (Overlay != PickerOverlay.None) {
+			if (Overlay == PickerOverlay.Scrape) {
+				// An option is chosen by letting go on it. The middle is not: letting go there cancels, as
+				// it does on the colour wheel, so going back to the colours takes a click.
+				if (PickerInput.HoveredScrape >= 0)
+					selected = ChooseScrapeTarget(PickerInput.HoveredScrape);
+			}
+			else if (Overlay != PickerOverlay.None) {
 				if (PickerInput.HoveredRow >= 0)
-					selected = ActivateRow(PickerInput.HoveredRow, config) != RowResult.Failed;
+					selected = ActivateRow(PickerInput.HoveredRow, config);
 			}
 			else if (PickerContent.IsScrapeButton(PickerInput.HoveredCoating)) {
-				// Entered, but its list is not opened: the picker is closing, and a menu that appears
-				// for the length of the fade and vanishes reads as a glitch. It is there next time.
+				// Entered, but its wheel is not shown: the picker is closing, and a view that appears for
+				// the length of the fade and vanishes reads as a glitch. It is there next time.
 				selected = PaintSelection.EnterScrape();
 			}
 			else if (PickerContent.IsNoPaintButton(PickerInput.HoveredCoating)) {
@@ -319,7 +407,10 @@ public static class PaintPicker
 		// pressed as it closed carry over and pick on the next opening's first frame.
 		PickerMenu.StopRenaming();
 		quickPick = -1;
+		viewRequest = null;
+		handSwappedBack = false;
 		active = false;
+		releasePending = true;
 
 		// A palette made with "+" and left empty was never really made, however the editor was left. The
 		// grid itself stays, for the fade.
@@ -359,10 +450,11 @@ public static class PaintPicker
 	/// <summary>Rebuilds the rows of whichever list is open, after something they show has changed.</summary>
 	internal static void BuildMenuRows() => PickerMenu.Build(Overlay);
 
-	internal static RowResult ActivateRow(int index, PaintWheelConfig config)
+	/// <summary>Does what row <paramref name="index"/> of the open list is for. False when there is no such row.</summary>
+	internal static bool ActivateRow(int index, PaintWheelConfig config)
 	{
 		if (index < 0 || index >= PickerMenu.Rows.Count)
-			return RowResult.Failed;
+			return false;
 
 		MenuRow row = PickerMenu.Rows[index];
 
@@ -370,40 +462,77 @@ public static class PaintPicker
 			case RowKind.Palette:
 				SwitchPalette(row.Index, config);
 				Overlay = PickerOverlay.None;
-				return RowResult.Handled;
-
-			case RowKind.ScrapeTarget:
-				PaintSelection.SetScrapeTarget(row.Mode);
-
-				// Rebuilt so the mark moves to the target just chosen. Without this the rows keep the
-				// state they were built with, and a picker that stays open shows the old one - which
-				// reads as the click having done nothing.
-				BuildMenuRows();
-				return RowResult.CloseAfter;
-
-			case RowKind.ExitScrape:
-				PaintSelection.ExitScrape();
-				Overlay = PickerOverlay.None;
-				return RowResult.CloseAfter;
+				return true;
 
 			default:
-				return RowResult.Failed;
+				return false;
 		}
 	}
 
-	/// <summary>Switches to scrape mode and shows its list, leaving the picker up.</summary>
+	/// <summary>Switches to scrape mode and shows its wheel, leaving the picker up.</summary>
 	internal static bool EnterScrapeFromRow(PaintWheelConfig config)
 	{
 		if (!PaintSelection.EnterScrape())
 			return false;
 
+		// On the button just clicked, so a flick from there reaches every option.
+		ShowScrapeWheel(Main.MouseScreen, config);
+		return true;
+	}
+
+	/// <summary>Puts the scrape wheel up centred on <paramref name="at"/>, which must be in UI space.</summary>
+	private static void ShowScrapeWheel(Vector2 at, PaintWheelConfig config)
+	{
 		Overlay = PickerOverlay.Scrape;
 		DrawOverlay = PickerOverlay.Scrape;
-		BuildMenuRows();
-		PickerInput.ResetMenuCursor();
+		ScrapeWheel.Open(at, config);
 
+		PickerInput.ResetMenuCursor();
 		PickerInput.HoveredCoating = -1;
+		PickerInput.HoveredScrape = -1;
+	}
+
+	/// <summary>Sets the scraper to what scrape wheel option <paramref name="option"/> strips. False outside scrape mode.</summary>
+	internal static bool ChooseScrapeTarget(int option)
+	{
+		if (option < 0 || option >= ScrapeWheel.Options.Length || PaintSelection.Scrape == ScrapeMode.Off)
+			return false;
+
+		PaintSelection.SetScrapeTarget(ScrapeWheel.Options[option]);
 		return true;
+	}
+
+	/// <summary>
+	/// The scrape wheel's middle: leaves scrape mode, which puts the scraper back, and shows the colours
+	/// with the picker still up to choose one - in hold mode too, where the button is still down. False
+	/// when the hand cannot change yet, mid-swing or with an item on the cursor.
+	/// </summary>
+	internal static bool BackToColours(PaintWheelConfig config)
+	{
+		if (!HandSwap.CanSwapNow(Main.LocalPlayer))
+			return false;
+
+		PaintSelection.ExitScrape();
+		ShowColours(config);
+		return true;
+	}
+
+	/// <summary>
+	/// Shows the colours again, centred where the cursor is - as the scrape wheel was, and as the picker
+	/// opens. Left where they were, the scraper's own button could sit under the cursor, and the next
+	/// release there would go straight back into scrape mode. Must be called with the cursor in UI space.
+	/// </summary>
+	private static void ShowColours(PaintWheelConfig config)
+	{
+		handSwappedBack = true;
+		Overlay = PickerOverlay.None;
+		DrawOverlay = PickerOverlay.None;
+		PickerContent.ScraperAvailable = PaintScraper.HasAny(Main.LocalPlayer);
+		Anchor = WheelLayout.ClampAnchor(BuildSettings(config, 1f), Main.MouseScreen, Main.screenWidth, Main.screenHeight);
+
+		PickerInput.HoveredScrape = -1;
+		PickerInput.HoveredRow = -1;
+		PickerInput.ResetMenuCursor();
 	}
 
 	internal static void ChangePage(int direction, PaintWheelConfig config)
@@ -455,7 +584,7 @@ public static class PaintPicker
 			quickPick = index;
 	}
 
-	/// <summary>A number key does what a click on the Nth swatch or row would. True when it picked something.</summary>
+	/// <summary>A number key does what a click on the Nth swatch, row or scrape option would. True when it picked something.</summary>
 	private static bool HandleQuickPick(PaintWheelConfig config)
 	{
 		int index = quickPick;
@@ -474,17 +603,24 @@ public static class PaintPicker
 				CloseSilently();
 				return true;
 
-			case PickerOverlay.Palettes or PickerOverlay.Scrape:
+			case PickerOverlay.Scrape:
+				if (index >= ScrapeWheel.Options.Length)
+					return false;
+
+				bool chosen = ChooseScrapeTarget(index);
+				Play(chosen ? SoundID.Grab : SoundID.MenuClose, config);
+
+				if (chosen)
+					CloseSilently();
+
+				return true;
+
+			case PickerOverlay.Palettes:
 				int row = PickerMenu.FirstShown + index;
 				if (index >= PickerMenu.ShownRows || row >= PickerMenu.Rows.Count)
 					return false;
 
-				RowResult result = ActivateRow(row, config);
-				Play(result == RowResult.Failed ? SoundID.MenuClose : SoundID.Grab, config);
-
-				if (result == RowResult.CloseAfter && !Sticky)
-					CloseSilently();
-
+				Play(ActivateRow(row, config) ? SoundID.Grab : SoundID.MenuClose, config);
 				return true;
 		}
 
@@ -546,9 +682,8 @@ public static class PaintPicker
 
 			if (active) {
 				LeaveEditor();
-				Overlay = PickerOverlay.None;
-				DrawOverlay = PickerOverlay.None;
-				PickerInput.HoveredRow = -1;
+				PickerMenu.StopRenaming();
+				viewRequest = PickerOverlay.None;
 			}
 
 			return ScrapeMode.Off;
@@ -557,14 +692,8 @@ public static class PaintPicker
 		if (!PaintSelection.EnterScrape())
 			return null;
 
-		if (active) {
-			LeaveEditor();
-			Overlay = PickerOverlay.Scrape;
-			DrawOverlay = PickerOverlay.Scrape;
-			BuildMenuRows();
-			PickerInput.ResetMenuCursor();
-			PickerInput.HoveredCoating = -1;
-		}
+		if (active)
+			viewRequest = PickerOverlay.Scrape;
 
 		return PaintSelection.Scrape;
 	}
@@ -593,7 +722,7 @@ public static class PaintPicker
 		Count = PickerContent.Swatches.Count,
 		Paged = PickerContent.PageCount(config) > 1,
 		CoatingCount = PickerContent.RowSlots,
-		ShowHeader = DrawOverlay == PickerOverlay.Scrape || MenuAvailable || PickerContent.PageCount(config) > 1,
+		ShowHeader = MenuAvailable || PickerContent.PageCount(config) > 1,
 		Radius = config.Appearance.WheelRadius,
 		Swatch = config.Appearance.SwatchSize,
 		DeadZone = config.Appearance.DeadZoneRadius,
@@ -608,9 +737,6 @@ public static class PaintPicker
 	/// <summary>The palette name, plus the page count when there is more than one page.</summary>
 	internal static string HeaderLabel(PaintWheelConfig config)
 	{
-		if (DrawOverlay == PickerOverlay.Scrape)
-			return Language.GetTextValue("Mods.PaintWheel.UI.Scrape.Header");
-
 		Palette palette = PickerContent.ActivePalette;
 		if (palette is null)
 			return null;
@@ -711,24 +837,39 @@ public static class PaintPicker
 	internal static void SwallowEscape() => escapeSwallowed = true;
 
 	/// <summary>
-	/// The scrape list and the editor grid carry their own content, so they stay up even when the
+	/// The scrape wheel and the editor grid carry their own content, so they stay up even when the
 	/// swatches behind them have nothing to show.
 	/// </summary>
 	private static bool ShouldCancel(PaintWheelConfig config)
-		=> EnvironmentBlocked(config) || (Overlay is not (PickerOverlay.Scrape or PickerOverlay.Grid) && !HasAnythingToShow);
+		=> EnvironmentBlocked() || !PaintToolSet.InventoryAllows(Main.LocalPlayer) || HandBlocked(config)
+			|| (Overlay is not (PickerOverlay.Scrape or PickerOverlay.Grid) && !HasAnythingToShow);
+
+	/// <summary>"Only while holding a paint tool", and what is in hand is not one - nor a block the Sprayer would paint.</summary>
+	private static bool HandBlocked(PaintWheelConfig config)
+		=> config.RequirePaintTool && !PaintToolSet.HoldsPaintingItem(Main.LocalPlayer);
 
 	/// <summary>Swatches, coatings, or a list worth opening. Any of the three is reason to be up.</summary>
 	private static bool HasAnythingToShow => PickerContent.Swatches.Count > 0 || PickerContent.RowSlots > 0 || MenuAvailable;
 
-	/// <summary>Everything about the world state that means the picker must not be up.</summary>
-	private static bool EnvironmentBlocked(PaintWheelConfig config)
+	/// <summary>
+	/// Everything about the world and the screen that means the picker must not be up - what is in hand
+	/// is checked apart (HandBlocked). The inventory is not one of them: over it the picker answers to a
+	/// paint tool in hand (PaintToolSet.InventoryAllows), and the HUD under it is kept out of the
+	/// mouse's reach meanwhile (PaintWheelUISystem).
+	/// </summary>
+	private static bool EnvironmentBlocked()
 	{
 		// inFancyUI covers the mod config and the other full-screen menus, which draw over the layer the
 		// picker lives on: a picker opened under one would be live but invisible.
-		if (Main.gameMenu || Main.mapFullscreen || Main.playerInventory || Main.ingameOptionsWindow || Main.inFancyUI)
+		if (Main.gameMenu || Main.mapFullscreen || Main.ingameOptionsWindow || Main.inFancyUI)
 			return true;
 
 		if (Main.drawingPlayerChat || Main.editSign || Main.editChest || Main.blockInput)
+			return true;
+
+		// An NPC's head or the housing query on the cursor: its click assigns a house wherever it lands,
+		// and that layer draws after the picker, where the mouse cannot be kept from it.
+		if (Main.instance.mouseNPCType > -1)
 			return true;
 
 		// Escape while typing a palette's name only drops the name; the list stays up, for as long as
@@ -737,9 +878,6 @@ public static class PaintPicker
 			return true;
 
 		Player player = Main.LocalPlayer;
-		if (player is null || !player.active || player.dead)
-			return true;
-
-		return config.RequirePaintTool && !PaintToolSet.HoldsPaintingItem(player);
+		return player is null || !player.active || player.dead;
 	}
 }

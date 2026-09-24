@@ -61,8 +61,9 @@ public class PaintWheelPlayer : ModPlayer
 			: "Mods.PaintWheel.UI.PaintBothOff"), PaintBoth ? PaintedTextColor : PaletteTextColor);
 	}
 
-	// What taking the scraper in hand moved, so leaving scrape mode can put the hotbar back. Session
-	// only: restoring slots from a previous session would be meaningless.
+	// What taking the scraper in hand moved, so leaving scrape mode can put it back. Saved with the
+	// character like the mode itself, or leaving it after a save and reload - reloading the mod included -
+	// would leave the scraper in hand. Slots are only trusted after checking what is in them.
 	private HandSwap.Swap scrapeSwap = HandSwap.Swap.None;
 
 	/// <summary>
@@ -180,8 +181,20 @@ public class PaintWheelPlayer : ModPlayer
 		if (ActivePage > 0)
 			tag["page"] = ActivePage;
 
-		if (Scrape != ScrapeMode.Off)
+		if (Scrape != ScrapeMode.Off) {
 			tag["scrape"] = Scrape.ToString();
+
+			if (scrapeSwap.HandSlot >= 0) {
+				var swap = new TagCompound {
+					["selected"] = scrapeSwap.PreviousSelection,
+					["hand"] = scrapeSwap.HandSlot,
+					["bag"] = scrapeSwap.BagSlot,
+				};
+
+				Store(swap, "held", scrapeSwap.DisplacedType);
+				tag["scrapeSwap"] = swap;
+			}
+		}
 
 		if (PaintBoth)
 			tag["paintBoth"] = true;
@@ -199,6 +212,11 @@ public class PaintWheelPlayer : ModPlayer
 		Scrape = tag.ContainsKey("scrape") && Enum.TryParse(tag.GetString("scrape"), out ScrapeMode mode)
 			? mode
 			: ScrapeMode.Off;
+
+		// Characters saved before this was stored have none: leaving then falls back to a brush or roller.
+		scrapeSwap = Scrape != ScrapeMode.Off && tag.TryGet("scrapeSwap", out TagCompound swap)
+			? new HandSwap.Swap(swap.GetInt("selected"), swap.GetInt("hand"), swap.GetInt("bag"), Restore(swap, "held"))
+			: HandSwap.Swap.None;
 
 		PaintBoth = tag.ContainsKey("paintBoth");
 	}

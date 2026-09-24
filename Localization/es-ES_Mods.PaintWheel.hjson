@@ -48,7 +48,7 @@ UI: {
 	RenamePalette: Renombrar esta paleta
 	RenameHint: Intro para guardar, Esc para cancelar
 	NothingToShow: No hay pintura para elegir
-	CloseInventory: Cierra el inventario para abrir Paint Wheel
+	PaintToolNeeded: Necesitas una herramienta de pintura
 
 	Keys: {
 		MouseLeft: el botón izquierdo del ratón
@@ -394,9 +394,9 @@ Configs: {
 			Label: Un clic para abrir
 			Tooltip:
 				'''
-				Un clic derecho deja el selector abierto, sin mantener. Al pulsar un color lo elige y se
-				cierra; los recubrimientos, las paletas y el modo raspador lo dejan abierto para ajustar
-				varias cosas seguidas. Clic derecho otra vez, Esc o un clic fuera lo cierran.
+				Un clic derecho deja el selector abierto, sin mantener. Al pulsar un color o una opción de raspado
+				la elige y se cierra; los recubrimientos, las paletas y el botón del raspador lo dejan abierto para
+				ajustar varias cosas seguidas. Clic derecho otra vez o Esc lo cierran.
 				'''
 		}
 	}

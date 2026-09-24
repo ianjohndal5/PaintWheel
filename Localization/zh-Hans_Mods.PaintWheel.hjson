@@ -48,7 +48,7 @@ UI: {
 	RenamePalette: 重命名这个调色板
 	RenameHint: 回车保存，Esc 取消
 	NothingToShow: 没有可选的油漆
-	CloseInventory: 关闭物品栏才能打开 Paint Wheel
+	PaintToolNeeded: 需要手持油漆工具
 
 	Keys: {
 		MouseLeft: 鼠标左键
@@ -349,9 +349,9 @@ Configs: {
 			Label: 点击打开
 			Tooltip:
 				'''
-				点一下右键界面就会留在屏幕上，不用一直按住。点击颜色会选中并关闭；
-				涂层、调色板和刮除模式则会保持打开，方便你一次设置多项。
-				再按一次右键、按 Esc，或点击别处即可收起。
+				点一下右键界面就会留在屏幕上，不用一直按住。点击颜色或刮除选项会选中并关闭；
+				涂层、调色板和刮刀按钮则会保持打开，方便你一次设置多项。
+				再按一次右键或按 Esc 即可收起。
 				'''
 		}
 	}

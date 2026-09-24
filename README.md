@@ -11,7 +11,7 @@ Fully client side — no server install, no netcode, and by default nothing abou
 inventory.
 
 - **Author:** SugarDark
-- **Version:** 1.0
+- **Version:** 1.1
 - **Side:** Client
 
 ---
@@ -29,7 +29,6 @@ inventory.
 - [Compatibility](#compatibility)
 - [Troubleshooting](#troubleshooting)
 - [Building from source](#building-from-source)
-- [Project layout](#project-layout)
 - [License](#license)
 
 ---
@@ -54,6 +53,13 @@ Releasing near the centre cancels and keeps the paint you already had.
 Prefer not to hold the button? Set **Right click behaviour → Click to open** in the config: one press
 leaves the picker up, and a colour closes it.
 
+It works with the inventory open too, as long as the item in your hand is a paint tool — a brush,
+roller or scraper. With anything else in hand it stays shut there, where right click belongs to the
+inventory, and trying to open it says "Paint tool needed". On the housing page right click is left
+to the NPC banners; the Open key still works. While the picker is up, the inventory, hotbar and the
+rest of the HUD under it ignore the mouse, so a click on a swatch never also moves the item beneath
+it.
+
 ## What it does
 
 - **Three picker shapes,** switchable in the config: a radial **Wheel** of colour discs, a vertical
@@ -71,8 +77,9 @@ leaves the picker up, and a colour closes it.
 - **Number keys pick directly.** While the picker is up, `1`–`0` choose the first ten swatches (or rows
   of a list) instead of switching the hotbar, and a small digit on each shows which is which. Stack
   counts on the swatches are an option too.
-- **Gamepad.** On the wheel the right stick points at a swatch, the way a radial menu is used; in the
-  bar, the grid and the lists it moves across the whole picker.
+- **Gamepad.** On the wheel, and on scrape mode's wheel in every shape, the right stick points at a
+  disc the way a radial menu is used; in the bar, the grid and the palette list it moves across the
+  whole picker.
 - **Paint both halves with one tool.** A switch on the bottom row (or `Z`) lets the brush and the roller
   each paint blocks *and* walls: the tool's own half first, then the other one once that is done, so
   holding the mouse on a tile lands both. `Q` trades the brush in hand for the roller and back.
@@ -93,14 +100,16 @@ leaves the picker up, and a colour closes it.
   paint-both switch on a brush or roller, and which half a restricted scraper takes.
 - **It tells you when nothing happens.** "Out of Red Paint" floats up the moment your chosen paint or
   coating runs dry, choosing a paint you do not carry says so, and so does a picker that cannot open
-  (inventory open, or no paint to offer) — rather than leaving the button to seem dead.
+  (no paint to offer, or no paint tool in hand with the inventory open) — rather than leaving the
+  button to seem dead.
 
 ## Keybinds
 
 All of these are rebindable in **Settings → Controls**. Several let you work without opening the
 picker at all. With *Only while holding a paint tool* on (the default) they answer only while you hold
 one — or a block, with the Paint Sprayer's effect on — except the eyedropper on an inventory slot, and
-leaving scrape mode, which always work.
+leaving scrape mode, which always work. With the inventory open, opening the picker takes a paint tool
+in hand whatever that setting says.
 
 | Action | Default | What it does |
 | --- | --- | --- |
@@ -142,21 +151,29 @@ its colours stay in the order you added them, which is the order they sit in the
 
 ## Scrape mode
 
-Click the scraper disc on the bottom row and the wheel becomes a scraper menu:
+Click the scraper disc on the bottom row and the picker turns into the scrape wheel: a small wheel
+of its own, drawn with the game's wood block and wood wall.
 
-- **Blocks and walls**
-- **Blocks only**
-- **Walls only** — something the vanilla scraper cannot do at all.
-- **Coatings only** — strips Illuminant or Echo and leaves the paint under it. The vanilla scraper
-  always takes both together.
+- **Blocks only** (top) — a wood block.
+- **Walls only** (right) — a wood wall. Something the vanilla scraper cannot do at all.
+- **Blocks and walls** (bottom) — a block in front of its wall. What the vanilla scraper does.
+- **Coatings only** (left) — a block with a shine on it. Strips Illuminant or Echo and leaves the
+  paint under it; the vanilla scraper always takes both together.
+
+The one in use has the gold ring. Choose the way you choose a colour: flick and let go, or click, or
+press `1`–`4`. The disc in the middle, a ring of paint, goes **back to the colours**: click it and
+scrape mode ends, and the colours come back still open and centred on the cursor, ready for a colour
+— unless what goes back into your hand cannot open the picker, when it says so and closes. Letting go
+over the middle cancels, as it does on the colour wheel. The scrape wheel looks the same in every picker
+shape, and opens where your cursor is.
 
 It needs a Paint Scraper, and it takes one into your hand for you: if the scraper is already on your
 hotbar it just switches to that slot, and if it is in your bag it swaps into the slot you were
-holding. Leaving the mode puts both back — unless you have moved either since, in which case your
-inventory is left as you arranged it. The swap-back is remembered for the session only: scrape mode
-itself stays on across a save and reload, but after one, leaving it just switches mode. Apart from
-this, the brush/roller swap key and the *Inventory swap* fallback in Advanced, nothing in the mod
-moves an item.
+holding. Leaving the mode — the middle disc, or the key — puts back what you were holding: the same
+two slots traded back if nothing has moved, otherwise that item from wherever it is now; and if you no
+longer carry it, a brush or roller takes the scraper's place. This is saved with your character, like
+scrape mode itself, so it works after a save and reload too. Apart from this, the brush/roller swap
+key and the *Inventory swap* fallback in Advanced, nothing in the mod moves an item.
 
 ## Settings
 
@@ -170,7 +187,7 @@ the front page; the rest live behind their own buttons.
 | Language | Automatic | Follows the game's language, or forces one. See [Languages](#languages). |
 | Open with right click | On | Turn off if another mod wants right click on paint tools. The keybind still works. |
 | Right click behaviour | Hold to open | Or *Click to open*, which leaves the picker up until you are done. |
-| Only while holding a paint tool | On | Restricts the wheel and its keybinds to paint tools (and to holding blocks with a Paint Sprayer equipped). |
+| Only while holding a paint tool | On | Restricts the wheel and its keybinds to paint tools (and to holding blocks with a Paint Sprayer equipped). With the inventory open, a paint tool is needed either way. |
 | Play sounds | On | Menu ticks while flicking, and a grab sound on commit. |
 | Picker shape | Wheel | Wheel, Bar or Grid. |
 | Palettes | — | Your saved palettes. |
@@ -246,8 +263,9 @@ override method* to Inventory swap is worth trying if another mod is involved.
 **Scrape mode says there is no scraper to hold.** It needs a Paint Scraper somewhere in your inventory
 or hotbar. The brush/roller swap is the same: it needs the other tool somewhere on you.
 
-**"Close the inventory to open Paint Wheel."** The picker does not open over the inventory, where a
-right click belongs to the slots. Close it first, or use the eyedropper key on a paint in a slot.
+**"Paint tool needed."** With the inventory open, the picker only opens while the item in your hand
+is a Paintbrush, Paint Roller or Paint Scraper, since right click there otherwise belongs to the
+inventory. Select the tool on your hotbar, or close the inventory.
 
 ## Building from source
 
@@ -262,7 +280,7 @@ repository. tModLoader needs `build.txt` to build the mod, so create one before 
 ```
 displayName = Paint Wheel
 author = SugarDark
-version = 1.0
+version = 1.1
 side = Client
 
 buildIgnore = README.md, tools/*, Properties/*

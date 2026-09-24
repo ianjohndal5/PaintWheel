@@ -48,7 +48,7 @@ UI: {
 	RenamePalette: Zmień nazwę tej palety
 	RenameHint: Enter zapisuje, Esc anuluje
 	NothingToShow: Brak farby do wyboru
-	CloseInventory: Zamknij ekwipunek, by otworzyć Paint Wheel
+	PaintToolNeeded: Potrzebne narzędzie do malowania
 
 	Keys: {
 		MouseLeft: lewy przycisk myszy
@@ -385,9 +385,9 @@ Configs: {
 			Label: Kliknij, by otworzyć
 			Tooltip:
 				'''
-				Jedno kliknięcie prawym zostawia wybierak otwarty, bez trzymania. Kliknięcie koloru wybiera
-				go i zamyka; powłoki, palety i tryb skrobaka zostawiają go otwartym, byś ustawił kilka
-				rzeczy naraz. Prawy przycisk ponownie, Esc albo kliknięcie obok zamyka go.
+				Jedno kliknięcie prawym zostawia wybierak otwarty, bez trzymania. Kliknięcie koloru lub opcji
+				skrobania wybiera ją i zamyka; powłoki, palety i przycisk skrobaka zostawiają go otwartym, byś
+				ustawił kilka rzeczy naraz. Prawy przycisk ponownie albo Esc zamyka go.
 				'''
 		}
 	}

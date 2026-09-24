@@ -5,9 +5,9 @@ using PaintWheel.Common.Configs;
 namespace PaintWheel.Common.UI.Picker;
 
 /// <summary>
-/// Where every piece of the picker goes, for all three layouts, the lists and the editor grid. Pure -
-/// no Main, no config instance, no drawing - so hit testing and drawing read the same numbers and
-/// cannot disagree about where anything is.
+/// Where every piece of the picker goes, for all three layouts, the list, the scrape wheel and the
+/// editor grid. Pure - no Main, no config instance, no drawing - so hit testing and drawing read the
+/// same numbers and cannot disagree about where anything is.
 /// </summary>
 internal static class WheelLayout
 {
@@ -578,6 +578,96 @@ internal static class WheelLayout
 
 	public static Vector2 ClampGridCenter(Vector2 center, in GridSettings grid, float screenWidth, float screenHeight)
 		=> ClampOnScreen(center, GridBounds(center, grid), screenWidth, screenHeight);
+
+	// ---- Scrape wheel -----------------------------------------------------------------------
+
+	/// <summary>
+	/// Scrape mode's wheel: a few options round a disc in the middle. Sized from the picker's own
+	/// settings so its discs match the swatches, with a tighter ring than the colour wheel's - it holds
+	/// four, not twelve.
+	/// </summary>
+	public struct ScrapeSettings
+	{
+		public int Count;
+
+		/// <summary>Diameter of an option disc.</summary>
+		public float Option;
+
+		/// <summary>Diameter of the disc in the middle.</summary>
+		public float Back;
+
+		public float Radius;
+
+		/// <summary>Eased open animation, 0 to 1.</summary>
+		public float Progress;
+
+		/// <summary>From the middle to the far edge of a hovered option.</summary>
+		public readonly float Outer => Radius + Option * 0.5f * HoverScale;
+	}
+
+	/// <summary>What <see cref="HitTestScrape"/> returns for the disc in the middle.</summary>
+	public const int ScrapeBack = -2;
+
+	/// <summary>Clear space round the middle disc before the options' sectors begin, so a near miss hits neither.</summary>
+	private const float ScrapeGap = 6f;
+
+	public static ScrapeSettings ComputeScrape(in Settings settings, int count)
+	{
+		float option = MathF.Max(36f, settings.Swatch * 1.1f);
+
+		return new ScrapeSettings {
+			Count = count,
+			Option = option,
+			Back = option * 0.9f,
+			Radius = MathF.Max(option * 1.55f, settings.Radius * 0.72f),
+			Progress = settings.Progress,
+		};
+	}
+
+	/// <summary>Centre of option <paramref name="index"/>: the swatches' angles, springing out as the wheel opens.</summary>
+	public static Vector2 ScrapeOption(Vector2 center, in ScrapeSettings scrape, int index)
+		=> WheelMath.SectorPosition(center, index, scrape.Count, scrape.Radius * scrape.Progress);
+
+	public static Vector2 ScrapeTitle(Vector2 center, in ScrapeSettings scrape)
+		=> new(center.X, center.Y - scrape.Outer - HeaderGap);
+
+	/// <summary>Where the hovered option's name goes: under the ring, as the colour wheel puts a swatch's.</summary>
+	public static Vector2 ScrapeInfo(Vector2 center, in ScrapeSettings scrape)
+		=> new(center.X, center.Y + scrape.Outer + InfoGap);
+
+	/// <summary>The square the background panel fills, with the colour wheel's margin.</summary>
+	public static Rectangle ScrapePanel(Vector2 center, in ScrapeSettings scrape)
+	{
+		float half = scrape.Outer + 14f;
+		return FromEdges(center.X - half, center.Y - half, center.X + half, center.Y + half);
+	}
+
+	/// <summary>Everything the wheel draws, title and name included: what has to stay on screen.</summary>
+	public static Rectangle ScrapeBounds(Vector2 center, in ScrapeSettings scrape)
+	{
+		Rectangle panel = ScrapePanel(center, scrape);
+
+		return FromEdges(panel.Left, MathF.Min(panel.Top, ScrapeTitle(center, scrape).Y - 16f),
+			panel.Right, MathF.Max(panel.Bottom, ScrapeInfo(center, scrape).Y + 16f));
+	}
+
+	public static Vector2 ClampScrapeCenter(Vector2 center, in ScrapeSettings scrape, float screenWidth, float screenHeight)
+		=> ClampOnScreen(center, ScrapeBounds(center, scrape), screenWidth, screenHeight);
+
+	/// <summary>
+	/// What the cursor is on: <see cref="ScrapeBack"/> for the disc in the middle, an option by angle -
+	/// so a flick toward one is enough, as with the swatches - or -1. Options wait for
+	/// <paramref name="aimed"/>, as swatches wait for the cursor to move, so opening under the cursor
+	/// cannot choose one.
+	/// </summary>
+	public static int HitTestScrape(Vector2 center, in ScrapeSettings scrape, Vector2 cursor, bool aimed)
+	{
+		float back = scrape.Back * 0.5f;
+		if (Vector2.DistanceSquared(cursor, center) <= back * back)
+			return ScrapeBack;
+
+		return aimed ? WheelMath.SectorAt(center, cursor, scrape.Count, back + ScrapeGap) : -1;
+	}
 
 	// ---- Placement --------------------------------------------------------------------------
 
