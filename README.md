@@ -300,4 +300,4 @@ work released under different terms. If you modify a file covered by this
 license and distribute the result, that file's source must remain available
 under the MPL.
 
-Copyright (c) 2026 Ian John L. Dal (SugarDark)
+Copyright (c) 2026 Ian Dal (SugarDark)
