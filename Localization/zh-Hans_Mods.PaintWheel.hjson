@@ -20,7 +20,6 @@ UI: {
 	NoPaintOn: 不上漆
 	NoPaintOff: 上漆
 	ScrollHint: 滚动滚轮或点击箭头查看更多油漆
-	PaletteTitle: 调色板
 	PaletteHint: 点击切换调色板
 	PaletteScrollHint: 滚动滚轮或点击名称切换调色板
 	Empty: 已用完
@@ -30,12 +29,10 @@ UI: {
 	SlotPickCoating: 按 {0} 选择这种涂层
 	Disabled: Paint Wheel 出现错误，已停止应用你选择的油漆。详情见 client.log。
 	NewPalette: 用身上的油漆新建调色板
-	EditPalette: 编辑这个调色板
 	DeletePalette: 删除这个调色板
 	EditHint: 点击颜色即可加入或移除。
-	DoneEditing: 完成
+	AutoPaletteHint: 自动收录你身上的所有油漆。点击 + 新建你自己的调色板。
 	NewPaletteName: 调色板
-	EditingHeader: 正在编辑 {0}
 	ConfirmDelete: 再次点击以删除
 	PaletteHintNew: 点击查看调色板
 	RanOut: "{0}已用完"
@@ -133,7 +130,7 @@ Configs: {
 			Label: 调色板
 			Tooltip:
 				'''
-				已保存的调色板，点击轮盘中心或上方的调色板名称即可在列表里选择。
+				已保存的调色板。点击轮盘中心或上方的调色板名称即可打开调色板面板，在那里切换调色板并修改其中的颜色。
 				其中始终有一个会自动装入你身上携带的所有油漆。
 				'''
 		}
@@ -161,7 +158,7 @@ Configs: {
 			Label: 在色块上显示数字键
 			Tooltip:
 				'''
-				轮盘打开时，数字键会选择前十个色块或行，而不是切换快捷栏。
+				轮盘打开时，数字键会选择前十个色块，而不是切换快捷栏。
 				这里会像快捷栏一样显示每个键对应哪一个。
 				'''
 		}

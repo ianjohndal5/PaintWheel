@@ -13,9 +13,9 @@ namespace PaintWheel.Common.UI.Picker;
 
 /// <summary>
 /// Scrape mode's own small wheel, built the way the colour wheel is: a ring of discs for what the
-/// scraper may strip, drawn with the world's own wood block and wood wall, round a disc in the middle
-/// that goes back to the colours. It stands in for the swatches while scrape mode is on, whatever the
-/// picker's shape. Geometry is <see cref="WheelLayout.ComputeScrape"/>'s; clicks and releases are
+/// scraper may strip, drawn with a wood block and a wood wall, round a disc in the middle that goes
+/// back to the colours. It stands in for the swatches while scrape mode is on, whatever the picker's
+/// shape. Geometry is <see cref="WheelLayout.ComputeScrape"/>'s; clicks and releases are
 /// <see cref="PickerInput"/>'s and <see cref="PaintPicker"/>'s, as for everything else.
 /// </summary>
 internal static class ScrapeWheel
@@ -40,7 +40,7 @@ internal static class ScrapeWheel
 		ItemID.RedPaint, ItemID.YellowPaint, ItemID.GreenPaint, ItemID.CyanPaint, ItemID.BluePaint, ItemID.PurplePaint,
 	};
 
-	// Flat stand-ins for the wood sprites, for the frames before they have loaded.
+	// Flat stand-ins for the wood images, for the frames before they have loaded.
 	private static readonly Color BlockFallback = new(151, 107, 75);
 	private static readonly Color WallFallback = new(69, 50, 37);
 
@@ -173,13 +173,13 @@ internal static class ScrapeWheel
 	}
 
 	private static void DrawBlock(SpriteBatch spriteBatch, Rectangle box, float opacity)
-		=> DrawFrame(spriteBatch, UITextures.WoodBlock, UITextures.BlockFrame, box, BlockFallback, opacity);
+		=> DrawImage(spriteBatch, UITextures.ScrapeBlock, box, BlockFallback, opacity);
 
 	/// <summary>With a dark edge, which the wall needs to keep its square shape against the disc.</summary>
 	private static void DrawWall(SpriteBatch spriteBatch, Rectangle box, float opacity)
 	{
 		DrawEdge(spriteBatch, box, opacity);
-		DrawFrame(spriteBatch, UITextures.WoodWall, UITextures.WallFrame, box, WallFallback, opacity);
+		DrawImage(spriteBatch, UITextures.ScrapeWall, box, WallFallback, opacity);
 	}
 
 	private static void DrawEdge(SpriteBatch spriteBatch, Rectangle box, float opacity)
@@ -200,15 +200,15 @@ internal static class ScrapeWheel
 		WheelDrawing.DrawRect(spriteBatch, new Rectangle(x, y - 3, 1, 7), Color.White * opacity);
 	}
 
-	/// <summary>One frame of a sprite sheet stretched over <paramref name="box"/>, or a flat colour until the sheet has loaded.</summary>
-	private static void DrawFrame(SpriteBatch spriteBatch, Texture2D sheet, Rectangle frame, Rectangle box, Color fallback, float opacity)
+	/// <summary>An image fitted to <paramref name="box"/>, or a flat colour until it has loaded.</summary>
+	private static void DrawImage(SpriteBatch spriteBatch, Texture2D image, Rectangle box, Color fallback, float opacity)
 	{
-		if (sheet is null) {
+		if (image is null) {
 			WheelDrawing.DrawRect(spriteBatch, box, fallback * opacity);
 			return;
 		}
 
-		spriteBatch.Draw(sheet, box, frame, Color.White * opacity);
+		spriteBatch.Draw(image, box, Color.White * opacity);
 	}
 
 	private static Rectangle Square(Vector2 center, float size)

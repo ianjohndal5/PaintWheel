@@ -5,8 +5,8 @@ using PaintWheel.Common.Configs;
 namespace PaintWheel.Common.UI.Picker;
 
 /// <summary>
-/// Where every piece of the picker goes, for all three layouts, the list, the scrape wheel and the
-/// editor grid. Pure - no Main, no config instance, no drawing - so hit testing and drawing read the
+/// Where every piece of the picker goes, for all three layouts and the scrape wheel. The palette
+/// board keeps its own geometry, since it is laid out on its art. Pure - no Main, no config instance, no drawing - so hit testing and drawing read the
 /// same numbers and cannot disagree about where anything is.
 /// </summary>
 internal static class WheelLayout
@@ -16,25 +16,11 @@ internal static class WheelLayout
 	/// <summary>Clear space between the swatches and an arrow, so a near miss hits neither.</summary>
 	public const float ArrowGap = 12f;
 
-	/// <summary>Height of one row in a menu.</summary>
-	public const float MenuRowHeight = 28f;
-
-	/// <summary>Height of the band above the rows that holds the menu's title.</summary>
-	public const float MenuTitleHeight = 21f;
-
-	/// <summary>Padding around a menu's rows.</summary>
-	public const float MenuPadding = 8f;
-
-	/// <summary>Breathing room around the palette grid. Wider than the menu's: the grid is the page.</summary>
+	/// <summary>Breathing room around the palette grid.</summary>
 	public const float GridPadding = 13f;
 
-	/// <summary>Taller than a menu title, so the button on it is not wedged against the colours.</summary>
-	public const float GridTitleHeight = 28f;
-
-	/// <summary>Bounds on menu width. Sized to its contents between these, so names are never clipped.</summary>
-	public const float MenuMinWidth = 190f;
-
-	public const float MenuMaxWidth = 330f;
+	/// <summary>Widest the header label may be before it is shortened, so a long palette name never runs off.</summary>
+	public const float HeaderMaxWidth = 330f;
 
 	public const float HeaderGap = 24f;
 	public const float InfoGap = 24f;
@@ -99,13 +85,13 @@ internal static class WheelLayout
 
 		public Vector2 HeaderCenter;
 
-		/// <summary>The header label's click box, which opens the palette menu.</summary>
+		/// <summary>The header label's click box, which opens the palette board.</summary>
 		public Rectangle HeaderBox;
 
 		public Rectangle LeftArrow;
 		public Rectangle RightArrow;
 
-		/// <summary>Centre of the swatches, and so of the palette menu that replaces them.</summary>
+		/// <summary>Centre of the swatches, and so of the palette board that replaces them.</summary>
 		public Vector2 MenuCenter;
 
 		/// <summary>Where the hovered swatch's name goes. Centred for the wheel and the grid, left-aligned beside the bar.</summary>
@@ -378,100 +364,7 @@ internal static class WheelLayout
 		return (settings.CoatingCount - 1) * spacing * 0.5f + geometry.CoatingSize * 0.5f + 4f;
 	}
 
-	// ---- Menus ------------------------------------------------------------------------------
-
-	/// <summary>
-	/// A vertical list, not another ring: its entries are words. Width is passed in because only the
-	/// caller can measure its own text, and a fixed width either clips long names or wastes space.
-	/// </summary>
-	public struct MenuSettings
-	{
-		public int Rows;
-
-		/// <summary>Requested width. Clamped to <see cref="MenuMinWidth"/>..<see cref="MenuMaxWidth"/>.</summary>
-		public float Width;
-
-		/// <summary>True when a title band is drawn above the rows.</summary>
-		public bool Titled;
-
-		public float ClampedWidth => MathHelper.Clamp(Width, MenuMinWidth, MenuMaxWidth);
-
-		public float TitleBand => Titled ? MenuTitleHeight : 0f;
-	}
-
-	public static Rectangle MenuBounds(Vector2 center, in MenuSettings menu)
-	{
-		float width = menu.ClampedWidth;
-		float height = Math.Max(1, menu.Rows) * MenuRowHeight + menu.TitleBand + MenuPadding * 2f;
-
-		return FromEdges(
-			center.X - width * 0.5f, center.Y - height * 0.5f,
-			center.X + width * 0.5f, center.Y + height * 0.5f);
-	}
-
-	public static Rectangle MenuRow(Vector2 center, in MenuSettings menu, int index)
-	{
-		Rectangle bounds = MenuBounds(center, menu);
-		float top = bounds.Top + MenuPadding + menu.TitleBand;
-
-		return FromEdges(
-			bounds.Left + MenuPadding, top + index * MenuRowHeight,
-			bounds.Right - MenuPadding, top + (index + 1) * MenuRowHeight);
-	}
-
-	/// <summary>The title band, which is never part of a row and so never selects anything.</summary>
-	public static Rectangle MenuTitle(Vector2 center, in MenuSettings menu)
-	{
-		Rectangle bounds = MenuBounds(center, menu);
-
-		return FromEdges(bounds.Left + MenuPadding, bounds.Top + MenuPadding,
-			bounds.Right - MenuPadding, bounds.Top + MenuPadding + menu.TitleBand);
-	}
-
-	/// <summary>Width one row button needs, including the gap before the next.</summary>
-	public const float MenuActionSize = 19f;
-
-	public const float MenuActionGap = 3f;
-
-	/// <summary>Room a row must leave on its right for <paramref name="count"/> buttons.</summary>
-	public static float MenuActionRoom(int count)
-		=> count <= 0 ? 0f : count * (MenuActionSize + MenuActionGap) + MenuActionGap;
-
-	/// <summary>
-	/// One of the buttons at the right of a row, numbered from the left of the group so the order
-	/// matches the order they are drawn and described in.
-	/// </summary>
-	public static Rectangle MenuRowAction(Rectangle row, int index, int count)
-	{
-		float right = row.Right - MenuActionGap;
-		float left = right - MenuActionRoom(count) + MenuActionGap + index * (MenuActionSize + MenuActionGap);
-		float top = row.Y + (row.Height - MenuActionSize) * 0.5f;
-
-		return FromEdges(left, top, left + MenuActionSize, top + MenuActionSize);
-	}
-
-	/// <summary>The button at the right of the title band, for adding a palette.</summary>
-	public static Rectangle MenuTitleAction(Vector2 center, in MenuSettings menu)
-	{
-		Rectangle band = MenuTitle(center, menu);
-		float top = band.Y + (band.Height - MenuActionSize) * 0.5f;
-
-		return FromEdges(band.Right - MenuActionSize, top, band.Right, top + MenuActionSize);
-	}
-
-	public static int HitTestMenu(Vector2 center, in MenuSettings menu, Vector2 cursor)
-	{
-		for (int i = 0; i < menu.Rows; i++) {
-			if (MenuRow(center, menu, i).Contains((int)cursor.X, (int)cursor.Y))
-				return i;
-		}
-
-		return -1;
-	}
-
-	/// <summary>Keeps a tall menu on screen even when the picker was opened near an edge.</summary>
-	public static Vector2 ClampMenuCenter(Vector2 center, in MenuSettings menu, float screenWidth, float screenHeight)
-		=> ClampOnScreen(center, MenuBounds(center, menu), screenWidth, screenHeight);
+	// ---- Placement -------------------------------------------------------------------------
 
 	/// <summary>
 	/// Moves a centred box just far enough to be fully on screen, or centres it when it is larger than
@@ -507,11 +400,6 @@ internal static class WheelLayout
 		public float Cell;
 		public float Gap;
 
-		/// <summary>True when a title band is kept above the colours, as the editor does.</summary>
-		public bool Titled;
-
-		public readonly float TitleBand => Titled ? GridTitleHeight + GridTitleGap : 0f;
-
 		public readonly int Rows => Math.Max(1, (Count + Math.Max(1, Columns) - 1) / Math.Max(1, Columns));
 
 		public readonly float Step => Cell + Gap;
@@ -524,35 +412,11 @@ internal static class WheelLayout
 	public static Rectangle GridBounds(Vector2 center, in GridSettings grid)
 	{
 		float width = grid.Width + GridPadding * 2f;
-		float height = grid.Height + GridPadding * 2f + grid.TitleBand;
+		float height = grid.Height + GridPadding * 2f;
 
 		return FromEdges(
 			center.X - width * 0.5f, center.Y - height * 0.5f,
 			center.X + width * 0.5f, center.Y + height * 0.5f);
-	}
-
-	/// <summary>The title band above the colours, which never selects one.</summary>
-	public static Rectangle GridTitle(Vector2 center, in GridSettings grid)
-	{
-		Rectangle bounds = GridBounds(center, grid);
-
-		return FromEdges(bounds.Left + GridPadding, bounds.Top + GridPadding,
-			bounds.Right - GridPadding, bounds.Top + GridPadding + GridTitleHeight);
-	}
-
-	/// <summary>Gap between the title band's rule and the first row of colours.</summary>
-	public const float GridTitleGap = 7f;
-
-	/// <summary>Width of the button that finishes editing. Wide enough for the word in any language.</summary>
-	public const float GridActionWidth = 70f;
-
-	public static Rectangle GridTitleAction(Vector2 center, in GridSettings grid)
-	{
-		Rectangle band = GridTitle(center, grid);
-		float height = MenuActionSize + 3f;
-		float top = band.Y + (band.Height - height) * 0.5f;
-
-		return FromEdges(band.Right - GridActionWidth, top, band.Right, top + height);
 	}
 
 	public static Rectangle GridCell(Vector2 center, in GridSettings grid, int index)
@@ -561,7 +425,7 @@ internal static class WheelLayout
 		int columns = Math.Max(1, grid.Columns);
 
 		float left = bounds.Left + GridPadding + index % columns * grid.Step;
-		float top = bounds.Top + GridPadding + grid.TitleBand + index / columns * grid.Step;
+		float top = bounds.Top + GridPadding + index / columns * grid.Step;
 
 		return FromEdges(left, top, left + grid.Cell, top + grid.Cell);
 	}
@@ -575,9 +439,6 @@ internal static class WheelLayout
 
 		return -1;
 	}
-
-	public static Vector2 ClampGridCenter(Vector2 center, in GridSettings grid, float screenWidth, float screenHeight)
-		=> ClampOnScreen(center, GridBounds(center, grid), screenWidth, screenHeight);
 
 	// ---- Scrape wheel -----------------------------------------------------------------------
 

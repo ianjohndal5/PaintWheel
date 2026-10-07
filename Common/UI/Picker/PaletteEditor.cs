@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using PaintWheel.Common.Configs;
 using PaintWheel.Common.Painting;
 using PaintWheel.Common.Players;
@@ -14,20 +12,19 @@ using Terraria.ModLoader.Config;
 namespace PaintWheel.Common.UI.Picker;
 
 /// <summary>
-/// Building a palette in game: every paint laid out in a grid, click to add or remove. Also creating
-/// and deleting saved palettes, which all end in writing the config.
+/// What is in the palette on the palette board, and every change to the saved palettes - adding a
+/// paint, making, renaming and deleting a palette - which all end in writing the config. The board
+/// (<see cref="PaletteBoard"/>) is the drawing and the clicks.
 /// </summary>
 internal static class PaletteEditor
 {
-	/// <summary>Which config preset is being edited, or -1.</summary>
+	/// <summary>Which config preset is on the board, or -1 for the automatic palette.</summary>
 	private static int presetIndex = -1;
 
-	/// <summary>The preset "+" just made, until its first edit ends, so one left empty can be thrown away.</summary>
+	/// <summary>The preset "+" just made, until the board is left, so one left empty can be thrown away.</summary>
 	private static int newPreset = -1;
 
-	private static string presetName;
-
-	/// <summary>Every paint the game has, in catalog order: the cells of the grid.</summary>
+	/// <summary>Every paint the game has, in catalog order: the board's slots.</summary>
 	internal static readonly List<int> GridPaints = new();
 
 	/// <summary>The paints in the palette, for asking "is this one in it".</summary>
@@ -36,38 +33,20 @@ internal static class PaletteEditor
 	/// <summary>The same paints in the palette's own order, which is the order they sit in the ring.</summary>
 	private static readonly List<int> order = new();
 
-	internal static WheelLayout.GridSettings GridShape;
-
-	/// <summary>True while a palette is being built rather than picked from.</summary>
+	/// <summary>True while a saved palette is on the board, so its paints can be changed.</summary>
 	internal static bool Editing => presetIndex >= 0;
-
-	/// <summary>Twelve columns, as the config grid uses: a hue and its Deep variant line up.</summary>
-	private static void MeasureGrid()
-	{
-		GridShape = new WheelLayout.GridSettings {
-			Count = GridPaints.Count,
-			Columns = WheelLayout.GridColumns,
-			Cell = 30f,
-			Gap = 6f,
-			Titled = true,
-		};
-	}
 
 	internal static void StopEditing()
 	{
 		presetIndex = -1;
 		newPreset = -1;
-		presetName = null;
 		GridPaints.Clear();
 		Members.Clear();
 		order.Clear();
 	}
 
-	internal static Vector2 GridCenter(in WheelLayout.Geometry geometry)
-		=> WheelLayout.ClampGridCenter(geometry.MenuCenter, GridShape, Main.screenWidth, Main.screenHeight);
-
 	/// <summary>
-	/// Loads a saved palette into the grid: every paint the game has, with the palette's own marked.
+	/// Puts a saved palette on the board: every paint the game has, with the palette's own marked.
 	/// False when <paramref name="index"/> is not a saved palette.
 	/// </summary>
 	internal static bool Begin(int index, PaintWheelConfig config)
@@ -76,16 +55,63 @@ internal static class PaletteEditor
 			return false;
 
 		presetIndex = index;
-		presetName = config.Presets[index].Name;
-		GridPaints.Clear();
+		FillGrid();
 		ReadMembers(config.Presets[index]);
-
-		// Every paint the game has, in the same order the config grid uses - a palette is worth
-		// building out of colours you have not bought yet.
-		GridPaints.AddRange(PaintCatalog.Paints);
-		MeasureGrid();
-
 		return true;
+	}
+
+	/// <summary>Puts the automatic palette on the board: the same grid, with what it holds marked. Not editable.</summary>
+	internal static void ShowAutomatic()
+	{
+		presetIndex = -1;
+		FillGrid();
+		Members.Clear();
+		order.Clear();
+
+		foreach (Palette palette in PickerContent.Palettes) {
+			if (palette.Key != PickerContent.OwnedPaletteKey)
+				continue;
+
+			foreach (int type in palette.Paints) {
+				if (Members.Add(type))
+					order.Add(type);
+			}
+		}
+	}
+
+	/// <summary>
+	/// Every paint the game has, in the order the config grid uses - a palette is worth building out of
+	/// colours you have not bought yet.
+	/// </summary>
+	private static void FillGrid()
+	{
+		GridPaints.Clear();
+		GridPaints.AddRange(PaintCatalog.Paints);
+	}
+
+	/// <summary>A paint's place in the palette on the board, counting from 1 - its place in the ring - or 0.</summary>
+	internal static int PlaceOf(int type) => order.IndexOf(type) + 1;
+
+	/// <summary>How many paints a palette holds - -1 for the automatic one - as the ring will show them.</summary>
+	internal static int CountOf(int preset, PaintWheelConfig config)
+	{
+		if (preset < 0 || preset >= config.Presets.Count) {
+			foreach (Palette palette in PickerContent.Palettes) {
+				if (palette.Key == PickerContent.OwnedPaletteKey)
+					return palette.Paints.Count;
+			}
+
+			return 0;
+		}
+
+		var seen = new HashSet<int>();
+		foreach (ItemDefinition definition in config.Presets[preset]?.Paints ?? new List<ItemDefinition>()) {
+			int type = definition?.IsUnloaded == false ? definition.Type : 0;
+			if (type > 0 && PaintCatalog.IsPaint(type))
+				seen.Add(type);
+		}
+
+		return seen.Count;
 	}
 
 	/// <summary>
@@ -99,7 +125,7 @@ internal static class PaletteEditor
 			return;
 
 		// Fetched fresh each time: saving reads the file back into the config, replacing these objects.
-		PaintPreset preset = config.Presets[presetIndex];
+		PaintPreset preset = config.Presets[presetIndex] ??= new PaintPreset();
 		preset.Paints ??= new List<ItemDefinition>();
 
 		if (Members.Contains(type))
@@ -119,7 +145,7 @@ internal static class PaletteEditor
 		Members.Clear();
 		order.Clear();
 
-		foreach (ItemDefinition definition in preset.Paints ?? new List<ItemDefinition>()) {
+		foreach (ItemDefinition definition in preset?.Paints ?? new List<ItemDefinition>()) {
 			int type = definition?.IsUnloaded == false ? definition.Type : 0;
 			if (type > 0 && PaintCatalog.IsPaint(type) && Members.Add(type))
 				order.Add(type);
@@ -129,8 +155,8 @@ internal static class PaletteEditor
 	private static readonly List<int> owned = new();
 
 	/// <summary>
-	/// Adds a palette of what you are carrying - an empty one when that is nothing, to fill in the
-	/// editor - and makes it the one in use.
+	/// Adds a palette of what you are carrying - an empty one when that is nothing, to fill in on the
+	/// board - and makes it the one in use once it has a colour.
 	/// </summary>
 	/// <returns>Its index among the presets, or -1 when it could not be saved.</returns>
 	internal static int CreatePreset(PaintWheelConfig config)
@@ -145,13 +171,14 @@ internal static class PaletteEditor
 		int index = config.Presets.Count - 1;
 		bool saved = Save(config);
 
-		if (saved)
+		// In use once it has a colour. An empty one is nothing the wheel can show, so the palette in use
+		// stays - and stays put if this one is thrown away unfilled.
+		if (saved && preset.Paints.Count > 0)
 			PaintSelection.SetPalette(preset.Name);
 
-		// Rebuilt whether or not the save went through, so the rows always match the presets in memory.
+		// Rebuilt whether or not the save went through, so the wheel always matches the presets in memory.
 		PickerContent.RebuildPalettes(config);
 		PickerContent.ApplyPage(config);
-		PaintPicker.BuildMenuRows();
 
 		if (!saved || index >= config.Presets.Count)
 			return -1;
@@ -160,21 +187,36 @@ internal static class PaletteEditor
 		return index;
 	}
 
-	/// <summary>Throws away the palette "+" made if its first edit ended with nothing in it.</summary>
-	internal static void DiscardIfEmptyNew(PaintWheelConfig config)
+	/// <summary>
+	/// Throws away the palette "+" made if it is being left - for another palette, or by leaving the
+	/// board - with nothing in it. Returns the place it had, or -1 when nothing went, so a caller
+	/// holding a later place can step it back.
+	/// </summary>
+	internal static int DiscardIfEmptyNew(PaintWheelConfig config)
 	{
+		// Only while it is the one on the board: "+" marks its palette before the board moves onto it.
 		int preset = newPreset;
+		if (preset < 0 || preset != presetIndex)
+			return -1;
+
 		newPreset = -1;
 
-		if (preset < 0 || preset != presetIndex || preset >= config.Presets.Count)
-			return;
+		if (preset >= config.Presets.Count
+			|| config.Presets[preset]?.Paints?.Exists(definition => definition is { IsUnloaded: false }) == true)
+			return -1;
 
-		if (config.Presets[preset].Paints?.Exists(definition => definition is { IsUnloaded: false }) == true)
-			return;
+		// Back to the palette that is always there only when this was the one in use: one that was
+		// filled with what you carry and then emptied again.
+		bool inUse = PaintSelection.Palette == PickerContent.PaletteKey(preset, config);
 
 		config.Presets.RemoveAt(preset);
+		presetIndex = -1;
 		Save(config);
-		PaintSelection.SetPalette(PickerContent.OwnedPaletteKey);
+
+		if (inUse)
+			PaintSelection.SetPalette(PickerContent.OwnedPaletteKey);
+
+		return preset;
 	}
 
 	/// <summary>
@@ -189,7 +231,7 @@ internal static class PaletteEditor
 		int shownPreset = PickerContent.ActivePalette?.Preset ?? -1;
 		int shownPage = PickerContent.PageIndex;
 
-		config.Presets[preset].Name = name;
+		(config.Presets[preset] ??= new PaintPreset()).Name = name;
 		Save(config);
 
 		PickerContent.RebuildPalettes(config);
@@ -198,7 +240,6 @@ internal static class PaletteEditor
 			PickerContent.FollowPreset(shownPreset, shownPage, config);
 
 		PickerContent.ApplyPage(config);
-		PaintPicker.BuildMenuRows();
 	}
 
 	internal static bool DeletePreset(int index, PaintWheelConfig config)
@@ -218,7 +259,7 @@ internal static class PaletteEditor
 		if (shownPreset == index)
 			PaintSelection.SetPalette(PickerContent.OwnedPaletteKey);
 
-		// Rebuilt whether or not the save went through, so the rows always match the presets in memory.
+		// Rebuilt whether or not the save went through, so the wheel always matches the presets in memory.
 		PickerContent.RebuildPalettes(config);
 
 		// Palettes sharing a name are keyed by their order, so taking out an earlier one renumbers the
@@ -227,7 +268,6 @@ internal static class PaletteEditor
 			PickerContent.FollowPreset(shownPreset - 1, shownPage, config);
 
 		PickerContent.ApplyPage(config);
-		PaintPicker.BuildMenuRows();
 
 		return saved;
 	}
@@ -262,81 +302,5 @@ internal static class PaletteEditor
 		}
 
 		return label;
-	}
-
-	/// <summary>
-	/// The palette being built: every paint laid out at once, the way the config grid shows them, so
-	/// choosing is a matter of looking rather than paging. Members carry the gold rim.
-	/// </summary>
-	internal static void DrawGrid(SpriteBatch spriteBatch, in WheelLayout.Geometry geometry, float opacity)
-	{
-		Vector2 center = GridCenter(geometry);
-		Rectangle bounds = WheelLayout.GridBounds(center, GridShape);
-
-		WheelDrawing.DrawPanel(spriteBatch, bounds, opacity);
-		DrawGridTitle(spriteBatch, center, opacity);
-
-		Player player = Main.LocalPlayer;
-
-		for (int i = 0; i < GridPaints.Count; i++) {
-			int type = GridPaints[i];
-			bool member = Members.Contains(type);
-			bool hovered = i == PickerInput.HoveredCell;
-			Rectangle cell = WheelLayout.GridCell(center, GridShape, i);
-			Color accent = PaintCatalog.AccentColor(type);
-
-			// A colour that is not in the palette is dimmed rather than merely unringed, so a full
-			// palette does not read as a wall of gold with nothing to compare against.
-			float strength = member ? 1f : hovered ? 0.72f : 0.42f;
-			Color fill = Color.Lerp(new Color(38, 40, 58), accent, strength);
-
-			// Its place in the palette - the order the ring deals them out in - in the corner, the way the
-			// config's palette block numbers them, so the colour itself stays in view.
-			string place = member ? (order.IndexOf(type) + 1).ToString() : null;
-			WheelDrawing.DrawPaletteCell(spriteBatch, cell, fill, member, hovered, place, opacity);
-
-			// Struck through when you are not carrying it: still worth adding, worth knowing you lack.
-			if (PaintInventory.TotalStack(player, type) <= 0)
-				WheelDrawing.DrawSlash(spriteBatch, cell.Center.ToVector2(), cell.Width * 0.66f, PickerRenderer.EmptyMark * opacity);
-		}
-
-		string hint = PickerInput.HoveredCell >= 0 && PickerInput.HoveredCell < GridPaints.Count
-			? Lang.GetItemNameValue(GridPaints[PickerInput.HoveredCell])
-			: Language.GetTextValue("Mods.PaintWheel.UI.EditHint");
-
-		WheelDrawing.DrawTextCentered(spriteBatch, hint,
-			new Vector2(bounds.Center.X, bounds.Bottom + 18f), Color.White, opacity, 0.85f);
-	}
-
-	private static void DrawGridTitle(SpriteBatch spriteBatch, Vector2 center, float opacity)
-	{
-		Rectangle band = WheelLayout.GridTitle(center, GridShape);
-
-		// The palette being edited, which is not necessarily the one being used. Trimmed to leave room for
-		// the tally and the Done button, so a long name cannot run under them.
-		string tally = Members.Count.ToString();
-		float room = band.Width - WheelLayout.GridActionWidth - WheelDrawing.MeasureText(tally, 0.74f).X - 24f;
-		string title = WheelDrawing.Truncate(Language.GetTextValue("Mods.PaintWheel.UI.EditingHeader", presetName ?? ""), 0.8f, room);
-		var at = new Vector2(band.X + 4f, band.Center.Y - 1f);
-
-		WheelDrawing.DrawTextLeft(spriteBatch, title, at, Main.OurFavoriteColor, opacity, 0.8f);
-
-		// Dimmed and set apart, so it reads as a tally rather than as part of the palette's name.
-		WheelDrawing.DrawTextLeft(spriteBatch, tally,
-			new Vector2(at.X + WheelDrawing.MeasureText(title, 0.8f).X + 9f, at.Y),
-			new Color(150, 154, 184), opacity, 0.74f);
-
-		Rectangle done = WheelLayout.GridTitleAction(center, GridShape);
-
-		WheelDrawing.DrawRect(spriteBatch, done, (PickerInput.HoveredDone ? Color.White : PickerRenderer.RimColor) * (opacity * 0.22f));
-		WheelDrawing.DrawRectOutline(spriteBatch, done, 1,
-			(PickerInput.HoveredDone ? Color.White : new Color(120, 124, 156)) * opacity);
-
-		WheelDrawing.DrawTextCentered(spriteBatch, Language.GetTextValue("Mods.PaintWheel.UI.DoneEditing"),
-			new Vector2(done.Center.X, done.Center.Y - 1f),
-			PickerInput.HoveredDone ? Color.White : new Color(214, 216, 234), opacity, 0.72f);
-
-		WheelDrawing.DrawRect(spriteBatch, new Rectangle(band.X, band.Bottom - 1, band.Width, 1),
-			PickerRenderer.RimColor * (opacity * 0.8f));
 	}
 }

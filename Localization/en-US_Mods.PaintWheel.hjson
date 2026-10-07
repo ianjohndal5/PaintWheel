@@ -20,7 +20,6 @@ UI: {
 	NoPaintOn: Unpainted
 	NoPaintOff: Painted
 	ScrollHint: Scroll or click the arrows for more paints
-	PaletteTitle: Palettes
 	PaletteHint: Click to switch palette
 	PaletteScrollHint: Scroll or click the name to switch palette
 	Empty: none left
@@ -30,12 +29,10 @@ UI: {
 	SlotPickCoating: Press {0} to select this coating
 	Disabled: Paint Wheel hit an error and has stopped applying your paint. Details are in client.log.
 	NewPalette: New palette from what you carry
-	EditPalette: Edit this palette
 	DeletePalette: Delete this palette
 	EditHint: Click a colour to add or remove it.
-	DoneEditing: Done
+	AutoPaletteHint: Fills itself with every paint you carry. Click + to make your own.
 	NewPaletteName: Palette
-	EditingHeader: Editing {0}
 	ConfirmDelete: Click again to delete
 	PaletteHintNew: Click for palettes
 	RanOut: Out of {0}
@@ -147,8 +144,9 @@ Configs: {
 			Label: Palettes
 			Tooltip:
 				'''
-				Saved palettes, chosen from the list that opens when you click the centre of the wheel or the palette
-				name above it. There is always one auto-filled palette holding everything you are carrying.
+				Saved palettes. Click the centre of the wheel or the palette name above it to open the palette board,
+				where you switch between them and change their colours. There is always one auto-filled palette
+				holding everything you are carrying.
 				'''
 		}
 	}
@@ -183,7 +181,7 @@ Configs: {
 			Label: Show number keys on swatches
 			Tooltip:
 				'''
-				While the picker is up, the number keys pick the first ten swatches or rows instead of the
+				While the picker is up, the number keys pick the first ten swatches instead of the
 				hotbar. This shows which key picks which, the way the hotbar shows its own.
 				'''
 		}

@@ -20,7 +20,6 @@ UI: {
 	NoPaintOn: Sans peinture
 	NoPaintOff: Peint
 	ScrollHint: Molette ou flèches pour voir plus de peintures
-	PaletteTitle: Palettes
 	PaletteHint: Cliquez pour changer de palette
 	PaletteScrollHint: Molette ou clic sur le nom pour changer de palette
 	Empty: épuisée
@@ -30,12 +29,10 @@ UI: {
 	SlotPickCoating: Appuyez sur {0} pour choisir ce revêtement
 	Disabled: Paint Wheel a rencontré une erreur et n'applique plus votre peinture. Détails dans client.log.
 	NewPalette: Nouvelle palette avec vos peintures
-	EditPalette: Modifier cette palette
 	DeletePalette: Supprimer cette palette
 	EditHint: Cliquez une couleur pour l'ajouter ou la retirer.
-	DoneEditing: Terminé
+	AutoPaletteHint: Se remplit de toutes les peintures que vous avez. Cliquez sur + pour créer la vôtre.
 	NewPaletteName: Palette
-	EditingHeader: Modification de {0}
 	ConfirmDelete: Cliquez encore pour supprimer
 	PaletteHintNew: Cliquez pour voir les palettes
 	RanOut: Plus de {0}
@@ -147,8 +144,9 @@ Configs: {
 			Label: Palettes
 			Tooltip:
 				'''
-				Palettes enregistrées, choisies dans la liste qui s'ouvre au centre de la roue ou sur le nom de la
-				palette au-dessus. Une palette se remplit toujours automatiquement avec tout ce que vous portez.
+				Palettes enregistrées. Cliquez au centre de la roue ou sur le nom de la palette au-dessus pour ouvrir le
+				tableau des palettes, où vous passez de l'une à l'autre et modifiez leurs couleurs. Une palette se
+				remplit toujours automatiquement avec tout ce que vous portez.
 				'''
 		}
 	}
@@ -183,8 +181,8 @@ Configs: {
 			Label: Afficher les touches numériques sur les pastilles
 			Tooltip:
 				'''
-				Tant que la roue est ouverte, les touches numériques choisissent les dix premières pastilles ou
-				lignes au lieu de la barre d'accès rapide. Ceci montre quelle touche choisit quoi, comme la barre.
+				Tant que la roue est ouverte, les touches numériques choisissent les dix premières pastilles
+				au lieu de la barre d'accès rapide. Ceci montre quelle touche choisit quoi, comme la barre.
 				'''
 		}
 
