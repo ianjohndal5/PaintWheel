@@ -20,7 +20,6 @@ UI: {
 	NoPaintOn: Non verniciato
 	NoPaintOff: Verniciato
 	ScrollHint: Scorri o usa le frecce per altre vernici
-	PaletteTitle: Tavolozze
 	PaletteHint: Clicca per cambiare tavolozza
 	PaletteScrollHint: Scorri o clicca sul nome per cambiare tavolozza
 	Empty: esaurita
@@ -30,12 +29,10 @@ UI: {
 	SlotPickCoating: Premi {0} per scegliere questo rivestimento
 	Disabled: Paint Wheel ha avuto un errore e non applica più la tua vernice. I dettagli sono in client.log.
 	NewPalette: Nuova tavolozza da ciò che hai
-	EditPalette: Modifica questa tavolozza
 	DeletePalette: Elimina questa tavolozza
 	EditHint: Clicca un colore per aggiungerlo o toglierlo.
-	DoneEditing: Fatto
+	AutoPaletteHint: Si riempie con ogni vernice che hai. Clicca + per crearne una tua.
 	NewPaletteName: Tavolozza
-	EditingHeader: Modifica di {0}
 	ConfirmDelete: Clicca di nuovo per eliminare
 	PaletteHintNew: Clicca per vedere le tavolozze
 	RanOut: Non hai più {0}
@@ -147,8 +144,9 @@ Configs: {
 			Label: Tavolozze
 			Tooltip:
 				'''
-				Tavolozze salvate, scelte dall'elenco che si apre cliccando al centro della ruota o sul nome della
-				tavolozza sopra. C'è sempre una tavolozza che si riempie da sola con tutto quello che hai addosso.
+				Tavolozze salvate. Clicca al centro della ruota o sul nome della tavolozza sopra per aprire il pannello
+				delle tavolozze, dove passi dall'una all'altra e ne cambi i colori. C'è sempre una tavolozza che si
+				riempie da sola con tutto quello che hai addosso.
 				'''
 		}
 	}
@@ -183,7 +181,7 @@ Configs: {
 			Label: Mostra i tasti numerici sui colori
 			Tooltip:
 				'''
-				Con la ruota aperta, i tasti numerici scelgono i primi dieci colori o righe invece della barra
+				Con la ruota aperta, i tasti numerici scelgono i primi dieci colori invece della barra
 				rapida. Questo mostra quale tasto sceglie cosa, come la barra rapida mostra i suoi.
 				'''
 		}

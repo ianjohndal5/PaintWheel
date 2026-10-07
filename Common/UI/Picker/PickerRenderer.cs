@@ -47,17 +47,19 @@ internal static class PickerRenderer
 		WheelLayout.Geometry geometry = WheelLayout.Compute(settings, PaintPicker.Anchor);
 
 		// The scrape wheel is its own shape, with its own panel, title and name.
+		// The scrape wheel and the palette board are their own shapes, with their own panel and titles.
 		bool scraping = PaintPicker.DrawOverlay == PickerOverlay.Scrape;
+		bool board = PaintPicker.DrawOverlay == PickerOverlay.Palettes;
 
-		if (config.Appearance.ShowBackgroundPanel && !scraping)
+		if (config.Appearance.ShowBackgroundPanel && !scraping && !board)
 			WheelDrawing.DrawPanel(spriteBatch, geometry.Panel, opacity);
 
-		// Only over the swatches: a list carries its own title and marks its own current row, so drawing
-		// the header too says everything twice.
+		// Only over the swatches: the board carries its own title and marks the palette in use, so
+		// drawing the header too says everything twice.
 		if (PaintPicker.DrawOverlay == PickerOverlay.None)
 			DrawHeader(spriteBatch, config, geometry, opacity);
 
-		// Swatches are put away rather than faded: the menu is wider than the ring's clear space, so a
+		// Swatches are put away rather than faded: the board is wider than the ring's clear space, so a
 		// ghost ring behind it is noise.
 		if (PaintPicker.DrawOverlay == PickerOverlay.None) {
 			switch (settings.Style) {
@@ -75,19 +77,15 @@ internal static class PickerRenderer
 			}
 		}
 
-		// No coating row in scrape mode, where coatings mean nothing, nor under the editor grid, which
-		// covers it and takes every click.
-		if (PaintPicker.DrawOverlay is not (PickerOverlay.Scrape or PickerOverlay.Grid)) {
-			DrawCoatingRow(spriteBatch, config, settings, geometry,
-				PaintPicker.DrawOverlay == PickerOverlay.Palettes ? opacity * 0.35f : opacity, eased);
-		}
+		// No coating row in scrape mode, where coatings mean nothing, nor under the board, which covers it
+		// and takes every click.
+		if (!scraping && !board)
+			DrawCoatingRow(spriteBatch, config, settings, geometry, opacity, eased);
 
-		if (PaintPicker.DrawOverlay == PickerOverlay.Grid)
-			PaletteEditor.DrawGrid(spriteBatch, geometry, opacity);
-		else if (scraping)
+		if (scraping)
 			ScrapeWheel.Draw(spriteBatch, config, settings, opacity);
-		else if (PaintPicker.DrawOverlay == PickerOverlay.Palettes)
-			PickerMenu.DrawMenu(spriteBatch, geometry, opacity);
+		else if (board)
+			PaletteBoard.Draw(spriteBatch, config, geometry, opacity);
 		else
 			DrawHoverText(spriteBatch, config, settings, geometry, opacity);
 	}

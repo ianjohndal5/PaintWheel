@@ -20,7 +20,6 @@ UI: {
 	NoPaintOn: Bez farby
 	NoPaintOff: Malowane
 	ScrollHint: Przewiń lub kliknij strzałki, by zobaczyć więcej farb
-	PaletteTitle: Palety
 	PaletteHint: Kliknij, by zmienić paletę
 	PaletteScrollHint: Przewiń lub kliknij nazwę, by zmienić paletę
 	Empty: brak
@@ -30,12 +29,10 @@ UI: {
 	SlotPickCoating: Naciśnij {0}, aby wybrać tę powłokę
 	Disabled: Paint Wheel napotkał błąd i przestał nakładać twoją farbę. Szczegóły są w client.log.
 	NewPalette: Nowa paleta z tego, co masz
-	EditPalette: Edytuj tę paletę
 	DeletePalette: Usuń tę paletę
 	EditHint: Kliknij kolor, aby go dodać lub usunąć.
-	DoneEditing: Gotowe
+	AutoPaletteHint: Wypełnia się każdą farbą, którą masz. Kliknij +, aby stworzyć własną.
 	NewPaletteName: Paleta
-	EditingHeader: Edycja {0}
 	ConfirmDelete: Kliknij ponownie, by usunąć
 	PaletteHintNew: Kliknij, by zobaczyć palety
 	RanOut: Brak: {0}
@@ -143,8 +140,9 @@ Configs: {
 			Label: Palety
 			Tooltip:
 				'''
-				Zapisane palety, wybierane z listy otwieranej kliknięciem środka koła lub nazwy palety nad nim.
-				Zawsze jest jedna paleta, która sama wypełnia się wszystkim, co niesiesz.
+				Zapisane palety. Kliknij środek koła lub nazwę palety nad nim, aby otworzyć tablicę palet, gdzie
+				przełączasz się między nimi i zmieniasz ich kolory. Zawsze jest jedna paleta, która sama wypełnia się
+				wszystkim, co niesiesz.
 				'''
 		}
 	}
@@ -175,7 +173,7 @@ Configs: {
 			Label: Pokazuj klawisze cyfr na kolorach
 			Tooltip:
 				'''
-				Gdy koło jest otwarte, klawisze cyfr wybierają pierwsze dziesięć kolorów lub wierszy zamiast
+				Gdy koło jest otwarte, klawisze cyfr wybierają pierwsze dziesięć kolorów zamiast
 				paska szybkiego dostępu. To pokazuje, który klawisz co wybiera, tak jak pasek pokazuje swoje.
 				'''
 		}

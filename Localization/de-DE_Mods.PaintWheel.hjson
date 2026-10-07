@@ -20,7 +20,6 @@ UI: {
 	NoPaintOn: Unbemalt
 	NoPaintOff: Bemalt
 	ScrollHint: Scrolle oder klicke die Pfeile für weitere Farben
-	PaletteTitle: Paletten
 	PaletteHint: Klicken, um die Palette zu wechseln
 	PaletteScrollHint: Scrolle oder klicke den Namen, um die Palette zu wechseln
 	Empty: nichts übrig
@@ -30,12 +29,10 @@ UI: {
 	SlotPickCoating: Mit {0} diese Beschichtung auswählen
 	Disabled: Paint Wheel hatte einen Fehler und wendet deine Farbe nicht mehr an. Details stehen in client.log.
 	NewPalette: Neue Palette aus deinem Vorrat
-	EditPalette: Diese Palette bearbeiten
 	DeletePalette: Diese Palette löschen
 	EditHint: Klicke eine Farbe an, um sie hinzuzufügen oder zu entfernen.
-	DoneEditing: Fertig
+	AutoPaletteHint: Füllt sich mit jeder Farbe, die du dabeihast. Klicke auf +, um eine eigene anzulegen.
 	NewPaletteName: Palette
-	EditingHeader: Bearbeiten: {0}
 	ConfirmDelete: Zum Löschen erneut klicken
 	PaletteHintNew: Klicken für Paletten
 	RanOut: "{0} ist aufgebraucht"
@@ -147,7 +144,8 @@ Configs: {
 			Label: Paletten
 			Tooltip:
 				'''
-				Gespeicherte Paletten, wählbar über die Liste in der Mitte des Rades oder am Palettennamen darüber.
+				Gespeicherte Paletten. Ein Klick auf die Mitte des Rades oder den Palettennamen darüber öffnet die
+				Palettentafel, auf der du sie wechselst und ihre Farben änderst.
 				Eine Palette füllt sich immer automatisch mit allem, was du dabeihast.
 				'''
 		}
@@ -183,7 +181,7 @@ Configs: {
 			Label: Zifferntasten auf Farbfeldern zeigen
 			Tooltip:
 				'''
-				Solange das Rad offen ist, wählen die Zifferntasten die ersten zehn Farbfelder oder Zeilen statt
+				Solange das Rad offen ist, wählen die Zifferntasten die ersten zehn Farbfelder statt
 				der Schnellleiste. Das zeigt, welche Taste was wählt - so wie die Schnellleiste ihre eigenen.
 				'''
 		}

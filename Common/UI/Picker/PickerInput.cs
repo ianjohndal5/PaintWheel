@@ -37,25 +37,11 @@ internal static class PickerInput
 	internal static int HoveredSwatch = -1;
 	internal static int HoveredCoating = -1;
 	internal static int HoveredArrow = -1;
-	internal static int HoveredRow = -1;
 	internal static bool HoveredCenter;
 	internal static bool HoveredHeader;
-	internal static int HoveredCell = -1;
-	internal static int HoveredAction = -1;
-	internal static bool HoveredPlus;
-	internal static bool HoveredDone;
 
 	/// <summary>On the scrape wheel: an option, <see cref="WheelLayout.ScrapeBack"/> for the disc in the middle, or -1.</summary>
 	internal static int HoveredScrape = -1;
-
-	/// <summary>True while the cursor is anywhere over an open list's panel, rows or not.</summary>
-	internal static bool HoveredPanel;
-
-	/// <summary>
-	/// The saved palette whose bin has been clicked once, or -1. Deleting is permanent and saved at once,
-	/// so it takes a second click on the same bin; moving off it forgets the first.
-	/// </summary>
-	internal static int ArmedDelete = -1;
 
 	/// <summary>A button already down when the picker opens is not a click on it.</summary>
 	internal static void PrimeButtons()
@@ -80,19 +66,13 @@ internal static class PickerInput
 	/// <summary>Forgets what the cursor was over, in every view.</summary>
 	internal static void ClearHover()
 	{
-		HoveredCell = -1;
-		HoveredAction = -1;
-		HoveredPlus = false;
-		HoveredDone = false;
 		HoveredSwatch = -1;
 		HoveredCoating = -1;
 		HoveredArrow = -1;
-		HoveredRow = -1;
 		HoveredCenter = false;
 		HoveredHeader = false;
-		HoveredPanel = false;
 		HoveredScrape = -1;
-		ArmedDelete = -1;
+		PaletteBoard.ClearHover();
 	}
 
 	/// <summary>
@@ -123,61 +103,13 @@ internal static class PickerInput
 		if (!freshLeftClick)
 			return;
 
-		// A click anywhere but the name being typed keeps it, then does what it would have done.
-		if (PickerMenu.IsRenaming) {
-			bool onRenamed = HoveredRow >= 0 && HoveredRow < PickerMenu.Rows.Count
-				&& PickerMenu.Rows[HoveredRow].Preset == PickerMenu.Renaming && HoveredAction < 0;
-
-			if (onRenamed) {
-				Consume();
-				return;
-			}
-
-			PickerMenu.CommitRename(config);
-		}
-
-		// Editing: a click puts a colour in the palette or takes it out, or finishes.
-		if (PaintPicker.Overlay == PickerOverlay.Grid) {
-			if (HoveredDone) {
-				PaintPicker.FinishEditing(config);
+		// The board: its own buttons, pills and paints. A click off it goes back to the colours.
+		if (PaintPicker.Overlay == PickerOverlay.Palettes) {
+			if (!PaletteBoard.Click(config)) {
+				PaintPicker.CloseBoard();
 				PaintPicker.Play(SoundID.MenuClose, config);
-				Consume();
-				return;
 			}
 
-			if (HoveredCell >= 0 && HoveredCell < PaletteEditor.GridPaints.Count) {
-				PaletteEditor.ToggleMember(PaletteEditor.GridPaints[HoveredCell], config);
-				PaintPicker.Play(SoundID.MenuTick, config);
-			}
-
-			Consume();
-			return;
-		}
-
-		if (PaintPicker.Overlay == PickerOverlay.Palettes && HoveredPlus) {
-			PaintPicker.Play(PaintPicker.CreateAndEdit(config) ? SoundID.Grab : SoundID.MenuClose, config);
-			Consume();
-			return;
-		}
-
-		if (PaintPicker.Overlay == PickerOverlay.Palettes && HoveredRow >= 0 && HoveredAction >= 0) {
-			MenuRow entry = PickerMenu.Rows[HoveredRow];
-
-			if (HoveredAction == PickerMenu.ActionDelete && ArmedDelete != entry.Preset) {
-				ArmedDelete = entry.Preset;
-				PaintPicker.Play(SoundID.MenuTick, config);
-				Consume();
-				return;
-			}
-
-			ArmedDelete = -1;
-			bool done = HoveredAction switch {
-				PickerMenu.ActionEdit => PaintPicker.StartEditing(entry.Preset, config),
-				PickerMenu.ActionRename => PaintPicker.StartRenaming(entry.Preset, config),
-				_ => PaletteEditor.DeletePreset(entry.Preset, config),
-			};
-
-			PaintPicker.Play(done ? SoundID.Grab : SoundID.MenuClose, config);
 			Consume();
 			return;
 		}
@@ -202,21 +134,6 @@ internal static class PickerInput
 			return;
 		}
 
-		if (PaintPicker.Overlay == PickerOverlay.Palettes) {
-			if (HoveredRow >= 0) {
-				PaintPicker.Play(PaintPicker.ActivateRow(HoveredRow, config) ? SoundID.Grab : SoundID.MenuClose, config);
-			}
-			else if (!HoveredPanel) {
-				// Clicking off the list backs out to the swatches. A click on the panel between rows is a
-				// near miss, not a request to leave.
-				PaintPicker.Play(SoundID.MenuClose, config);
-				PaintPicker.Overlay = PickerOverlay.None;
-			}
-
-			Consume();
-			return;
-		}
-
 		if (HoveredArrow >= 0) {
 			PaintPicker.ChangePage(HoveredArrow == 0 ? -1 : 1, config);
 			Consume();
@@ -235,7 +152,7 @@ internal static class PickerInput
 		}
 
 		if ((HoveredCenter || HoveredHeader) && PaintPicker.MenuAvailable) {
-			PaintPicker.OpenOverlay(PickerOverlay.Palettes, config);
+			PaintPicker.OpenBoard(config);
 			Consume();
 			return;
 		}
@@ -348,21 +265,20 @@ internal static class PickerInput
 		int direction = delta > 0 ? -1 : 1;
 		bool shift = Main.keyState.IsKeyDown(Keys.LeftShift) || Main.keyState.IsKeyDown(Keys.RightShift);
 
-		// Nothing to scroll through on the scrape wheel, and changing palette under the editor would
-		// leave it editing one you can no longer see. The delta is still swallowed above so the hotbar
+		// Nothing to scroll through on the scrape wheel. The delta is still swallowed above so the hotbar
 		// does not move underneath either.
-		if (PaintPicker.Overlay is PickerOverlay.Scrape or PickerOverlay.Grid)
+		if (PaintPicker.Overlay == PickerOverlay.Scrape)
 			return;
 
-		// A list longer than fits scrolls instead, so every palette in it can be reached.
-		if (PaintPicker.Overlay == PickerOverlay.Palettes && PickerMenu.Rows.Count > PickerMenu.ShownRows) {
-			if (PickerMenu.Scroll(direction))
+		// The board scrolls what is under the cursor: its row of palettes, or its paints.
+		if (PaintPicker.Overlay == PickerOverlay.Palettes) {
+			if (PaletteBoard.Scroll(direction, config))
 				PaintPicker.Play(SoundID.MenuTick, config);
 
 			return;
 		}
 
-		if (PaintPicker.Overlay == PickerOverlay.Palettes || shift || PickerContent.PageCount(config) <= 1)
+		if (shift || PickerContent.PageCount(config) <= 1)
 			PaintPicker.CyclePalette(direction, config);
 		else
 			PaintPicker.ChangePage(direction, config);
@@ -397,22 +313,9 @@ internal static class PickerInput
 		HoveredHeader = !overlaid && PaintPicker.MenuAvailable && settings.ShowHeader
 			&& geometry.HeaderBox.Contains((int)cursor.X, (int)cursor.Y);
 
-		if (PaintPicker.Overlay == PickerOverlay.Grid) {
-			Vector2 gridAt = PaletteEditor.GridCenter(geometry);
-
-			HoveredDone = CursorMoved
-				&& WheelLayout.GridTitleAction(gridAt, PaletteEditor.GridShape).Contains((int)cursor.X, (int)cursor.Y);
-
-			int cell = CursorMoved && !HoveredDone
-				? WheelLayout.HitTestGrid(gridAt, PaletteEditor.GridShape, cursor)
-				: -1;
-
-			// Ticks on reaching a cell, not on leaving one, so crossing the grid is one tick per colour.
-			if (cell >= 0 && cell != HoveredCell)
-				PaintPicker.Play(SoundID.MenuTick, config);
-
-			HoveredCell = cell;
-			HoveredRow = -1;
+		if (PaintPicker.Overlay == PickerOverlay.Palettes) {
+			PaletteBoard.Place(geometry);
+			PaletteBoard.UpdateHover(cursor, config);
 			HoveredSwatch = -1;
 			HoveredCoating = -1;
 			HoveredArrow = -1;
@@ -427,44 +330,12 @@ internal static class PickerInput
 				PaintPicker.Play(SoundID.MenuTick, config);
 
 			HoveredScrape = target;
-			HoveredRow = -1;
-			HoveredAction = -1;
-			HoveredPanel = false;
-			HoveredPlus = false;
 			HoveredSwatch = -1;
 			HoveredCoating = -1;
 			HoveredArrow = -1;
 			return;
 		}
 
-		if (overlaid) {
-			Vector2 menuAt = PickerMenu.MenuCenter(geometry);
-
-			int row = CursorMoved
-				? PickerMenu.HitTestRow(menuAt, cursor)
-				: -1;
-
-			if (row >= 0 && row != HoveredRow)
-				PaintPicker.Play(SoundID.MenuTick, config);
-
-			HoveredRow = row;
-			HoveredAction = PickerMenu.HitTestRowActions(menuAt, cursor);
-			HoveredPanel = PickerMenu.Rows.Count > 0
-				&& WheelLayout.MenuBounds(menuAt, PickerMenu.Shape).Contains((int)cursor.X, (int)cursor.Y);
-
-			if (ArmedDelete >= 0 && !(HoveredAction == PickerMenu.ActionDelete && PickerMenu.Rows[HoveredRow].Preset == ArmedDelete))
-				ArmedDelete = -1;
-
-			HoveredPlus = PaintPicker.Overlay == PickerOverlay.Palettes && CursorMoved
-				&& WheelLayout.MenuTitleAction(menuAt, PickerMenu.Shape).Contains((int)cursor.X, (int)cursor.Y);
-			HoveredSwatch = -1;
-			HoveredCoating = -1;
-			HoveredArrow = -1;
-			return;
-		}
-
-		HoveredRow = -1;
-		HoveredPanel = false;
 		HoveredArrow = HitTestArrows(config, geometry, cursor);
 
 		// An arrow no longer hides the swatch behind it. Sitting beside the swatches means a flick that
@@ -494,11 +365,6 @@ internal static class PickerInput
 		Rectangle area;
 
 		switch (PaintPicker.Overlay) {
-			case PickerOverlay.Grid:
-				area = WheelLayout.GridBounds(PaletteEditor.GridCenter(geometry), PaletteEditor.GridShape);
-				area.Inflate(-(int)WheelLayout.GridPadding - 1, -(int)WheelLayout.GridPadding - 1);
-				break;
-
 			// A radial menu: which way the stick leans is the swatch, whatever the distance.
 			case PickerOverlay.None when settings.Style == WheelLayoutStyle.Wheel:
 				return PaintPicker.Anchor + stick * geometry.Radius;
@@ -513,16 +379,17 @@ internal static class PickerInput
 				area.Inflate(-2, -2);
 				break;
 
+			// The palette board, edge to edge: its buttons sit right out at its side.
 			default:
-				area = WheelLayout.MenuBounds(PickerMenu.MenuCenter(geometry), PickerMenu.Shape);
-				area.Inflate(-(int)WheelLayout.MenuPadding - 1, -(int)WheelLayout.MenuPadding - 1);
+				area = PaletteBoard.Bounds;
+				area.Inflate(-8, -8);
 				break;
 		}
 
 		// The dead zone's worth of lean is taken off first, or everything within it of the middle - in
 		// the grid, whole columns of swatches - could never be pointed at. Then stretched from the
-		// stick's circle to the rectangle, so leaning into a corner reaches it: the list's "+" and the
-		// editor's Done both sit in one.
+		// stick's circle to the rectangle, so leaning into a corner reaches it: the board's buttons sit
+		// out at its edge.
 		float length = stick.Length();
 		float reach = Math.Clamp((length - StickDeadZone) / (1f - StickDeadZone), 0f, 1f);
 		float lean = Math.Max(Math.Abs(stick.X), Math.Abs(stick.Y));
@@ -548,10 +415,9 @@ internal static class PickerInput
 		return geometry.RightArrow.Contains(point) ? 1 : -1;
 	}
 
-	/// <summary>Same rule as the wheel: nothing is chosen until the cursor moves onto a row.</summary>
+	/// <summary>Same rule as the wheel, for a view just switched to: nothing is chosen until the cursor moves.</summary>
 	internal static void ResetMenuCursor()
 	{
-		HoveredRow = -1;
 		OpenCursor = Main.MouseScreen;
 		CursorMoved = false;
 	}

@@ -17,32 +17,30 @@ namespace PaintWheel.Common.UI.Picker;
 internal enum PickerOverlay
 {
 	None,
+
+	/// <summary>The palette board: which palette is in use, and what is in it.</summary>
 	Palettes,
 
 	/// <summary>Scrape mode's wheel: what the scraper strips, and the way back to the colours.</summary>
 	Scrape,
-
-	/// <summary>Every paint at once, for building a palette.</summary>
-	Grid,
 }
 
 /// <summary>
 /// The picker's lifecycle: opening, closing, committing, and moving between its views (the swatches,
-/// the palette list, the scrape wheel and the palette editor). This is the one class the rest of the
-/// mod talks to; the others in this folder each own one part of it:
+/// the palette board and the scrape wheel). This is the one class the rest of the mod talks to; the
+/// others in this folder each own one part of it:
 /// <list type="bullet">
 /// <item><see cref="PickerContent"/> - what is on offer: palettes, the page on show, the bottom row.</item>
 /// <item><see cref="PickerInput"/> - reading the mouse: what is hovered, what a click or release means.</item>
-/// <item><see cref="PickerMenu"/> - the palette list: its rows, size, hit testing and drawing.</item>
+/// <item><see cref="PaletteBoard"/> - the palette board: its layout, clicks and drawing.</item>
+/// <item><see cref="PaletteEditor"/> - what is in the palette on the board, and saving every change to palettes.</item>
 /// <item><see cref="ScrapeWheel"/> - scrape mode's own wheel: its options and their drawing.</item>
-/// <item><see cref="PaletteEditor"/> - building a palette in game, and creating and deleting saved ones.</item>
 /// <item><see cref="PickerRenderer"/> - drawing everything else: the swatches, header and bottom row.</item>
 /// <item><see cref="WheelLayout"/>, <see cref="WheelMath"/>, <see cref="WheelPaging"/> - where things go, for
 /// every layout; pure, with no game state.</item>
 /// </list>
 /// Small types live beside their users: <see cref="PickerOverlay"/> here, <see cref="Palette"/> in its own
-/// file, and <see cref="MenuRow"/> and <see cref="RowKind"/> in PickerMenu.cs.
-/// Palettes and pages are separate axes. A palette is a named set of paints, chosen from a list; a page
+/// file. Palettes and pages are separate axes. A palette is a named set of paints, chosen on the board; a page
 /// is one ring's worth of the palette you are on, walked with the arrows or the scroll wheel.
 /// <para/>
 /// All coordinates are UI space: UpdateUI and interface layers both run inside PlayerInput.SetZoom_UI,
@@ -145,14 +143,13 @@ public static class PaintPicker
 
 	/// <summary>
 	/// What a picker that is not on screen must not still remember: what the cursor was over, and which
-	/// list was open. Shared by the end of the close animation and by <see cref="Reset"/> so there is
+	/// view was open. Shared by the end of the close animation and by <see cref="Reset"/> so there is
 	/// one list to keep up to date rather than two that drift.
 	/// </summary>
 	private static void ClearTransient()
 	{
 		PaletteEditor.StopEditing();
-		PickerMenu.StopRenaming();
-		PickerMenu.ForgetOpenList();
+		PaletteBoard.Reset();
 		PickerInput.ClearHover();
 		Overlay = PickerOverlay.None;
 		DrawOverlay = PickerOverlay.None;
@@ -175,7 +172,6 @@ public static class PaintPicker
 		PickerInput.ResetButtons();
 		ClearTransient();
 		PickerContent.Clear();
-		PickerMenu.Clear();
 		WheelDrawing.ClearCaches();
 	}
 
@@ -204,7 +200,7 @@ public static class PaintPicker
 			holder.mouseInterface = true;
 
 		if (active) {
-			PickerMenu.ClaimTextInput();
+			PaletteBoard.ClaimTextInput();
 
 			bool swappedBack = handSwappedBack;
 			handSwappedBack = false;
@@ -225,8 +221,7 @@ public static class PaintPicker
 					viewRequest = null;
 
 					if (view == PickerOverlay.Scrape && PaintSelection.Scrape != ScrapeMode.Off) {
-						LeaveEditor();
-						PickerMenu.StopRenaming();
+						LeaveBoard();
 						ShowScrapeWheel(Main.MouseScreen, config);
 					}
 					else if (view == PickerOverlay.None && PaintSelection.Scrape == ScrapeMode.Off) {
@@ -314,7 +309,6 @@ public static class PaintPicker
 		PickerInput.CursorMoved = false;
 		Overlay = scraping ? PickerOverlay.Scrape : PickerOverlay.None;
 		DrawOverlay = Overlay;
-		BuildMenuRows();
 		Anchor = WheelLayout.ClampAnchor(BuildSettings(config, 1f), PickerInput.OpenCursor, Main.screenWidth, Main.screenHeight);
 
 		// Under the cursor itself rather than the anchor, which is placed to fit the bigger colour view.
@@ -332,7 +326,6 @@ public static class PaintPicker
 		PickerInput.HoveredSwatch = -1;
 		PickerInput.HoveredCoating = -1;
 		PickerInput.HoveredArrow = -1;
-		PickerInput.HoveredRow = -1;
 		PickerInput.HoveredCenter = false;
 		PickerInput.HoveredHeader = false;
 
@@ -368,9 +361,8 @@ public static class PaintPicker
 				if (PickerInput.HoveredScrape >= 0)
 					selected = ChooseScrapeTarget(PickerInput.HoveredScrape);
 			}
-			else if (Overlay != PickerOverlay.None) {
-				if (PickerInput.HoveredRow >= 0)
-					selected = ActivateRow(PickerInput.HoveredRow, config);
+			else if (Overlay == PickerOverlay.Palettes) {
+				// The board is clicked, never let go on - it keeps the picker up - so nothing is chosen here.
 			}
 			else if (PickerContent.IsScrapeButton(PickerInput.HoveredCoating)) {
 				// Entered, but its wheel is not shown: the picker is closing, and a view that appears for
@@ -405,15 +397,15 @@ public static class PaintPicker
 	{
 		// A name half typed is dropped: closing is not the Enter that keeps it. Nor may a number key
 		// pressed as it closed carry over and pick on the next opening's first frame.
-		PickerMenu.StopRenaming();
+		PaletteBoard.StopRenaming();
 		quickPick = -1;
 		viewRequest = null;
 		handSwappedBack = false;
 		active = false;
 		releasePending = true;
 
-		// A palette made with "+" and left empty was never really made, however the editor was left. The
-		// grid itself stays, for the fade.
+		// A palette made with "+" and left empty was never really made, however the board was left. The
+		// board itself stays, for the fade.
 		if (PaletteEditor.Editing && PaintWheelConfig.Instance is PaintWheelConfig config)
 			PaletteEditor.DiscardIfEmptyNew(config);
 
@@ -423,13 +415,17 @@ public static class PaintPicker
 		openSuppression = 2;
 	}
 
-	internal static void OpenOverlay(PickerOverlay which, PaintWheelConfig config)
+	/// <summary>
+	/// Puts the palette board up, on the palette in use. It is clicked rather than let go on, so the
+	/// picker stays up from here even in hold mode, until the board's exit or a dismissal.
+	/// </summary>
+	internal static void OpenBoard(PaintWheelConfig config)
 	{
-		// Synced on the spot: only a close freezes the picture, opening a list should show it now.
-		Overlay = which;
-		DrawOverlay = which;
-		PickerMenu.ForgetOpenList();
-		BuildMenuRows();
+		// Synced on the spot: only a close freezes the picture, opening a view should show it now.
+		Overlay = PickerOverlay.Palettes;
+		DrawOverlay = PickerOverlay.Palettes;
+		Sticky = true;
+		PaletteBoard.Open(config);
 
 		PickerInput.HoveredSwatch = -1;
 		PickerInput.HoveredCoating = -1;
@@ -440,34 +436,33 @@ public static class PaintPicker
 		Play(SoundID.MenuOpen, config);
 	}
 
+	/// <summary>The board's exit, or a click off it: back to the colours of the palette now in use.</summary>
+	internal static void CloseBoard()
+	{
+		LeaveBoard();
+		Overlay = PickerOverlay.None;
+		DrawOverlay = PickerOverlay.None;
+		PickerInput.ResetMenuCursor();
+	}
+
+	/// <summary>Leaving the board for anywhere: a name half typed is dropped, and an empty "+" palette with it.</summary>
+	private static void LeaveBoard()
+	{
+		PaletteBoard.StopRenaming();
+
+		if (PaletteEditor.Editing && PaintWheelConfig.Instance is PaintWheelConfig config)
+			PaletteEditor.DiscardIfEmptyNew(config);
+
+		PaletteEditor.StopEditing();
+		PaletteBoard.ClearHover();
+	}
+
 	/// <summary>
-	/// Whether the centre and the header have a list worth opening: when there is somewhere to switch
-	/// to, and also when there is not, since the list is where a palette gets made. Still false with no
+	/// Whether the centre and the header have a board worth opening: when there is somewhere to switch
+	/// to, and also when there is not, since the board is where a palette gets made. Still false with no
 	/// paints at all, so an empty picker stays shut.
 	/// </summary>
 	internal static bool MenuAvailable => PickerContent.Palettes.Count > 1 || PickerContent.Swatches.Count > 0;
-
-	/// <summary>Rebuilds the rows of whichever list is open, after something they show has changed.</summary>
-	internal static void BuildMenuRows() => PickerMenu.Build(Overlay);
-
-	/// <summary>Does what row <paramref name="index"/> of the open list is for. False when there is no such row.</summary>
-	internal static bool ActivateRow(int index, PaintWheelConfig config)
-	{
-		if (index < 0 || index >= PickerMenu.Rows.Count)
-			return false;
-
-		MenuRow row = PickerMenu.Rows[index];
-
-		switch (row.Kind) {
-			case RowKind.Palette:
-				SwitchPalette(row.Index, config);
-				Overlay = PickerOverlay.None;
-				return true;
-
-			default:
-				return false;
-		}
-	}
 
 	/// <summary>Switches to scrape mode and shows its wheel, leaving the picker up.</summary>
 	internal static bool EnterScrapeFromRow(PaintWheelConfig config)
@@ -531,7 +526,7 @@ public static class PaintPicker
 		Anchor = WheelLayout.ClampAnchor(BuildSettings(config, 1f), Main.MouseScreen, Main.screenWidth, Main.screenHeight);
 
 		PickerInput.HoveredScrape = -1;
-		PickerInput.HoveredRow = -1;
+		PaletteBoard.ClearHover();
 		PickerInput.ResetMenuCursor();
 	}
 
@@ -554,10 +549,6 @@ public static class PaintPicker
 	{
 		PaintWheelConfig config = PaintWheelConfig.Instance;
 		if (config is null)
-			return null;
-
-		// Not under the editor grid, where changing palette would leave it editing one out of sight.
-		if (active && Overlay == PickerOverlay.Grid)
 			return null;
 
 		if (!active) {
@@ -615,12 +606,12 @@ public static class PaintPicker
 
 				return true;
 
+			// The Nth palette, the automatic one first.
 			case PickerOverlay.Palettes:
-				int row = PickerMenu.FirstShown + index;
-				if (index >= PickerMenu.ShownRows || row >= PickerMenu.Rows.Count)
+				if (!PaletteBoard.SelectEntry(index, config))
 					return false;
 
-				Play(ActivateRow(row, config) ? SoundID.Grab : SoundID.MenuClose, config);
+				Play(SoundID.Grab, config);
 				return true;
 		}
 
@@ -635,7 +626,7 @@ public static class PaintPicker
 	public static int StepPaintExternally(int direction)
 	{
 		PaintWheelConfig config = PaintWheelConfig.Instance;
-		if (config is null || (active && Overlay == PickerOverlay.Grid))
+		if (config is null)
 			return 0;
 
 		if (!active) {
@@ -681,8 +672,7 @@ public static class PaintPicker
 			PaintSelection.ExitScrape();
 
 			if (active) {
-				LeaveEditor();
-				PickerMenu.StopRenaming();
+				LeaveBoard();
 				viewRequest = PickerOverlay.None;
 			}
 
@@ -706,9 +696,9 @@ public static class PaintPicker
 		SwitchPalette((PickerContent.PaletteIndex + direction + PickerContent.Palettes.Count) % PickerContent.Palettes.Count, config);
 		Play(SoundID.MenuTick, config);
 
-		// The open list's rows carry the mark for the current palette, so they go stale otherwise.
+		// The board shows the palette in use, so it moves with it.
 		if (Overlay == PickerOverlay.Palettes)
-			BuildMenuRows();
+			PaletteBoard.FollowActive(config);
 	}
 
 	private static void SwitchPalette(int index, PaintWheelConfig config)
@@ -744,72 +734,8 @@ public static class PaintPicker
 		int pages = PickerContent.PageCount(config);
 
 		// The name is trimmed rather than the page count, which is the part that says there is more.
-		string name = WheelDrawing.Truncate(palette.Name, HeaderTextScale, WheelLayout.MenuMaxWidth);
+		string name = WheelDrawing.Truncate(palette.Name, HeaderTextScale, WheelLayout.HeaderMaxWidth);
 		return pages > 1 ? $"{name}  {PickerContent.PageIndex + 1}/{pages}" : name;
-	}
-
-	// ---- Editing a palette ------------------------------------------------------------------
-
-	/// <summary>Opens the palette editor on one saved palette, leaving the picker up to click in.</summary>
-	internal static bool StartEditing(int index, PaintWheelConfig config)
-	{
-		if (!PaletteEditor.Begin(index, config))
-			return false;
-
-		// Clicking is what edits, so the picker has to stay up even in hold mode.
-		Sticky = true;
-		Overlay = PickerOverlay.Grid;
-		DrawOverlay = PickerOverlay.Grid;
-		PickerInput.ResetMenuCursor();
-
-		return true;
-	}
-
-	/// <summary>Starts typing a new name for a saved palette. The picker stays up while you type.</summary>
-	internal static bool StartRenaming(int preset, PaintWheelConfig config)
-	{
-		if (!PickerMenu.StartRenaming(preset, config))
-			return false;
-
-		Sticky = true;
-		return true;
-	}
-
-	/// <summary>
-	/// The list's "+": a new palette from what you are carrying - or an empty one when that is nothing -
-	/// opened straight in the editor, since choosing its colours is the next thing to do.
-	/// </summary>
-	internal static bool CreateAndEdit(PaintWheelConfig config)
-	{
-		int preset = PaletteEditor.CreatePreset(config);
-		return preset >= 0 && StartEditing(preset, config);
-	}
-
-	/// <summary>Leaves the editor for somewhere other than the list, discarding an empty "+" palette as Done would.</summary>
-	private static void LeaveEditor()
-	{
-		if (PaletteEditor.Editing && PaintWheelConfig.Instance is PaintWheelConfig config)
-			PaletteEditor.DiscardIfEmptyNew(config);
-
-		PaletteEditor.StopEditing();
-	}
-
-	/// <summary>
-	/// Leaves the grid for the list it was opened from, rather than putting the picker away: the
-	/// palette you have just built is usually the one you then want to use.
-	/// </summary>
-	internal static void FinishEditing(PaintWheelConfig config)
-	{
-		// A palette made with "+" and left empty was never really made.
-		PaletteEditor.DiscardIfEmptyNew(config);
-		PaletteEditor.StopEditing();
-		PickerContent.RebuildPalettes(config);
-		PickerContent.ApplyPage(config);
-
-		Overlay = PickerOverlay.Palettes;
-		DrawOverlay = PickerOverlay.Palettes;
-		BuildMenuRows();
-		PickerInput.ResetMenuCursor();
 	}
 
 	// ---- Sound ------------------------------------------------------------------------------
@@ -837,12 +763,12 @@ public static class PaintPicker
 	internal static void SwallowEscape() => escapeSwallowed = true;
 
 	/// <summary>
-	/// The scrape wheel and the editor grid carry their own content, so they stay up even when the
+	/// The scrape wheel and the palette board carry their own content, so they stay up even when the
 	/// swatches behind them have nothing to show.
 	/// </summary>
 	private static bool ShouldCancel(PaintWheelConfig config)
 		=> EnvironmentBlocked() || !PaintToolSet.InventoryAllows(Main.LocalPlayer) || HandBlocked(config)
-			|| (Overlay is not (PickerOverlay.Scrape or PickerOverlay.Grid) && !HasAnythingToShow);
+			|| (Overlay is not (PickerOverlay.Scrape or PickerOverlay.Palettes) && !HasAnythingToShow);
 
 	/// <summary>"Only while holding a paint tool", and what is in hand is not one - nor a block the Sprayer would paint.</summary>
 	private static bool HandBlocked(PaintWheelConfig config)
@@ -874,7 +800,7 @@ public static class PaintPicker
 
 		// Escape while typing a palette's name only drops the name; the list stays up, for as long as
 		// that same press is held.
-		if (Main.keyState.IsKeyDown(Keys.Escape) && !PickerMenu.IsRenaming && !escapeSwallowed)
+		if (Main.keyState.IsKeyDown(Keys.Escape) && !PaletteBoard.IsRenaming && !escapeSwallowed)
 			return true;
 
 		Player player = Main.LocalPlayer;

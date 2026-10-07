@@ -20,7 +20,6 @@ UI: {
 	NoPaintOn: Sem tinta
 	NoPaintOff: Pintado
 	ScrollHint: Role ou clique nas setas para ver mais tintas
-	PaletteTitle: Paletas
 	PaletteHint: Clique para trocar de paleta
 	PaletteScrollHint: Role ou clique no nome para trocar de paleta
 	Empty: acabou
@@ -30,12 +29,10 @@ UI: {
 	SlotPickCoating: Pressione {0} para escolher este revestimento
 	Disabled: O Paint Wheel teve um erro e parou de aplicar a sua tinta. Os detalhes estão em client.log.
 	NewPalette: Nova paleta com o que você tem
-	EditPalette: Editar esta paleta
 	DeletePalette: Excluir esta paleta
 	EditHint: Clique em uma cor para adicionar ou remover.
-	DoneEditing: Pronto
+	AutoPaletteHint: Se enche com todas as tintas que você tem. Clique em + para criar a sua.
 	NewPaletteName: Paleta
-	EditingHeader: Editando {0}
 	ConfirmDelete: Clique de novo para excluir
 	PaletteHintNew: Clique para ver as paletas
 	RanOut: "{0} acabou"
@@ -147,8 +144,9 @@ Configs: {
 			Label: Paletas
 			Tooltip:
 				'''
-				Paletas salvas, escolhidas na lista que abre ao clicar no centro da roda ou no nome da paleta
-				acima dela. Sempre existe uma paleta que se preenche sozinha com tudo o que você está carregando.
+				Paletas salvas. Clique no centro da roda ou no nome da paleta acima dela para abrir o painel de paletas,
+				onde você troca entre elas e muda as cores. Sempre existe uma paleta que se preenche sozinha com tudo o
+				que você está carregando.
 				'''
 		}
 	}
@@ -183,7 +181,7 @@ Configs: {
 			Label: Mostrar teclas numéricas nas cores
 			Tooltip:
 				'''
-				Com a roda aberta, as teclas numéricas escolhem as dez primeiras cores ou linhas em vez da barra
+				Com a roda aberta, as teclas numéricas escolhem as dez primeiras cores em vez da barra
 				rápida. Isto mostra qual tecla escolhe o quê, como a barra rápida mostra as dela.
 				'''
 		}

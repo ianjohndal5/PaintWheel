@@ -18,8 +18,8 @@ public class PaintTooltipGlobalItem : GlobalItem
 		if (item.paint <= 0 && item.paintCoating <= 0)
 			return;
 
-		List<string> keys = KeybindSystem.EyedropperKey?.GetAssignedKeys();
-		if (keys is null || keys.Count == 0)
+		List<string> keys = KeybindSystem.BoundKeys(KeybindSystem.EyedropperKey);
+		if (keys.Count == 0)
 			return;
 
 		string text = Language.GetTextValue(item.paintCoating > 0

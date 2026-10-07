@@ -125,6 +125,64 @@ internal static class PickerContent
 		}
 	}
 
+	/// <summary>
+	/// Makes a palette the one in use by its preset - -1 for the automatic one - on the page it was left
+	/// on. False when it has nothing to use, and so is not among the palettes the wheel offers.
+	/// </summary>
+	internal static bool SelectPreset(int preset, PaintWheelConfig config)
+	{
+		for (int i = 0; i < Palettes.Count; i++) {
+			bool match = preset < 0 ? Palettes[i].Key == OwnedPaletteKey : Palettes[i].Preset == preset;
+			if (match)
+				return i == PaletteIndex || SelectPalette(i, config);
+		}
+
+		return false;
+	}
+
+	/// <summary>
+	/// A palette's name as the player sees it: the automatic one's, or a saved one's with a number after
+	/// it when an earlier one has the same name - the same rule the palette keys follow.
+	/// </summary>
+	internal static string PaletteName(int preset, PaintWheelConfig config)
+	{
+		if (preset < 0 || preset >= config.Presets.Count)
+			return Language.GetTextValue("Mods.PaintWheel.UI.AutoPreset");
+
+		(string name, int use) = NameAndUse(preset, config);
+		return use == 1 ? name : $"{name} ({use})";
+	}
+
+	/// <summary>The key a saved palette is remembered by, as <see cref="RebuildPalettes"/> gives it out.</summary>
+	internal static string PaletteKey(int preset, PaintWheelConfig config)
+	{
+		if (preset < 0 || preset >= config.Presets.Count)
+			return OwnedPaletteKey;
+
+		(string name, int use) = NameAndUse(preset, config);
+		return KeyFor(name, use);
+	}
+
+	/// <summary>A palette's name, and which use of that name it is - 2 for the second palette called it.</summary>
+	private static (string Name, int Use) NameAndUse(int preset, PaintWheelConfig config)
+	{
+		string name = NameOf(config.Presets[preset]);
+		int use = 1;
+
+		// Counted as the rebuild counts them, which skips a preset with no list at all.
+		for (int i = 0; i < preset; i++) {
+			if (config.Presets[i]?.Paints is not null && NameOf(config.Presets[i]) == name)
+				use++;
+		}
+
+		return (name, use);
+	}
+
+	private static string KeyFor(string name, int use) => use == 1 ? name : $"{name}\u001F{use}";
+
+	private static string NameOf(PaintPreset preset)
+		=> string.IsNullOrWhiteSpace(preset?.Name) ? PaintPreset.DefaultName : preset.Name;
+
 	/// <summary>Turns to the page holding the palette's <paramref name="index"/>th colour, so a keybind's step is on show.</summary>
 	internal static void ShowPaletteIndex(int index, PaintWheelConfig config)
 	{
@@ -221,13 +279,10 @@ internal static class PickerContent
 			// every one added with the config's '+' starts as "Palette" - so the second and later get a
 			// key of their own; the first keeps the plain name that older saves remember. The separator is
 			// a control character, which no name typed into the config can contain.
-			string name = string.IsNullOrWhiteSpace(preset.Name) ? PaintPreset.DefaultName : preset.Name;
+			string name = NameOf(preset);
 			int use = nameUses[name] = nameUses.GetValueOrDefault(name) + 1;
 
-			if (use == 1)
-				AddPalette(name, name, paletteScratch, config, index);
-			else
-				AddPalette($"{name}\u001F{use}", $"{name} ({use})", paletteScratch, config, index);
+			AddPalette(KeyFor(name, use), use == 1 ? name : $"{name} ({use})", paletteScratch, config, index);
 		}
 
 		ResolveActivePalette();

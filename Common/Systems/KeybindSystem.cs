@@ -1,4 +1,4 @@
-using Microsoft.Xna.Framework.Input;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.ModLoader;
 
@@ -6,7 +6,9 @@ namespace PaintWheel.Common.Systems;
 
 /// <summary>
 /// Every keybind the mod registers. The names are what Controls saves your bindings under, and the
-/// registration order is the order they are listed there, so both are kept stable.
+/// registration order is the order they are listed there, so both are kept stable. None of them has a
+/// default key: a mod that claims keys out of the box clashes with whatever else is installed, and
+/// right click already opens the picker. Bindings a player has already saved are kept by the game.
 /// </summary>
 public class KeybindSystem : ModSystem
 {
@@ -48,26 +50,45 @@ public class KeybindSystem : ModSystem
 		if (Main.dedServ)
 			return;
 
-		OpenWheelKey = KeybindLoader.RegisterKeybind(Mod, "OpenWheel", Keys.V.ToString());
-		EyedropperKey = KeybindLoader.RegisterKeybind(Mod, "Eyedropper", "Mouse3");
-		QuickToggleKey = KeybindLoader.RegisterKeybind(Mod, "QuickToggleLastTwo", Keys.X.ToString());
+		OpenWheelKey = KeybindLoader.RegisterKeybind(Mod, "OpenWheel", Unbound);
+		EyedropperKey = KeybindLoader.RegisterKeybind(Mod, "Eyedropper", Unbound);
+		QuickToggleKey = KeybindLoader.RegisterKeybind(Mod, "QuickToggleLastTwo", Unbound);
+		PreviousPaletteKey = KeybindLoader.RegisterKeybind(Mod, "PreviousPalette", Unbound);
+		NextPaletteKey = KeybindLoader.RegisterKeybind(Mod, "NextPalette", Unbound);
+		ToggleScrapeKey = KeybindLoader.RegisterKeybind(Mod, "ToggleScrape", Unbound);
+		ToggleNoPaintKey = KeybindLoader.RegisterKeybind(Mod, "ToggleNoPaint", Unbound);
 
-		// Bracket keys: they read as previous/next, and nothing in vanilla claims them.
-		PreviousPaletteKey = KeybindLoader.RegisterKeybind(Mod, "PreviousPalette", Keys.OemOpenBrackets.ToString());
-		NextPaletteKey = KeybindLoader.RegisterKeybind(Mod, "NextPalette", Keys.OemCloseBrackets.ToString());
-
-		// G: unclaimed by vanilla, and next to the movement keys rather than across the board.
-		ToggleScrapeKey = KeybindLoader.RegisterKeybind(Mod, "ToggleScrape", Keys.G.ToString());
-		ToggleNoPaintKey = KeybindLoader.RegisterKeybind(Mod, "ToggleNoPaint", Keys.N.ToString());
-
-		// Added later, so after the first seven: the order is the Controls order, and the names are what
-		// bindings are saved under. Comma and period read as a step either way; Q and Z sit by the
-		// movement keys. None of the four is claimed by vanilla.
-		PreviousPaintKey = KeybindLoader.RegisterKeybind(Mod, "PreviousPaint", Keys.OemComma.ToString());
-		NextPaintKey = KeybindLoader.RegisterKeybind(Mod, "NextPaint", Keys.OemPeriod.ToString());
-		SwapToolKey = KeybindLoader.RegisterKeybind(Mod, "SwapPaintTool", Keys.Q.ToString());
-		PaintBothKey = KeybindLoader.RegisterKeybind(Mod, "TogglePaintBoth", Keys.Z.ToString());
+		// Added later, so after the first seven: the order is the Controls order.
+		PreviousPaintKey = KeybindLoader.RegisterKeybind(Mod, "PreviousPaint", Unbound);
+		NextPaintKey = KeybindLoader.RegisterKeybind(Mod, "NextPaint", Unbound);
+		SwapToolKey = KeybindLoader.RegisterKeybind(Mod, "SwapPaintTool", Unbound);
+		PaintBothKey = KeybindLoader.RegisterKeybind(Mod, "TogglePaintBoth", Unbound);
 	}
+
+	/// <summary>
+	/// The default that means no key. tModLoader refuses an empty one, and lists "None" in Controls -
+	/// the name of the key the keyboard never reports as pressed - so this is how a keybind starts unbound.
+	/// </summary>
+	private const string Unbound = "None";
+
+	/// <summary>
+	/// The keys bound to <paramref name="keybind"/>, leaving out <see cref="Unbound"/>, which is a placeholder
+	/// rather than a key: "Reset to default" in Controls puts it back.
+	/// </summary>
+	public static List<string> BoundKeys(ModKeybind keybind)
+	{
+		var keys = new List<string>();
+
+		foreach (string key in keybind?.GetAssignedKeys() ?? new List<string>()) {
+			if (!string.IsNullOrEmpty(key) && key != Unbound)
+				keys.Add(key);
+		}
+
+		return keys;
+	}
+
+	/// <summary>Whether <paramref name="keybind"/> has a real key bound, so a hint about it is worth showing.</summary>
+	public static bool IsBound(ModKeybind keybind) => BoundKeys(keybind).Count > 0;
 
 	public override void Unload()
 	{

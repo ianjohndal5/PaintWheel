@@ -129,7 +129,7 @@ public class PaintWheelUISystem : ModSystem
 		int paint = PaintHover.Type;
 
 		// Nothing to promise if the key it describes is not bound to anything.
-		if (paint <= 0 || KeybindSystem.EyedropperKey is null || KeybindSystem.EyedropperKey.GetAssignedKeys().Count == 0)
+		if (paint <= 0 || !KeybindSystem.IsBound(KeybindSystem.EyedropperKey))
 			return;
 
 		bool chosen = paint == PaintSelection.Paint || paint == PaintSelection.Coating;

@@ -20,7 +20,6 @@ UI: {
 	NoPaintOn: Walang pintura
 	NoPaintOff: May pintura
 	ScrollHint: Mag-scroll o pindutin ang mga arrow para sa iba pang pintura
-	PaletteTitle: Mga palette
 	PaletteHint: Pindutin para magpalit ng palette
 	PaletteScrollHint: Mag-scroll o pindutin ang pangalan para magpalit ng palette
 	Empty: wala nang natira
@@ -30,12 +29,10 @@ UI: {
 	SlotPickCoating: Pindutin ang {0} para piliin ang coating na ito
 	Disabled: Nagka-error ang Paint Wheel at hindi na nito inilalagay ang pintura mo. Nasa client.log ang detalye.
 	NewPalette: Bagong palette mula sa dala mo
-	EditPalette: I-edit ang palette na ito
 	DeletePalette: Burahin ang palette na ito
 	EditHint: Pindutin ang kulay para idagdag o tanggalin.
-	DoneEditing: Tapos na
+	AutoPaletteHint: Napupuno ito ng bawat pintura na dala mo. Pindutin ang + para gumawa ng sarili mo.
 	NewPaletteName: Palette
-	EditingHeader: Ini-edit ang {0}
 	ConfirmDelete: Pindutin ulit para burahin
 	PaletteHintNew: Pindutin para sa mga palette
 	RanOut: Ubos na ang {0}
@@ -148,8 +145,9 @@ Configs: {
 			Label: Mga palette
 			Tooltip:
 				'''
-				Mga nakasave na palette, pipiliin sa listahang lalabas kapag pinindot mo ang gitna ng wheel o ang
-				pangalan ng palette sa itaas nito. Laging may isang palette na kusang napupuno ng lahat ng dala mo.
+				Mga nakasave na palette. Pindutin ang gitna ng wheel o ang pangalan ng palette sa itaas nito para buksan
+				ang palette board, kung saan ka lilipat ng palette at babaguhin ang mga kulay nito. Laging may isang
+				palette na kusang napupuno ng lahat ng dala mo.
 				'''
 		}
 	}
@@ -184,7 +182,7 @@ Configs: {
 			Label: Ipakita ang number keys sa mga kulay
 			Tooltip:
 				'''
-				Habang bukas ang wheel, pinipili ng number keys ang unang sampung kulay o row sa halip na ang
+				Habang bukas ang wheel, pinipili ng number keys ang unang sampung kulay sa halip na ang
 				hotbar. Ipinapakita nito kung aling key ang pumipili ng alin, gaya ng sa hotbar.
 				'''
 		}

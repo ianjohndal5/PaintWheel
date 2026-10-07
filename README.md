@@ -74,15 +74,16 @@ it.
   the same for anything you have carried since entering the world.
 - **Paging.** Arrows and the scroll wheel step through a palette holding more than one ring's worth, so
   no colour is ever hidden.
-- **Number keys pick directly.** While the picker is up, `1`–`0` choose the first ten swatches (or rows
-  of a list) instead of switching the hotbar, and a small digit on each shows which is which. Stack
-  counts on the swatches are an option too.
+- **Number keys pick directly.** While the picker is up, `1`–`0` choose the first ten swatches (or,
+  on the palette board, the first ten palettes) instead of switching the hotbar, and a small digit on
+  each swatch shows which is which. Stack counts on the swatches are an option too.
 - **Gamepad.** On the wheel, and on scrape mode's wheel in every shape, the right stick points at a
-  disc the way a radial menu is used; in the bar, the grid and the palette list it moves across the
-  whole picker.
-- **Paint both halves with one tool.** A switch on the bottom row (or `Z`) lets the brush and the roller
-  each paint blocks *and* walls: the tool's own half first, then the other one once that is done, so
-  holding the mouse on a tile lands both. `Q` trades the brush in hand for the roller and back.
+  disc the way a radial menu is used; in the bar, the grid and the palette board it moves the cursor
+  across the whole picker.
+- **Paint both halves with one tool.** A switch on the bottom row (or its key) lets the brush and the
+  roller each paint blocks *and* walls: the tool's own half first, then the other one once that is
+  done, so holding the mouse on a tile lands both. Another key trades the brush in hand for the roller
+  and back.
 - **A coating row** (none / Illuminant / Echo) sits underneath. With a paint *and* a coating picked,
   painting applies whichever the target tile is still missing, so holding the mouse on a tile lands
   both.
@@ -105,54 +106,69 @@ it.
 
 ## Keybinds
 
-All of these are rebindable in **Settings → Controls**. Several let you work without opening the
+None of these has a key out of the box, so they never clash with another mod's: bind the ones you want
+in **Settings → Controls**. Right click on a paint tool opens the picker without any of them. If you
+played an earlier version, the keys you already had are kept. Several let you work without opening the
 picker at all. With *Only while holding a paint tool* on (the default) they answer only while you hold
 one — or a block, with the Paint Sprayer's effect on — except the eyedropper on an inventory slot, and
 leaving scrape mode, which always work. With the inventory open, opening the picker takes a paint tool
 in hand whatever that setting says.
 
-| Action | Default | What it does |
-| --- | --- | --- |
-| Open Paint Wheel | `V` | Opens the picker. Hold, flick and release like right click, or tap it to leave the picker open. |
-| Paint Eyedropper | Middle mouse | Copies the paint off the tile or wall under the cursor, or the paint or coating off an inventory slot. |
-| Swap To Previous Paint | `X` | Flips between your two most recent paints. |
-| Previous Palette | `[` | Steps back through your palettes. |
-| Next Palette | `]` | Steps forward through your palettes. |
-| Toggle Scrape Mode | `G` | Enters or leaves scrape mode. |
-| Toggle No Paint | `N` | Flips between placing blocks bare and the colour you were using. |
-| Previous Paint | `,` | Steps back one colour in the current palette. |
-| Next Paint | `.` | Steps forward one colour in the current palette. |
-| Swap Brush And Roller | `Q` | Trades the Paintbrush in hand for the Paint Roller, or back. Same swap as scrape mode's. |
-| Toggle Paint Blocks And Walls | `Z` | Lets either tool paint both halves of a tile, or goes back to one half each. |
+| Action | What it does |
+| --- | --- |
+| Open Paint Wheel | Opens the picker. Hold, flick and release like right click, or tap it to leave the picker open. |
+| Paint Eyedropper | Copies the paint off the tile or wall under the cursor, or the paint or coating off an inventory slot. |
+| Swap To Previous Paint | Flips between your two most recent paints. |
+| Previous Palette | Steps back through your palettes. |
+| Next Palette | Steps forward through your palettes. |
+| Toggle Scrape Mode | Enters or leaves scrape mode. |
+| Toggle No Paint | Flips between placing blocks bare and the colour you were using. |
+| Previous Paint | Steps back one colour in the current palette. |
+| Next Paint | Steps forward one colour in the current palette. |
+| Swap Brush And Roller | Trades the Paintbrush in hand for the Paint Roller, or back. Same swap as scrape mode's. |
+| Toggle Paint Blocks And Walls | Lets either tool paint both halves of a tile, or goes back to one half each. |
 
 Whatever you switch to floats its name above your character, in its own colour.
 
 While the picker is open, your **hotbar keys** (`1`–`0` unless you have rebound them) pick its first
-ten swatches or list rows instead of switching the hotbar.
+ten swatches instead of switching the hotbar. On the palette board they pick your first ten palettes,
+the auto-filled one first.
 
 ## Palettes
 
-Click the **centre of the wheel**, or the **palette name** above the picker in any shape, to open your
-palette list.
+Click the **centre of the wheel**, or the **palette name** above the picker in any shape, to open the
+**palette board** in its place. It opens on the palette you are using, with its colours already laid
+out, so there is nothing more to click before you can change them.
 
-- There is always one auto-filled palette — **"Everything you own"** — holding every paint you are
-  carrying, plus anything you have carried since entering the world (struck through once used up, so
-  the ring does not close up under your hand).
-- Below it sits one entry per palette you have saved. A long list scrolls.
-- Click the one you want. The choice is remembered per character.
-- Each saved palette has an edit, a rename and a delete button. Delete takes a second click to
-  confirm, since a deleted palette is gone for good. Rename edits the name in place: Enter keeps it,
-  Escape cancels.
+- **The blue pills** along the top are your palettes, one each, side by side. Click one to show it; the
+  wheel switches to it as well. The green bar under them scrolls the row when there are more than fit,
+  and the mouse wheel over the pills does the same.
+- **The paints** below are every paint the game has, always in the same order. The ones in the palette
+  sit in **gold frames**, the rest in dark ones. Click a paint to add it or take it out; the wheel
+  follows straight away. Hovering one shows its name, how many you carry and, in a palette of your
+  own, its place in the ring. Two rows show at once: scroll, or use the small arrows on the right, for
+  the rest.
+- There is always one auto-filled palette, **"Everything you own"**, first in the row. It holds every
+  paint you are carrying, plus anything you have carried since entering the world (struck through once
+  used up, so the ring does not close up under your hand). It fills itself, so it cannot be edited,
+  renamed or deleted.
+- **+** makes a new palette from what you are carrying, or an empty one if you carry none. An empty
+  new palette you leave without adding anything to is not kept.
+- **The red bin** deletes the palette shown. It takes a second click to confirm, since a deleted
+  palette is gone for good.
+- **The brush** at the bottom right renames it in place: Enter keeps the name, Escape cancels.
+- **X**, or a click anywhere off the board, goes back to the colours.
 
-Saved palettes are built from a single palette block in the config: every paint the game has, laid out
-for you to click and add or remove. No item pickers full of swords. You can also build one in-game
-with the **+** in the list — from what you are carrying, or empty if you carry none — then edit it:
-its colours stay in the order you added them, which is the order they sit in the ring.
+Your choice of palette is remembered per character. A palette's colours stay in the order you added
+them, which is the order they sit in the ring.
+
+Saved palettes can also be built from a single palette block in the config: every paint the game has,
+laid out for you to click and add or remove. No item pickers full of swords.
 
 ## Scrape mode
 
 Click the scraper disc on the bottom row and the picker turns into the scrape wheel: a small wheel
-of its own, drawn with the game's wood block and wood wall.
+of its own, drawn with a wood block and a wood wall.
 
 - **Blocks only** (top) — a wood block.
 - **Walls only** (right) — a wood wall. Something the vanilla scraper cannot do at all.
