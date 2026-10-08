@@ -23,6 +23,34 @@ public static class WheelDrawing
 
 	public static void ClearCaches() => discSpans.Clear();
 
+	private static readonly RasterizerState Clipped = new() { CullMode = CullMode.None, ScissorTestEnable = true };
+
+	/// <summary>
+	/// Ends the batch and starts it again with <paramref name="sampler"/>, otherwise as the interface
+	/// layer had it - cut to <paramref name="clip"/>, in screen pixels, when one is given. Pixel art is
+	/// drawn with PointClamp, unsmoothed; text needs the layer's own LinearClamp back.
+	/// </summary>
+	public static void RestartBatch(SpriteBatch spriteBatch, SamplerState sampler, Rectangle? clip = null)
+	{
+		spriteBatch.End();
+
+		if (clip is Rectangle area)
+			spriteBatch.GraphicsDevice.ScissorRectangle = area;
+
+		spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, sampler, DepthStencilState.None,
+			clip is null ? RasterizerState.CullCounterClockwise : Clipped, null, Main.UIScaleMatrix);
+	}
+
+	/// <summary>A sprite drawn whole with its middle on <paramref name="center"/>.</summary>
+	public static void DrawCentered(SpriteBatch spriteBatch, Texture2D texture, Vector2 center, float scale, Color color)
+	{
+		if (texture is null || scale <= 0f || color.A == 0)
+			return;
+
+		spriteBatch.Draw(texture, center, null, color, 0f, new Vector2(texture.Width, texture.Height) * 0.5f, scale,
+			SpriteEffects.None, 0f);
+	}
+
 	public static void DrawPanel(SpriteBatch spriteBatch, Rectangle rect, float opacity)
 		=> Utils.DrawInvBG(spriteBatch, rect, PanelTint * opacity);
 

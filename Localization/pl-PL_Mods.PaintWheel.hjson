@@ -31,7 +31,7 @@ UI: {
 	NewPalette: Nowa paleta z tego, co masz
 	DeletePalette: Usuń tę paletę
 	EditHint: Kliknij kolor, aby go dodać lub usunąć.
-	AutoPaletteHint: Wypełnia się każdą farbą, którą masz. Kliknij +, aby stworzyć własną.
+	AutoPaletteHint: Wypełnia się każdą farbą, którą masz. Kliknij kolor, aby go dodać lub usunąć.
 	NewPaletteName: Paleta
 	ConfirmDelete: Kliknij ponownie, by usunąć
 	PaletteHintNew: Kliknij, by zobaczyć palety
@@ -153,6 +153,7 @@ Configs: {
 		Headers: {
 			Wheel: Koło
 			Bar: Pasek
+			PaletteBoard: Tablica palet
 		}
 
 		ShowItemIcons: {
@@ -225,6 +226,7 @@ Configs: {
 			Tooltip:
 				'''
 				Jak długo koło się rozwija, w tickach: 60 to jedna sekunda, 0 to natychmiast.
+				Zmiana strony lub palety trwa o połowę dłużej.
 				Trzymaj krótko, bo inaczej wydaje się ociężałe.
 				'''
 		}
@@ -242,6 +244,11 @@ Configs: {
 		BarSwatchesPerPage: {
 			Label: Pasków na stronę
 			Tooltip: Ile kolorów mieści się na jednej stronie paska, zanim wejdą strzałki.
+		}
+
+		PaletteBoardSize: {
+			Label: Rozmiar tablicy
+			Tooltip: Rozmiar tablicy palet otwieranej ze środka koła, w procentach. Przy 50, 100 i 150 jej pikselowa grafika pozostaje ostra.
 		}
 	}
 

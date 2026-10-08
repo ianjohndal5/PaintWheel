@@ -31,11 +31,15 @@ internal static class WheelMath
 
 	/// <summary>Where swatch <paramref name="index"/> sits, matching <see cref="SectorAt"/>'s geometry.</summary>
 	public static Vector2 SectorPosition(Vector2 center, int index, int count, float radius)
+		=> SectorPosition(center, index, count, radius, 0f);
+
+	/// <summary>The same, turned round the centre by <paramref name="turn"/> radians - clockwise when positive - as a page turns.</summary>
+	public static Vector2 SectorPosition(Vector2 center, int index, int count, float radius, float turn)
 	{
 		if (count <= 0)
 			return center;
 
-		float angle = index * MathHelper.TwoPi / count;
+		float angle = index * MathHelper.TwoPi / count + turn;
 		return center + new Vector2(MathF.Sin(angle) * radius, -MathF.Cos(angle) * radius);
 	}
 

@@ -31,7 +31,7 @@ UI: {
 	NewPalette: New palette from what you carry
 	DeletePalette: Delete this palette
 	EditHint: Click a colour to add or remove it.
-	AutoPaletteHint: Fills itself with every paint you carry. Click + to make your own.
+	AutoPaletteHint: Fills itself with every paint you carry. Click a colour to add or remove it.
 	NewPaletteName: Palette
 	ConfirmDelete: Click again to delete
 	PaletteHintNew: Click for palettes
@@ -157,6 +157,7 @@ Configs: {
 		Headers: {
 			Wheel: Wheel
 			Bar: Bar
+			PaletteBoard: Palette board
 		}
 
 		ShowItemIcons: {
@@ -233,6 +234,7 @@ Configs: {
 			Tooltip:
 				'''
 				How long the wheel takes to spring out, in ticks: 60 is one second, 0 is instant.
+				Turning a page or palette takes half as long again.
 				Keep it short or the wheel feels sluggish.
 				'''
 		}
@@ -250,6 +252,11 @@ Configs: {
 		BarSwatchesPerPage: {
 			Label: Bands per page
 			Tooltip: How many colours fit on one page of the bar before the arrows take over.
+		}
+
+		PaletteBoardSize: {
+			Label: Board size
+			Tooltip: Size of the palette board that opens from the middle of the wheel, in percent. 50, 100 and 150 keep its pixel art crisp.
 		}
 	}
 

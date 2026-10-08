@@ -12,9 +12,10 @@ using Terraria.Localization;
 namespace PaintWheel.Common.UI.Picker;
 
 /// <summary>
-/// Everything the picker draws apart from the palette list, the scrape wheel and the editor grid: the
-/// wheel, the bar, the grid layout, the coating row and the text around them - and the discs the scrape
-/// wheel is built from too, so the two wheels are one visual language. Nothing here decides anything -
+/// Everything the picker draws apart from the palette board and the scrape wheel: the wheel, the bar,
+/// the grid layout, the bottom row and the text around them - and the discs the scrape wheel is built
+/// from too. The wheel's rings and middle, the bottom row and the name's rack are the art in
+/// Assets/Textures/Picker, drawn unsmoothed; everything else is drawn. Nothing here decides anything -
 /// it reads the state the update pass left behind.
 /// </summary>
 internal static class PickerRenderer
@@ -24,9 +25,11 @@ internal static class PickerRenderer
 	private static readonly Color HaloColor = new(226, 226, 238);
 	private static readonly Color UnlitPip = new(38, 38, 48);
 	internal static readonly Color EmptyMark = new(232, 96, 96);
-	internal static readonly Color MenuRowTint = new(72, 76, 160);
 	private static readonly Color EmptyDiscFill = new(52, 52, 64);
 	private static readonly Color ScrapeDiscFill = new(64, 58, 48);
+
+	/// <summary>The picker's art at rest, a shade down from the full white it lights to under the cursor.</summary>
+	internal static readonly Color ArtRest = new(222, 222, 222);
 
 	/// <summary>The disc in the middle of a wheel, when it is a button rather than your colour.</summary>
 	internal static readonly Color CenterDiscFill = new(46, 48, 78);
@@ -46,41 +49,60 @@ internal static class PickerRenderer
 		WheelLayout.Settings settings = PaintPicker.BuildSettings(config, eased);
 		WheelLayout.Geometry geometry = WheelLayout.Compute(settings, PaintPicker.Anchor);
 
-		// The scrape wheel is its own shape, with its own panel, title and name.
 		// The scrape wheel and the palette board are their own shapes, with their own panel and titles.
 		bool scraping = PaintPicker.DrawOverlay == PickerOverlay.Scrape;
 		bool board = PaintPicker.DrawOverlay == PickerOverlay.Palettes;
 
+		// Only over the swatches: the board carries its own title and marks the palette in use, so the
+		// header there says everything twice. The swatches are put away rather than faded under it: the
+		// board is wider than the ring's clear space, so a ghost ring behind it is noise.
+		bool colours = PaintPicker.DrawOverlay == PickerOverlay.None;
+
+		// No bottom row in scrape mode, where coatings mean nothing, nor under the board, which covers it
+		// and takes every click.
+		bool row = !scraping && !board;
+
 		if (config.Appearance.ShowBackgroundPanel && !scraping && !board)
 			WheelDrawing.DrawPanel(spriteBatch, geometry.Panel, opacity);
 
-		// Only over the swatches: the board carries its own title and marks the palette in use, so
-		// drawing the header too says everything twice.
-		if (PaintPicker.DrawOverlay == PickerOverlay.None)
+		// The picker's art - the name rack, the wheel's rings and middle, the bottom row - is pixel art,
+		// drawn unsmoothed, with the marks that go over it. The text follows in the layer's own smoothed
+		// pass. The bar and the grid draw no art, so they go there whole, as they always did.
+		WheelDrawing.RestartBatch(spriteBatch, SamplerState.PointClamp);
+
+		if (colours) {
+			DrawHeaderArt(spriteBatch, config, geometry, opacity);
+
+			if (settings.Style == WheelLayoutStyle.Wheel)
+				DrawWheel(spriteBatch, config, settings, geometry, opacity, eased);
+			else if (settings.Style == WheelLayoutStyle.Bar)
+				DrawBarPaletteButton(spriteBatch, config, geometry, opacity, eased);
+			else
+				DrawGridPaletteButton(spriteBatch, settings, geometry, opacity);
+		}
+
+		if (row)
+			DrawCoatingRow(spriteBatch, config, settings, geometry, opacity, eased);
+
+		WheelDrawing.RestartBatch(spriteBatch, SamplerState.LinearClamp);
+
+		if (colours) {
 			DrawHeader(spriteBatch, config, geometry, opacity);
 
-		// Swatches are put away rather than faded: the board is wider than the ring's clear space, so a
-		// ghost ring behind it is noise.
-		if (PaintPicker.DrawOverlay == PickerOverlay.None) {
 			switch (settings.Style) {
 				case WheelLayoutStyle.Bar:
 					DrawBar(spriteBatch, config, settings, geometry, opacity, eased);
 					break;
 
 				case WheelLayoutStyle.Grid:
-					DrawGridSwatches(spriteBatch, config, settings, geometry, opacity);
+					DrawGridSwatches(spriteBatch, config, settings, geometry, opacity * PageTurn.Eased);
 					break;
 
 				default:
-					DrawWheel(spriteBatch, config, settings, geometry, opacity, eased);
+					DrawWheelNumbers(spriteBatch, config, settings, geometry, opacity, eased);
 					break;
 			}
 		}
-
-		// No coating row in scrape mode, where coatings mean nothing, nor under the board, which covers it
-		// and takes every click.
-		if (!scraping && !board)
-			DrawCoatingRow(spriteBatch, config, settings, geometry, opacity, eased);
 
 		if (scraping)
 			ScrapeWheel.Draw(spriteBatch, config, settings, opacity);
@@ -90,20 +112,85 @@ internal static class PickerRenderer
 			DrawHoverText(spriteBatch, config, settings, geometry, opacity);
 	}
 
+	/// <summary>The palette's name, or null when the header is not shown: one palette, one page.</summary>
+	private static string HeaderText(PaintWheelConfig config)
+	{
+		string label = PaintPicker.HeaderLabel(config);
+
+		return label is null || (!PaintPicker.MenuAvailable && PickerContent.PageCount(config) <= 1) ? null : label;
+	}
+
+	/// <summary>
+	/// The header's art: the page arrows, when there are pages, and the rack the name sits on - its
+	/// brush, as much bar as the name needs (the stretch of it that repeats without a seam, laid again
+	/// for a long name) and its splash. The name goes on in the text pass.
+	/// </summary>
+	private static void DrawHeaderArt(SpriteBatch spriteBatch, PaintWheelConfig config,
+		in WheelLayout.Geometry geometry, float opacity)
+	{
+		string label = HeaderText(config);
+		if (label is null)
+			return;
+
+		if (PickerContent.PageCount(config) > 1 && HasArrowArt) {
+			DrawArrowArt(spriteBatch, UITextures.PickerArrowLeft, geometry.LeftArrow, PickerInput.HoveredArrow == 0, opacity);
+			DrawArrowArt(spriteBatch, UITextures.PickerArrowRight, geometry.RightArrow, PickerInput.HoveredArrow == 1, opacity);
+		}
+
+		DrawRack(spriteBatch, geometry.HeaderCenter, WheelDrawing.MeasureText(label, PaintPicker.HeaderTextScale).X,
+			PickerInput.HoveredHeader, opacity);
+	}
+
+	/// <summary>
+	/// A name rack with its band's middle on <paramref name="center"/>, long enough for a name
+	/// <paramref name="labelWidth"/> wide. The colour wheel's palette name sits on one, and the scrape
+	/// wheel's title. Nothing without its art: the name stands alone then.
+	/// </summary>
+	internal static void DrawRack(SpriteBatch spriteBatch, Vector2 center, float labelWidth, bool hovered, float opacity)
+	{
+		Texture2D rack = UITextures.PickerNameRack;
+		if (rack is null)
+			return;
+
+		Rectangle bounds = WheelLayout.RackBounds(center, labelWidth);
+		Color color = (hovered ? Color.White : ArtRest) * opacity;
+
+		const float scale = WheelLayout.RackScale;
+		const int tileLeft = WheelLayout.RackTileLeft;
+		const int tileWidth = WheelLayout.RackTileWidth;
+
+		float x = bounds.X;
+		DrawRackPiece(spriteBatch, rack, ref x, bounds.Y, 0, tileLeft, color);
+
+		int bar = tileWidth + WheelLayout.RackExtra(labelWidth);
+		for (int laid = 0; laid < bar; laid += tileWidth)
+			DrawRackPiece(spriteBatch, rack, ref x, bounds.Y, tileLeft, Math.Min(tileWidth, bar - laid), color);
+
+		DrawRackPiece(spriteBatch, rack, ref x, bounds.Y, tileLeft + tileWidth, rack.Width - tileLeft - tileWidth, color);
+
+		static void DrawRackPiece(SpriteBatch spriteBatch, Texture2D rack, ref float x, float y, int from, int width, Color color)
+		{
+			spriteBatch.Draw(rack, new Vector2(x, y), new Rectangle(from, 0, width, rack.Height), color, 0f, Vector2.Zero,
+				scale, SpriteEffects.None, 0f);
+			x += width * scale;
+		}
+	}
+
 	private static void DrawHeader(SpriteBatch spriteBatch, PaintWheelConfig config,
 		in WheelLayout.Geometry geometry, float opacity)
 	{
-		string label = PaintPicker.HeaderLabel(config);
+		string label = HeaderText(config);
 		int pages = PickerContent.PageCount(config);
 
-		if (label is null || (!PaintPicker.MenuAvailable && pages <= 1))
+		if (label is null)
 			return;
 
 		Color color = PickerInput.HoveredHeader ? Color.White : Main.OurFavoriteColor;
 		WheelDrawing.DrawTextCentered(spriteBatch, label, geometry.HeaderCenter, color, opacity, PaintPicker.HeaderTextScale);
 
-		// Drawn, not a character: the UI font has no arrow and would render a missing-glyph box.
-		if (PaintPicker.MenuAvailable) {
+		// Without the rack's art, a marker past the name says it can be clicked. Drawn, not a character:
+		// the UI font has no arrow and would render a missing-glyph box.
+		if (PaintPicker.MenuAvailable && UITextures.PickerNameRack is null) {
 			float half = WheelDrawing.MeasureText(label, PaintPicker.HeaderTextScale).X * 0.5f;
 			var at = new Vector2(geometry.HeaderCenter.X + half + 9f, geometry.HeaderCenter.Y + 1f);
 
@@ -111,25 +198,32 @@ internal static class PickerRenderer
 			WheelDrawing.DrawTriangleVertical(spriteBatch, at, 9f, 1, color * opacity);
 		}
 
-		if (pages <= 1)
+		// Drawn here only when their art did not load; otherwise they went down with the rack.
+		if (pages <= 1 || HasArrowArt)
 			return;
 
 		DrawArrow(spriteBatch, geometry.LeftArrow, -1, PickerInput.HoveredArrow == 0, opacity);
 		DrawArrow(spriteBatch, geometry.RightArrow, 1, PickerInput.HoveredArrow == 1, opacity);
 	}
 
-	/// <summary>A disc behind the triangle, so the click target has a visible size.</summary>
+	private static bool HasArrowArt => UITextures.PickerArrowLeft is not null && UITextures.PickerArrowRight is not null;
+
+	/// <summary>
+	/// Screen pixels to one of the arrows' art. Larger than the rest of the picker's 2: the arrows are
+	/// drawn small, and at 3 they fill their click box.
+	/// </summary>
+	private const float ArrowArtScale = 3f;
+
+	/// <summary>A page arrow in its own art, popping and lit under the cursor like everything else.</summary>
+	private static void DrawArrowArt(SpriteBatch spriteBatch, Texture2D arrow, Rectangle box, bool hovered, float opacity)
+		=> WheelDrawing.DrawCentered(spriteBatch, arrow, box.Center.ToVector2(),
+			ArrowArtScale * (hovered ? WheelLayout.HoverScale : 1f), (hovered ? Color.White : ArtRest) * opacity);
+
+	/// <summary>A bare drawn triangle with a drop shadow, for when the arrows' art did not load.</summary>
 	private static void DrawArrow(SpriteBatch spriteBatch, Rectangle box, int direction, bool hovered, float opacity)
 	{
 		Vector2 center = box.Center.ToVector2();
-		float radius = box.Width * 0.5f;
-
-		WheelDrawing.DrawDisc(spriteBatch, center, radius,
-			(hovered ? HaloColor : RimColor) * (opacity * (hovered ? 0.95f : 0.75f)));
-		WheelDrawing.DrawDisc(spriteBatch, center, radius - 2f,
-			(hovered ? MenuRowTint : new Color(30, 30, 42)) * opacity);
-
-		float size = radius * (hovered ? 1.1f : 0.95f);
+		float size = box.Width * 0.5f * (hovered ? 1.1f : 0.95f);
 		WheelDrawing.DrawTriangle(spriteBatch, center + new Vector2(0f, 1f), size, direction,
 			Color.Black * (opacity * 0.5f));
 		WheelDrawing.DrawTriangle(spriteBatch, center, size, direction,
@@ -141,29 +235,82 @@ internal static class PickerRenderer
 	private static void DrawWheel(SpriteBatch spriteBatch, PaintWheelConfig config,
 		in WheelLayout.Settings settings, in WheelLayout.Geometry geometry, float opacity, float eased)
 	{
+		// The page being turned away from, under the one turning in: on round the ring the way it was
+		// going, out a little and fading.
+		if (PageTurn.Turning) {
+			int leaving = PageTurn.Leaving.Count;
+			float fade = opacity * (1f - PageTurn.Eased);
+
+			for (int i = 0; i < leaving; i++) {
+				int total = i < PageTurn.LeavingStacks.Count ? PageTurn.LeavingStacks[i] : 0;
+				DrawRingSwatch(spriteBatch, config, PageTurn.Leaving[i], total,
+					TurnedCenter(settings, geometry, i, leaving, leaving: true), hovered: false, fade, eased);
+			}
+		}
+
+		float arriving = opacity * PageTurn.Eased;
+
 		for (int i = 0; i < PickerContent.Swatches.Count; i++) {
 			if (i != PickerInput.HoveredSwatch)
-				DrawDiscSwatch(spriteBatch, config, settings, geometry, i, opacity, eased);
+				DrawWheelSwatch(spriteBatch, config, settings, geometry, i, arriving, eased);
 		}
 
 		// Last, so the hover pop is never clipped by the neighbour drawn after it.
 		if (PickerInput.HoveredSwatch >= 0 && PickerInput.HoveredSwatch < PickerContent.Swatches.Count)
-			DrawDiscSwatch(spriteBatch, config, settings, geometry, PickerInput.HoveredSwatch, opacity, eased);
+			DrawWheelSwatch(spriteBatch, config, settings, geometry, PickerInput.HoveredSwatch, arriving, eased);
 
 		DrawWheelCenter(spriteBatch, config, opacity, eased);
 	}
 
-	private static void DrawDiscSwatch(SpriteBatch spriteBatch, PaintWheelConfig config,
+	private static void DrawWheelSwatch(SpriteBatch spriteBatch, PaintWheelConfig config,
 		in WheelLayout.Settings settings, in WheelLayout.Geometry geometry, int index, float opacity, float eased)
 	{
-		int type = PickerContent.Swatches[index];
 		int total = index < PickerContent.SwatchStacks.Count ? PickerContent.SwatchStacks[index] : 0;
 
-		// Only one thing looks hovered at a time: over an arrow, the arrow is what a click would hit.
-		bool hovered = index == PickerInput.HoveredSwatch && PickerInput.HoveredArrow < 0;
+		DrawRingSwatch(spriteBatch, config, PickerContent.Swatches[index], total, SwatchPosition(settings, geometry, index),
+			IsHoveredSwatch(index), opacity, eased);
+	}
 
-		Vector2 center = WheelLayout.SwatchCenter(settings, geometry, index);
-		float radius = config.Appearance.SwatchSize * 0.5f * eased * (hovered ? WheelLayout.HoverScale : 1f);
+	/// <summary>Where a swatch of the page in use is drawn: its place on the ring, turned in from the side it came from while the page turns.</summary>
+	private static Vector2 SwatchPosition(in WheelLayout.Settings settings, in WheelLayout.Geometry geometry, int index)
+		=> PageTurn.Turning
+			? TurnedCenter(settings, geometry, index, settings.Count, leaving: false)
+			: WheelLayout.SwatchCenter(settings, geometry, index);
+
+	/// <summary>
+	/// A swatch's place part way through a turn: the arriving page coming round from behind its places
+	/// and in from a little inside the ring, the leaving one going on round from its own and out. Each
+	/// ring at its own radius, since the page left may hold more paints.
+	/// </summary>
+	private static Vector2 TurnedCenter(in WheelLayout.Settings settings, in WheelLayout.Geometry geometry, int index,
+		int count, bool leaving)
+	{
+		float t = PageTurn.Eased;
+
+		WheelLayout.Settings ring = settings;
+		ring.Count = count;
+
+		float spread = leaving ? 1f + PageTurn.Spread * t : 1f - PageTurn.Spread * (1f - t);
+		float radius = WheelLayout.EffectiveRadius(ring) * settings.Progress * spread;
+		float turn = PageTurn.Direction * PageTurn.Sweep * (leaving ? t : t - 1f);
+
+		return WheelMath.SectorPosition(geometry.Anchor, index, count, radius, turn);
+	}
+
+	/// <summary>
+	/// A paint on the wheel: its colour through the hole in its ring - the gold ring for the paint in
+	/// use - with the gauge round it and the item sprite and the out-of-it slash over it.
+	/// </summary>
+	private static void DrawRingSwatch(SpriteBatch spriteBatch, PaintWheelConfig config, int type, int total,
+		Vector2 center, bool hovered, float opacity, float eased)
+	{
+		if (opacity <= 0f)
+			return;
+
+		bool chosen = Marked(type);
+		float grow = eased * (hovered ? WheelLayout.HoverScale : 1f);
+		float radius = config.Appearance.SwatchSize * 0.5f * grow;
+		Color fill = SwatchFill(config, type, total, hovered);
 
 		if (ShowGauge(config, total)) {
 			WheelDrawing.DrawSupplyRing(spriteBatch, center, radius + WheelLayout.GaugeOffset * eased,
@@ -172,18 +319,55 @@ internal static class PickerRenderer
 				PaintCatalog.AccentColor(type) * opacity, UnlitPip * opacity);
 		}
 
-		DrawDisc(spriteBatch, config, center, radius, type, total, hovered, Marked(type), opacity);
+		Texture2D ring = chosen ? UITextures.PickerPaintActive : UITextures.PickerPaintInactive;
 
-		// The key and the count sit where the hotbar puts them on a slot: top left and bottom right.
-		DrawKeyHint(spriteBatch, config, index, center + new Vector2(-radius * 0.95f, -radius * 1.05f), opacity);
+		if (ring is null) {
+			// The art did not load: the drawn disc it replaced.
+			DrawDiscBody(spriteBatch, center, radius, fill, hovered, opacity);
+			DrawDiscMarks(spriteBatch, center, radius, chosen, hovered, opacity);
+		}
+		else {
+			float scale = WheelLayout.PixelScale(config.Appearance.SwatchSize) * grow;
 
-		if (config.Appearance.ShowStackCounts && total > 0) {
-			string count = total.ToString();
-			Vector2 size = WheelDrawing.MeasureSmallNumber(count, CountScale);
-			WheelDrawing.DrawSmallNumber(spriteBatch, count, center + new Vector2(radius * 0.95f - size.X, radius * 0.95f - size.Y),
-				Color.White * opacity, CountScale);
+			WheelDrawing.DrawCentered(spriteBatch, UITextures.FillOf(ring), center, scale, fill * opacity);
+			WheelDrawing.DrawCentered(spriteBatch, ring, center, scale, (hovered ? Color.White : ArtRest) * opacity);
+		}
+
+		if (config.Appearance.ShowItemIcons && type > 0)
+			WheelDrawing.DrawItemIcon(spriteBatch, type, center, radius / 22f,
+				Color.White * (opacity * (total > 0 ? 1f : 0.3f)));
+
+		if (total <= 0 && type > 0)
+			WheelDrawing.DrawSlash(spriteBatch, center, radius * 1.1f, EmptyMark * opacity);
+	}
+
+	/// <summary>
+	/// The wheel's numbers, in the text pass over its art: the key that picks each paint and how many
+	/// you have, where the hotbar puts them on a slot - top left and bottom right.
+	/// </summary>
+	private static void DrawWheelNumbers(SpriteBatch spriteBatch, PaintWheelConfig config,
+		in WheelLayout.Settings settings, in WheelLayout.Geometry geometry, float opacity, float eased)
+	{
+		opacity *= PageTurn.Eased;
+
+		for (int index = 0; index < PickerContent.Swatches.Count; index++) {
+			int total = index < PickerContent.SwatchStacks.Count ? PickerContent.SwatchStacks[index] : 0;
+			Vector2 center = SwatchPosition(settings, geometry, index);
+			float radius = config.Appearance.SwatchSize * 0.5f * eased * (IsHoveredSwatch(index) ? WheelLayout.HoverScale : 1f);
+
+			DrawKeyHint(spriteBatch, config, index, center + new Vector2(-radius * 0.95f, -radius * 1.05f), opacity);
+
+			if (config.Appearance.ShowStackCounts && total > 0) {
+				string count = total.ToString();
+				Vector2 size = WheelDrawing.MeasureSmallNumber(count, CountScale);
+				WheelDrawing.DrawSmallNumber(spriteBatch, count, center + new Vector2(radius * 0.95f - size.X, radius * 0.95f - size.Y),
+					Color.White * opacity, CountScale);
+			}
 		}
 	}
+
+	/// <summary>Only one thing looks hovered at a time: over an arrow, the arrow is what a click would hit.</summary>
+	private static bool IsHoveredSwatch(int index) => index == PickerInput.HoveredSwatch && PickerInput.HoveredArrow < 0;
 
 	private const float CountScale = 0.62f;
 
@@ -245,8 +429,16 @@ internal static class PickerRenderer
 		int coating = PaintSelection.Coating;
 
 		// Drawn as a button whenever it is one - the same rule the hit test uses - so a click that opens
-		// the palette list always had something visible to land on.
+		// the palette board always had something visible to land on: a painter's palette, outlined while
+		// hovered. The paint in use wears the gold ring out on the wheel, and the coating its row's.
 		bool button = PaintPicker.MenuAvailable;
+		Texture2D palette = PickerInput.HoveredCenter ? UITextures.PickerCenterHovered : UITextures.PickerCenter;
+
+		if (button && palette is not null) {
+			WheelDrawing.DrawCentered(spriteBatch, palette, PaintPicker.Anchor,
+				WheelLayout.PixelScale(config.Appearance.SwatchSize) * WheelLayout.ButtonGrow * eased, Color.White * opacity);
+			return;
+		}
 
 		if (chosen == 0 && coating <= 0 && !button)
 			return;
@@ -292,6 +484,62 @@ internal static class PickerRenderer
 			WheelDrawing.DrawDisc(spriteBatch, badge, small, RimColor * opacity);
 			WheelDrawing.DrawDisc(spriteBatch, badge, small - 2f, PaintCatalog.AccentColor(coating) * opacity);
 		}
+	}
+
+	/// <summary>
+	/// The bar's way to the palette board, over its left arrow: the wheel's middle, the painter's palette,
+	/// at the art's own pixel. A disc with three pips when the art did not load.
+	/// </summary>
+	private static void DrawBarPaletteButton(SpriteBatch spriteBatch, PaintWheelConfig config,
+		in WheelLayout.Geometry geometry, float opacity, float eased)
+	{
+		if (!PaintPicker.MenuAvailable)
+			return;
+
+		bool hovered = PickerInput.HoveredCenter;
+		Texture2D palette = hovered ? UITextures.PickerCenterHovered : UITextures.PickerCenter;
+
+		if (palette is not null) {
+			WheelDrawing.DrawCentered(spriteBatch, palette, geometry.PaletteButton,
+				WheelLayout.PixelScale(config.Appearance.SwatchSize) * eased, Color.White * opacity);
+			return;
+		}
+
+		DrawDrawnPaletteButton(spriteBatch, geometry.PaletteButton,
+			WheelLayout.BarPaletteRadius(config.Appearance.SwatchSize) * eased, hovered, opacity);
+	}
+
+	/// <summary>A palette button without its art: a disc with three pips, for when the art did not load.</summary>
+	private static void DrawDrawnPaletteButton(SpriteBatch spriteBatch, Vector2 center, float radius, bool hovered, float opacity)
+	{
+		WheelDrawing.DrawDisc(spriteBatch, center, radius, RimColor * (opacity * 0.85f));
+		WheelDrawing.DrawDisc(spriteBatch, center, radius - 2f, CenterDiscFill * opacity);
+
+		for (int i = -1; i <= 1; i++)
+			WheelDrawing.DrawPixelSquare(spriteBatch, center + new Vector2(i * radius * 0.44f, 0f),
+				MathF.Max(2f, radius * 0.17f), (hovered ? Color.White : HaloColor) * opacity);
+	}
+
+	/// <summary>
+	/// The grid's way to the palette board, in the place after its last colour: the painter's palette on
+	/// its own, no cell round it - the cells are for the paints.
+	/// </summary>
+	private static void DrawGridPaletteButton(SpriteBatch spriteBatch, in WheelLayout.Settings settings,
+		in WheelLayout.Geometry geometry, float opacity)
+	{
+		if (!settings.PaletteButton)
+			return;
+
+		bool hovered = PickerInput.HoveredCenter;
+		Rectangle cell = WheelLayout.GridCell(geometry.Anchor, geometry.Cells, settings.Count);
+		Vector2 center = cell.Center.ToVector2();
+		Texture2D palette = hovered ? UITextures.PickerCenterHovered : UITextures.PickerCenter;
+
+		// Fitted to the cell by the outlined art, the wider, so hovering does not outgrow it.
+		if (palette is not null)
+			WheelDrawing.DrawCentered(spriteBatch, palette, center, cell.Width / 21f, Color.White * opacity);
+		else
+			DrawDrawnPaletteButton(spriteBatch, center, cell.Width * 0.5f, hovered, opacity);
 	}
 
 	// ---- Grid -------------------------------------------------------------------------------
@@ -349,7 +597,7 @@ internal static class PickerRenderer
 		WheelDrawing.DrawRectOutline(spriteBatch, geometry.Strip, 2, RimColor * opacity);
 
 		for (int i = 0; i < PickerContent.Swatches.Count; i++)
-			DrawBarCell(spriteBatch, config, settings, geometry, i, opacity);
+			DrawBarCell(spriteBatch, config, settings, geometry, i, opacity * PageTurn.Eased);
 	}
 
 	private static void DrawBarCell(SpriteBatch spriteBatch, PaintWheelConfig config,
@@ -359,7 +607,9 @@ internal static class PickerRenderer
 		int total = index < PickerContent.SwatchStacks.Count ? PickerContent.SwatchStacks[index] : 0;
 		bool hovered = index == PickerInput.HoveredSwatch && PickerInput.HoveredArrow < 0;
 
-		Vector2 center = WheelLayout.SwatchCenter(settings, geometry, index);
+		// While a page turns, its bands slide in from the side it came from.
+		float slide = PageTurn.Turning ? PageTurn.Direction * settings.CellHeight * 1.5f * (1f - PageTurn.Eased) : 0f;
+		Vector2 center = WheelLayout.SwatchCenter(settings, geometry, index) + new Vector2(0f, slide);
 		int height = Math.Max(2, (int)MathF.Round(settings.CellHeight));
 
 		var cell = new Rectangle(
@@ -410,7 +660,87 @@ internal static class PickerRenderer
 
 	// ---- Bottom row and hover text ----------------------------------------------------------
 
+	/// <summary>
+	/// The bottom row: each slot a button of its own art - gold while it is on, the coating in use or a
+	/// switch that is set - with its icon in the middle. Slashed and faint for a coating you have none of.
+	/// </summary>
 	private static void DrawCoatingRow(SpriteBatch spriteBatch, PaintWheelConfig config,
+		in WheelLayout.Settings settings, in WheelLayout.Geometry geometry, float opacity, float eased)
+	{
+		Texture2D onButton = UITextures.PickerRowActive;
+		Texture2D offButton = UITextures.PickerRowInactive;
+
+		if (onButton is null || offButton is null) {
+			DrawDrawnCoatingRow(spriteBatch, config, settings, geometry, opacity, eased);
+			return;
+		}
+
+		Player player = Main.LocalPlayer;
+
+		for (int i = 0; i < PickerContent.RowSlots; i++) {
+			bool hovered = i == PickerInput.HoveredCoating;
+			(bool on, Texture2D icon, int item, bool missing) = RowSlot(i, player);
+
+			Vector2 center = WheelLayout.CoatingCenter(settings, geometry, i);
+			float grow = eased * (hovered ? WheelLayout.HoverScale : 1f);
+			float scale = geometry.CoatingSize / WheelLayout.RowButtonArtWidth * grow;
+			float iconScale = WheelLayout.PixelScale(config.Appearance.SwatchSize) * grow;
+			Color tint = hovered ? Color.White : ArtRest;
+
+			WheelDrawing.DrawCentered(spriteBatch, on ? onButton : offButton, center, scale, tint * opacity);
+
+			Color iconTint = tint * (opacity * (missing ? 0.45f : 1f));
+
+			// The paint-both art predates the row's and is drawn larger, so it is fitted inside.
+			if (icon == UITextures.PaintBoth)
+				WheelDrawing.DrawIcon(spriteBatch, icon, center, PaintBothIconSize * iconScale, iconTint);
+			else if (icon is not null)
+				WheelDrawing.DrawCentered(spriteBatch, icon, center, iconScale, iconTint);
+			else
+				WheelDrawing.DrawItemIcon(spriteBatch, item, center, iconScale * 0.45f, iconTint);
+
+			if (missing)
+				WheelDrawing.DrawSlash(spriteBatch, center, geometry.CoatingSize * 0.55f * grow, EmptyMark * opacity);
+		}
+	}
+
+	/// <summary>How wide the paint-both icon is drawn on its button, in the row art's pixels.</summary>
+	private const float PaintBothIconSize = 14f;
+
+	/// <summary>
+	/// What a bottom-row slot shows: whether it is on, its icon - or, for a coating with none, the item
+	/// to draw instead - and whether you are out of it.
+	/// </summary>
+	private static (bool on, Texture2D icon, int item, bool missing) RowSlot(int index, Player player)
+	{
+		if (PickerContent.IsScrapeButton(index)) {
+			int slot = PaintScraper.FindSlot(player);
+			return (false, UITextures.PickerScrape, slot >= 0 ? player.inventory[slot].type : ItemID.PaintScraper, false);
+		}
+
+		if (PickerContent.IsPaintBothButton(index))
+			return (PaintSelection.PaintBoth, UITextures.PaintBoth, 0, false);
+
+		if (PickerContent.IsNoPaintButton(index))
+			return (PaintSelection.Paint == PaintSelection.NoPaint, UITextures.PickerPaintTarget, ItemID.Paintbrush, false);
+
+		int type = PickerContent.CoatingRow[index];
+		int chosen = PaintSelection.Coating;
+
+		if (type <= 0)
+			return (chosen <= 0, UITextures.PickerNoCoating, 0, false);
+
+		Texture2D icon = PaintCatalog.CoatingIdOf(type) switch {
+			PaintCoatingID.Glow => UITextures.PickerIlluminant,
+			PaintCoatingID.Echo => UITextures.PickerEcho,
+			_ => null,
+		};
+
+		return (type == chosen, icon, type, PaintInventory.TotalStack(player, type) <= 0);
+	}
+
+	/// <summary>The bottom row as discs, as it was drawn before it had art of its own - for when that art did not load.</summary>
+	private static void DrawDrawnCoatingRow(SpriteBatch spriteBatch, PaintWheelConfig config,
 		in WheelLayout.Settings settings, in WheelLayout.Geometry geometry, float opacity, float eased)
 	{
 		Player player = Main.LocalPlayer;

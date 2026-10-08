@@ -41,6 +41,12 @@ internal static class PickerContent
 	/// </summary>
 	private static readonly HashSet<int> carriedThisSession = new();
 
+	/// <summary>
+	/// All the automatic palette holds, before the setting that hides empty swatches thins it out for
+	/// the wheel. What the palette board marks as in it.
+	/// </summary>
+	internal static readonly List<int> AutomaticPaints = new();
+
 	internal static bool ScraperAvailable;
 	internal static int PaletteIndex;
 	internal static int PageIndex;
@@ -239,7 +245,8 @@ internal static class PickerContent
 		Palettes.Clear();
 
 		// Auto-filled with everything you own, sorted by paint id - the order the Painter sells them in -
-		// plus whatever you have carried since entering the world, and the paint in use.
+		// plus whatever you have carried since entering the world, the paint in use, and the paints put
+		// in by hand on the palette board, less the ones taken out there.
 		PaintInventory.CollectOwnedPaints(Main.LocalPlayer, paletteScratch);
 		carriedThisSession.UnionWith(paletteScratch);
 
@@ -252,7 +259,22 @@ internal static class PickerContent
 		if (chosen > 0 && PaintCatalog.IsPaint(chosen) && !paletteScratch.Contains(chosen))
 			paletteScratch.Add(chosen);
 
+		if (PaintSelection.Local is PaintWheelPlayer state) {
+			foreach (int type in state.AutoAdded) {
+				if (PaintCatalog.IsPaint(type) && !paletteScratch.Contains(type))
+					paletteScratch.Add(type);
+			}
+
+			// Unless that would empty it: this is the palette that is always there, and with nothing in
+			// it the picker would stay shut, leaving no way back to the board to put a paint back.
+			if (paletteScratch.Exists(type => !state.AutoRemoved.Contains(type)))
+				paletteScratch.RemoveAll(state.AutoRemoved.Contains);
+		}
+
 		paletteScratch.Sort(PaintCatalog.ByPaintId);
+
+		AutomaticPaints.Clear();
+		AutomaticPaints.AddRange(paletteScratch);
 
 		AddPalette(OwnedPaletteKey, Language.GetTextValue("Mods.PaintWheel.UI.AutoPreset"), paletteScratch, config);
 

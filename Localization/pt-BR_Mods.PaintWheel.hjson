@@ -31,7 +31,7 @@ UI: {
 	NewPalette: Nova paleta com o que você tem
 	DeletePalette: Excluir esta paleta
 	EditHint: Clique em uma cor para adicionar ou remover.
-	AutoPaletteHint: Se enche com todas as tintas que você tem. Clique em + para criar a sua.
+	AutoPaletteHint: Se enche com todas as tintas que você tem. Clique em uma cor para adicionar ou remover.
 	NewPaletteName: Paleta
 	ConfirmDelete: Clique de novo para excluir
 	PaletteHintNew: Clique para ver as paletas
@@ -157,6 +157,7 @@ Configs: {
 		Headers: {
 			Wheel: Roda
 			Bar: Barra
+			PaletteBoard: Painel de paletas
 		}
 
 		ShowItemIcons: {
@@ -233,6 +234,7 @@ Configs: {
 			Tooltip:
 				'''
 				Quanto a roda demora para abrir, em ticks: 60 é um segundo, 0 é instantâneo.
+				Trocar de página ou de paleta leva metade do tempo a mais.
 				Deixe curto ou ela parece lenta.
 				'''
 		}
@@ -250,6 +252,11 @@ Configs: {
 		BarSwatchesPerPage: {
 			Label: Faixas por página
 			Tooltip: Quantas cores cabem em uma página da barra antes de usar as setas.
+		}
+
+		PaletteBoardSize: {
+			Label: Tamanho do painel
+			Tooltip: Tamanho do painel de paletas que abre pelo centro da roda, em porcentagem. Em 50, 100 e 150 a pixel art fica nítida.
 		}
 	}
 

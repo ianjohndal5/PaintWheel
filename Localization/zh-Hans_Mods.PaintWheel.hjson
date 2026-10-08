@@ -31,7 +31,7 @@ UI: {
 	NewPalette: 用身上的油漆新建调色板
 	DeletePalette: 删除这个调色板
 	EditHint: 点击颜色即可加入或移除。
-	AutoPaletteHint: 自动收录你身上的所有油漆。点击 + 新建你自己的调色板。
+	AutoPaletteHint: 自动收录你身上的所有油漆。点击颜色即可加入或移除。
 	NewPaletteName: 调色板
 	ConfirmDelete: 再次点击以删除
 	PaletteHintNew: 点击查看调色板
@@ -142,6 +142,7 @@ Configs: {
 		Headers: {
 			Wheel: 轮盘
 			Bar: 色条
+			PaletteBoard: 调色板面板
 		}
 
 		ShowItemIcons: {
@@ -202,6 +203,7 @@ Configs: {
 			Tooltip:
 				'''
 				轮盘弹出所需的时间，单位为帧：60 帧为一秒，0 为立即。
+				翻页或切换调色板的时长为其一倍半。
 				请保持短一些，否则会显得迟钝。
 				'''
 		}
@@ -219,6 +221,11 @@ Configs: {
 		BarSwatchesPerPage: {
 			Label: 每页色条数
 			Tooltip: 在需要用箭头翻页之前，一页色条能放下多少种颜色。
+		}
+
+		PaletteBoardSize: {
+			Label: 面板大小
+			Tooltip: 从轮盘中心打开的调色板面板的大小，以百分比计。设为 50、100 或 150 时像素画最清晰。
 		}
 	}
 

@@ -12,11 +12,12 @@ using Terraria.Localization;
 namespace PaintWheel.Common.UI.Picker;
 
 /// <summary>
-/// Scrape mode's own small wheel, built the way the colour wheel is: a ring of discs for what the
-/// scraper may strip, drawn with a wood block and a wood wall, round a disc in the middle that goes
-/// back to the colours. It stands in for the swatches while scrape mode is on, whatever the picker's
-/// shape. Geometry is <see cref="WheelLayout.ComputeScrape"/>'s; clicks and releases are
-/// <see cref="PickerInput"/>'s and <see cref="PaintPicker"/>'s, as for everything else.
+/// Scrape mode's own small wheel, from the colour wheel's art: a ring of the bottom row's buttons for
+/// what the scraper may strip, showing a wood block and a wood wall, round the painter's palette in
+/// the middle that goes back to the colours, under its title on a name rack. It stands in for the
+/// swatches while scrape mode is on, whatever the picker's shape. Geometry is
+/// <see cref="WheelLayout.ComputeScrape"/>'s; clicks and releases are <see cref="PickerInput"/>'s and
+/// <see cref="PaintPicker"/>'s, as for everything else.
 /// </summary>
 internal static class ScrapeWheel
 {
@@ -72,21 +73,35 @@ internal static class ScrapeWheel
 		if (config.Appearance.ShowBackgroundPanel)
 			WheelDrawing.DrawPanel(spriteBatch, WheelLayout.ScrapePanel(Center, shape), opacity);
 
-		WheelDrawing.DrawTextCentered(spriteBatch, Language.GetTextValue("Mods.PaintWheel.UI.Scrape.Header"),
-			WheelLayout.ScrapeTitle(Center, shape), Main.OurFavoriteColor, opacity, PaintPicker.HeaderTextScale);
-
+		string title = Language.GetTextValue("Mods.PaintWheel.UI.Scrape.Header");
+		Vector2 titleAt = WheelLayout.ScrapeTitle(Center, shape);
 		int hovered = PickerInput.HoveredScrape;
+
+		// The art - the title's rack, the buttons, the palette in the middle - unsmoothed, as the colour
+		// wheel's is. The block and wall pictures are finer than that art's pixel, so they go on over it
+		// with the text, smoothed.
+		WheelDrawing.RestartBatch(spriteBatch, SamplerState.PointClamp);
+
+		PickerRenderer.DrawRack(spriteBatch, titleAt, WheelDrawing.MeasureText(title, PaintPicker.HeaderTextScale).X,
+			hovered: false, opacity);
 
 		for (int i = 0; i < Options.Length; i++) {
 			if (i != hovered)
-				DrawOption(spriteBatch, config, shape, i, hovered: false, opacity);
+				DrawOptionButton(spriteBatch, shape, i, hovered: false, opacity);
 		}
 
 		// Last, so the hover pop is never clipped by the neighbour drawn after it.
 		if (hovered >= 0 && hovered < Options.Length)
-			DrawOption(spriteBatch, config, shape, hovered, hovered: true, opacity);
+			DrawOptionButton(spriteBatch, shape, hovered, hovered: true, opacity);
 
-		DrawBack(spriteBatch, shape, hovered == WheelLayout.ScrapeBack, opacity);
+		DrawBack(spriteBatch, config, shape, hovered == WheelLayout.ScrapeBack, opacity);
+
+		WheelDrawing.RestartBatch(spriteBatch, SamplerState.LinearClamp);
+
+		WheelDrawing.DrawTextCentered(spriteBatch, title, titleAt, Main.OurFavoriteColor, opacity, PaintPicker.HeaderTextScale);
+
+		for (int i = 0; i < Options.Length; i++)
+			DrawOptionPicture(spriteBatch, config, shape, i, i == hovered, opacity);
 
 		string name = hovered == WheelLayout.ScrapeBack ? Language.GetTextValue("Mods.PaintWheel.UI.Scrape.Exit")
 			: hovered >= 0 && hovered < Options.Length ? Label(hovered)
@@ -96,30 +111,68 @@ internal static class ScrapeWheel
 			WheelDrawing.DrawTextCentered(spriteBatch, name, WheelLayout.ScrapeInfo(Center, shape), Color.White, opacity, 0.9f);
 	}
 
-	/// <summary>A disc like a swatch's: gold ringed while it is the target, popping out while hovered.</summary>
-	private static void DrawOption(SpriteBatch spriteBatch, PaintWheelConfig config, in WheelLayout.ScrapeSettings shape,
-		int index, bool hovered, float opacity)
+	/// <summary>
+	/// An option's button, as the bottom row's: gold while it is the target, popping out and lit while
+	/// hovered. A disc like a swatch's when the art did not load.
+	/// </summary>
+	private static void DrawOptionButton(SpriteBatch spriteBatch, in WheelLayout.ScrapeSettings shape, int index,
+		bool hovered, float opacity)
 	{
 		Vector2 at = WheelLayout.ScrapeOption(Center, shape, index);
-		float radius = shape.Option * 0.5f * shape.Progress * (hovered ? WheelLayout.HoverScale : 1f);
+		float grow = shape.Progress * (hovered ? WheelLayout.HoverScale : 1f);
+		bool target = Options[index] == PaintSelection.Scrape;
+		Texture2D button = target ? UITextures.PickerRowActive : UITextures.PickerRowInactive;
 
+		if (button is not null) {
+			WheelDrawing.DrawCentered(spriteBatch, button, at, shape.Option / WheelLayout.RowButtonArtWidth * grow,
+				(hovered ? Color.White : PickerRenderer.ArtRest) * opacity);
+			return;
+		}
+
+		float radius = shape.Option * 0.5f * grow;
 		if (radius <= 2f)
 			return;
 
 		PickerRenderer.DrawDiscBody(spriteBatch, at, radius, OptionFill, hovered, opacity);
-		PickerRenderer.DrawDiscMarks(spriteBatch, at, radius, Options[index] == PaintSelection.Scrape, hovered, opacity);
-		DrawTarget(spriteBatch, Options[index], at, radius * 1.1f, opacity);
+		PickerRenderer.DrawDiscMarks(spriteBatch, at, radius, target, hovered, opacity);
+	}
+
+	/// <summary>What an option strips, on its button - the size the bottom row's icons are - with its number key.</summary>
+	private static void DrawOptionPicture(SpriteBatch spriteBatch, PaintWheelConfig config, in WheelLayout.ScrapeSettings shape,
+		int index, bool hovered, float opacity)
+	{
+		Vector2 at = WheelLayout.ScrapeOption(Center, shape, index);
+		float grow = shape.Progress * (hovered ? WheelLayout.HoverScale : 1f);
+		float radius = shape.Option * 0.5f * grow;
+
+		if (radius <= 2f)
+			return;
+
+		DrawTarget(spriteBatch, Options[index], at, WheelLayout.PixelScale(config.Appearance.SwatchSize) * PictureSize * grow, opacity);
 
 		// Where a swatch shows its number key: top left.
 		PickerRenderer.DrawKeyHint(spriteBatch, config, index, at + new Vector2(-radius * 0.95f, -radius * 1.05f), opacity);
 	}
 
+	/// <summary>How wide an option's picture is, in the picker art's pixels: a bottom-row icon's width.</summary>
+	private const float PictureSize = 13f;
+
 	/// <summary>
-	/// The disc in the middle: back to the colours, drawn as a ring of paint - the wheel it goes back to,
-	/// small. A button, like the colour wheel's middle, so it answers a click rather than a release.
+	/// The middle: back to the colours, shown as the painter's palette the colour wheel opens its
+	/// palettes from, outlined while hovered. A button, like the colour wheel's middle, so it answers a
+	/// click rather than a release. A ring of paint on a disc when the art did not load.
 	/// </summary>
-	private static void DrawBack(SpriteBatch spriteBatch, in WheelLayout.ScrapeSettings shape, bool hovered, float opacity)
+	private static void DrawBack(SpriteBatch spriteBatch, PaintWheelConfig config, in WheelLayout.ScrapeSettings shape,
+		bool hovered, float opacity)
 	{
+		Texture2D palette = hovered ? UITextures.PickerCenterHovered : UITextures.PickerCenter;
+
+		if (palette is not null) {
+			WheelDrawing.DrawCentered(spriteBatch, palette, Center,
+				WheelLayout.PixelScale(config.Appearance.SwatchSize) * WheelLayout.ButtonGrow * shape.Progress, Color.White * opacity);
+			return;
+		}
+
 		float radius = shape.Back * 0.5f * shape.Progress;
 		if (radius <= 2f)
 			return;

@@ -60,7 +60,11 @@ internal static class PaletteEditor
 		return true;
 	}
 
-	/// <summary>Puts the automatic palette on the board: the same grid, with what it holds marked. Not editable.</summary>
+	/// <summary>
+	/// Puts the automatic palette on the board: the same grid, with what it holds marked - all of it,
+	/// including paints the setting that hides empty swatches leaves off the wheel. Its changes are the
+	/// character's, not the config's, so they go through the player rather than through here.
+	/// </summary>
 	internal static void ShowAutomatic()
 	{
 		presetIndex = -1;
@@ -68,14 +72,9 @@ internal static class PaletteEditor
 		Members.Clear();
 		order.Clear();
 
-		foreach (Palette palette in PickerContent.Palettes) {
-			if (palette.Key != PickerContent.OwnedPaletteKey)
-				continue;
-
-			foreach (int type in palette.Paints) {
-				if (Members.Add(type))
-					order.Add(type);
-			}
+		foreach (int type in PickerContent.AutomaticPaints) {
+			if (Members.Add(type))
+				order.Add(type);
 		}
 	}
 

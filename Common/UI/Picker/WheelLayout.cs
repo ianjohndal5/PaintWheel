@@ -11,7 +11,8 @@ namespace PaintWheel.Common.UI.Picker;
 /// </summary>
 internal static class WheelLayout
 {
-	public const float ArrowSize = 26f;
+	/// <summary>A page arrow's click box: the size its art is drawn at, 9 pixels wide at three times.</summary>
+	public const float ArrowSize = 27f;
 
 	/// <summary>Clear space between the swatches and an arrow, so a near miss hits neither.</summary>
 	public const float ArrowGap = 12f;
@@ -26,8 +27,11 @@ internal static class WheelLayout
 	public const float InfoGap = 24f;
 	public const float CoatingGap = 20f;
 
-	/// <summary>Gap between the cursor and the left edge of the bar strip.</summary>
-	public const float BarOffset = 26f;
+	/// <summary>
+	/// Gap between the cursor and the left edge of the bar strip: room for the left page arrow between
+	/// them, clear of where the cursor opened the picker.
+	/// </summary>
+	public const float BarOffset = 45f;
 
 	/// <summary>Room kept to the right of the strip for the hovered swatch's name.</summary>
 	public const float BarLabelRoom = 170f;
@@ -43,6 +47,88 @@ internal static class WheelLayout
 
 	/// <summary>Size of one gauge pip for a given swatch size.</summary>
 	public static float GaugePip(float swatch) => MathF.Max(2f, swatch * 0.075f);
+
+	// ---- Pixel art --------------------------------------------------------------------------
+
+	/// <summary>The width of the ring a paint sits in on the wheel, in its art's own pixels.</summary>
+	public const int SwatchArtWidth = 20;
+
+	/// <summary>The width of a bottom-row button, in its art's own pixels.</summary>
+	public const int RowButtonArtWidth = 21;
+
+	/// <summary>The width and height of the wheel's middle button, in its art's own pixels.</summary>
+	public const int CenterArtWidth = 19;
+
+	public const int CenterArtHeight = 16;
+
+	/// <summary>
+	/// Screen pixels to one of the picker art's: a swatch is its ring's width across. The rings and the
+	/// icons are drawn at this, so they are one size of pixel.
+	/// </summary>
+	public static float PixelScale(float swatch) => swatch / SwatchArtWidth;
+
+	/// <summary>
+	/// How much larger than the rest the bottom row's buttons and the wheel's middle are drawn: a
+	/// quarter, so a button's icon - drawn at the art's own size - has room round it, and the middle
+	/// stands out from the paints.
+	/// </summary>
+	public const float ButtonGrow = 1.25f;
+
+	private static float RowButtonSize(float swatch) => PixelScale(swatch) * ButtonGrow * RowButtonArtWidth;
+
+	/// <summary>Half the width the wheel's middle is drawn at, for its click box to match.</summary>
+	public static float CenterButtonRadius(float swatch) => PixelScale(swatch) * ButtonGrow * CenterArtWidth * 0.5f;
+
+	/// <summary>
+	/// Half the width the bar's palette button is drawn at: the wheel's middle at the art's own pixel,
+	/// without the quarter more - the column beside the strip has no room for it.
+	/// </summary>
+	public static float BarPaletteRadius(float swatch) => PixelScale(swatch) * CenterArtWidth * 0.5f;
+
+	/// <summary>Gap between the bar's palette button and the arrow under it.</summary>
+	private const float BarButtonGap = 6f;
+
+	// ---- Name rack ----------------------------------------------------------------------------
+
+	/// <summary>
+	/// The rack the palette name sits on, at a fixed scale rather than the wheel's: one its dark band
+	/// holds the header's text at with room above and below.
+	/// </summary>
+	public const float RackScale = 3f;
+
+	public const int RackArtWidth = 88;
+	public const int RackArtHeight = 15;
+
+	/// <summary>The stretch of bar that repeats without a seam, laid again to lengthen the rack for a long name.</summary>
+	public const int RackTileLeft = 18;
+	public const int RackTileWidth = 44;
+
+	/// <summary>The inside of the rack's dark band, left to right, where the name is written.</summary>
+	public const int RackBandLeft = 11;
+	public const int RackBandRight = 73;
+
+	/// <summary>Where the name is centred top to bottom: the band's middle, nudged as the board's pill names are.</summary>
+	public const float RackBandMiddle = 9.5f;
+
+	private const float RackPadding = 4f;
+
+	/// <summary>How much longer than drawn the rack has to be, in its art's pixels, for a name this wide.</summary>
+	public static int RackExtra(float labelWidth)
+		=> Math.Max(0, (int)MathF.Ceiling(labelWidth / RackScale + RackPadding * 2f - (RackBandRight - RackBandLeft)));
+
+	/// <summary>The rack on screen, placed so its band's middle is on the header's centre.</summary>
+	public static Rectangle RackBounds(Vector2 center, float labelWidth)
+	{
+		int extra = RackExtra(labelWidth);
+		float left = center.X - (RackBandLeft + RackBandRight + extra) * 0.5f * RackScale;
+		float top = center.Y - RackBandMiddle * RackScale;
+
+		return new Rectangle((int)MathF.Round(left), (int)MathF.Round(top),
+			(int)((RackArtWidth + extra) * RackScale), (int)(RackArtHeight * RackScale));
+	}
+
+	/// <summary>How far above the header's centre its rack reaches, for the picker's bounds.</summary>
+	private const float HeaderAbove = RackBandMiddle * RackScale + 2f;
 
 	/// <summary>Room a swatch needs beyond its width, derived from the gauge so spacing cannot drift.</summary>
 	public static float GaugeAllowance(float swatch) => GaugeOffset * 2f + GaugePip(swatch) + 1f;
@@ -67,6 +153,12 @@ internal static class WheelLayout
 
 		/// <summary>Width of the header label, so the arrows can be placed clear of the text.</summary>
 		public float LabelWidth;
+
+		/// <summary>
+		/// The palette board can be opened, so the grid keeps a cell for its button after the last
+		/// colour - it has no middle to open it from, as the wheel does.
+		/// </summary>
+		public bool PaletteButton;
 
 		/// <summary>Eased open animation, 0 to 1.</summary>
 		public float Progress;
@@ -93,6 +185,12 @@ internal static class WheelLayout
 
 		/// <summary>Centre of the swatches, and so of the palette board that replaces them.</summary>
 		public Vector2 MenuCenter;
+
+		/// <summary>
+		/// The button for the palette board where the shape has no middle to open it from: the bar's
+		/// over its left arrow, the grid's in the cell after the last colour.
+		/// </summary>
+		public Vector2 PaletteButton;
 
 		/// <summary>Where the hovered swatch's name goes. Centred for the wheel and the grid, left-aligned beside the bar.</summary>
 		public Vector2 InfoAnchor;
@@ -133,17 +231,25 @@ internal static class WheelLayout
 	{
 		var geometry = new Geometry { Anchor = anchor };
 
+		// One cell more when the palette board's button takes the place after the last colour.
+		int cells = Math.Max(1, settings.Count) + (settings.PaletteButton ? 1 : 0);
+
 		geometry.Cells = new GridSettings {
-			Count = Math.Max(1, settings.Count),
+			Count = cells,
 
 			// Narrower than twelve when there is less to show, so a short palette is a short grid
 			// rather than one row rattling around in a full width panel.
-			Columns = Math.Clamp(settings.Count, 1, GridColumns),
+			Columns = Math.Clamp(cells, 1, GridColumns),
 			Cell = MathF.Max(20f, settings.Swatch * 0.8f) * MathHelper.Lerp(0.85f, 1f, settings.Progress),
 			Gap = 6f,
 		};
 
 		Rectangle bounds = GridBounds(anchor, geometry.Cells);
+
+		if (settings.PaletteButton) {
+			Rectangle button = GridCell(anchor, geometry.Cells, settings.Count);
+			geometry.PaletteButton = new Vector2(button.X + button.Width * 0.5f, button.Y + button.Height * 0.5f);
+		}
 
 		geometry.Panel = bounds;
 		geometry.MenuCenter = anchor;
@@ -156,13 +262,13 @@ internal static class WheelLayout
 
 		geometry.InfoAnchor = new Vector2(anchor.X, bounds.Bottom + InfoGap * 0.6f);
 
-		geometry.CoatingSize = MathF.Max(24f, settings.Swatch * 0.72f);
+		geometry.CoatingSize = RowButtonSize(settings.Swatch);
 		geometry.CoatingCenterX = anchor.X;
 		geometry.CoatingY = geometry.InfoAnchor.Y + CoatingGap + geometry.CoatingSize * 0.5f;
 
 		float halfWidth = MathF.Max(spread + ArrowSize * 0.5f + 2f, CoatingHalfWidth(settings, geometry));
 
-		float top = settings.ShowHeader ? geometry.HeaderCenter.Y - 16f : bounds.Top;
+		float top = settings.ShowHeader ? geometry.HeaderCenter.Y - HeaderAbove : bounds.Top;
 		float bottom = settings.CoatingCount > 0
 			? geometry.CoatingY + geometry.CoatingSize * 0.5f + 4f
 			: geometry.InfoAnchor.Y + 16f;
@@ -208,7 +314,7 @@ internal static class WheelLayout
 
 		geometry.InfoAnchor = new Vector2(anchor.X, anchor.Y + geometry.Outer + InfoGap);
 
-		geometry.CoatingSize = MathF.Max(24f, settings.Swatch * 0.72f);
+		geometry.CoatingSize = RowButtonSize(settings.Swatch);
 		geometry.CoatingCenterX = anchor.X;
 		geometry.CoatingY = geometry.InfoAnchor.Y + CoatingGap + geometry.CoatingSize * 0.5f;
 
@@ -220,7 +326,7 @@ internal static class WheelLayout
 		float halfWidth = MathF.Max(geometry.Outer + pad, spread + ArrowSize * 0.5f + 2f);
 		halfWidth = MathF.Max(halfWidth, CoatingHalfWidth(settings, geometry));
 
-		float top = settings.ShowHeader ? geometry.HeaderCenter.Y - 16f : anchor.Y - geometry.Outer;
+		float top = settings.ShowHeader ? geometry.HeaderCenter.Y - HeaderAbove : anchor.Y - geometry.Outer;
 		float bottom = settings.CoatingCount > 0
 			? geometry.CoatingY + geometry.CoatingSize * 0.5f + 4f
 			: geometry.InfoAnchor.Y + 16f;
@@ -249,20 +355,24 @@ internal static class WheelLayout
 		float centerX = left + width * 0.5f;
 		geometry.HeaderCenter = new Vector2(centerX, top - HeaderGap);
 
-		// Beside the middle of the strip rather than above it, for the same reason as the wheel. The left
-		// one is kept clear of the cursor, which the strip opens just beside: an arrow under the opening
-		// position would be clicked by the first click of a picker left open.
+		// Beside the middle of the strip rather than above it, for the same reason as the wheel, and the
+		// same distance out either side. The strip opens far enough from the cursor that the left one is
+		// clear of it: an arrow under the opening position would be clicked by the first click of a
+		// picker left open.
 		float spread = width * 0.5f + ArrowGap + ArrowSize * 0.5f;
 		float middle = top + height * 0.5f;
-		float leftX = settings.Paged ? MathF.Min(centerX - spread, anchor.X - ArrowGap - ArrowSize * 0.5f) : centerX - spread;
-		geometry.LeftArrow = Box(new Vector2(leftX, middle), ArrowSize);
+		geometry.LeftArrow = Box(new Vector2(centerX - spread, middle), ArrowSize);
 		geometry.RightArrow = Box(new Vector2(centerX + spread, middle), ArrowSize);
+
+		// Over the left arrow, on the side the cursor comes from - there whether or not the arrows are.
+		float buttonHalfHeight = PixelScale(settings.Swatch) * CenterArtHeight * 0.5f;
+		geometry.PaletteButton = new Vector2(centerX - spread, middle - ArrowSize * 0.5f - BarButtonGap - buttonHalfHeight);
 		geometry.HeaderBox = HeaderHitBox(geometry.HeaderCenter, settings.LabelWidth);
 		geometry.MenuCenter = new Vector2(centerX, top + height * 0.5f);
 
 		geometry.InfoAnchor = new Vector2(left + width + 12f, anchor.Y);
 
-		geometry.CoatingSize = MathF.Max(24f, settings.CellHeight * 1.25f);
+		geometry.CoatingSize = RowButtonSize(settings.Swatch);
 		geometry.CoatingCenterX = centerX;
 		geometry.CoatingY = top + height + CoatingGap + geometry.CoatingSize * 0.5f;
 
@@ -272,8 +382,8 @@ internal static class WheelLayout
 		float boundsRight = MathF.Max(left + width + BarLabelRoom, centerX + CoatingHalfWidth(settings, geometry));
 		boundsRight = MathF.Max(boundsRight, geometry.RightArrow.Right + 2f);
 
-		float boundsTop = settings.ShowHeader ? geometry.HeaderCenter.Y - 16f : top;
-		boundsTop = MathF.Min(boundsTop, geometry.LeftArrow.Top - 2f);
+		float boundsTop = settings.ShowHeader ? geometry.HeaderCenter.Y - HeaderAbove : top;
+		boundsTop = MathF.Min(boundsTop, MathF.Min(geometry.LeftArrow.Top, geometry.PaletteButton.Y - buttonHalfHeight) - 2f);
 
 		float boundsBottom = settings.CoatingCount > 0
 			? geometry.CoatingY + geometry.CoatingSize * 0.5f + 4f
@@ -315,8 +425,11 @@ internal static class WheelLayout
 		if (settings.Count <= 0)
 			return -1;
 
-		if (settings.Style == WheelLayoutStyle.Grid)
-			return HitTestGrid(geometry.Anchor, geometry.Cells, cursor);
+		// The grid's cells can include the palette button's, after the colours: that one is no swatch.
+		if (settings.Style == WheelLayoutStyle.Grid) {
+			int cell = HitTestGrid(geometry.Anchor, geometry.Cells, cursor);
+			return cell < settings.Count ? cell : -1;
+		}
 
 		if (settings.Style != WheelLayoutStyle.Bar)
 			return WheelMath.SectorAt(geometry.Anchor, cursor, settings.Count, settings.DeadZone);
@@ -451,10 +564,10 @@ internal static class WheelLayout
 	{
 		public int Count;
 
-		/// <summary>Diameter of an option disc.</summary>
+		/// <summary>Width of an option's button: the bottom row's, at the same size.</summary>
 		public float Option;
 
-		/// <summary>Diameter of the disc in the middle.</summary>
+		/// <summary>Width of the button in the middle, and so of its click box: the colour wheel's middle, at the same size.</summary>
 		public float Back;
 
 		public float Radius;
@@ -474,13 +587,15 @@ internal static class WheelLayout
 
 	public static ScrapeSettings ComputeScrape(in Settings settings, int count)
 	{
-		float option = MathF.Max(36f, settings.Swatch * 1.1f);
+		float option = RowButtonSize(settings.Swatch);
 
+		// Close round the middle, as the colour wheel's paints are: far enough out that a popped option
+		// still clears the button there, and its neighbours each other.
 		return new ScrapeSettings {
 			Count = count,
 			Option = option,
-			Back = option * 0.9f,
-			Radius = MathF.Max(option * 1.55f, settings.Radius * 0.72f),
+			Back = CenterButtonRadius(settings.Swatch) * 2f,
+			Radius = MathF.Max(option * 1.2f, settings.Radius * 0.72f),
 			Progress = settings.Progress,
 		};
 	}
@@ -508,7 +623,7 @@ internal static class WheelLayout
 	{
 		Rectangle panel = ScrapePanel(center, scrape);
 
-		return FromEdges(panel.Left, MathF.Min(panel.Top, ScrapeTitle(center, scrape).Y - 16f),
+		return FromEdges(panel.Left, MathF.Min(panel.Top, ScrapeTitle(center, scrape).Y - HeaderAbove),
 			panel.Right, MathF.Max(panel.Bottom, ScrapeInfo(center, scrape).Y + 16f));
 	}
 
@@ -554,18 +669,8 @@ internal static class WheelLayout
 		return new Vector2(x, y);
 	}
 
-	/// <summary>
-	/// Half the header's click box, covering the text and the marker past it. The arrow spread derives
-	/// from this so the two can never overlap as click targets.
-	/// </summary>
-	private static float HeaderHalfWidth(float labelWidth) => MathF.Max(44f, labelWidth * 0.5f + 16f);
-
-	private static Rectangle HeaderHitBox(Vector2 center, float labelWidth)
-	{
-		float halfWidth = HeaderHalfWidth(labelWidth);
-
-		return FromEdges(center.X - halfWidth, center.Y - 12f, center.X + halfWidth, center.Y + 12f);
-	}
+	/// <summary>The header's click box: the whole rack the name sits on.</summary>
+	private static Rectangle HeaderHitBox(Vector2 center, float labelWidth) => RackBounds(center, labelWidth);
 
 	private static Rectangle Box(Vector2 center, float size)
 		=> FromEdges(center.X - size * 0.5f, center.Y - size * 0.5f, center.X + size * 0.5f, center.Y + size * 0.5f);

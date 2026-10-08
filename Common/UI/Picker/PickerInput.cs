@@ -307,14 +307,18 @@ internal static class PickerInput
 		// opening under the cursor cannot commit what sits there.
 		bool overlaid = PaintPicker.Overlay != PickerOverlay.None;
 
-		HoveredCenter = settings.Style == WheelLayoutStyle.Wheel && !overlaid && PaintPicker.MenuAvailable
-			&& Vector2.Distance(cursor, PaintPicker.Anchor) <= CenterHitRadius(config);
+		HoveredCenter = !overlaid && PaintPicker.MenuAvailable && settings.Style switch {
+			WheelLayoutStyle.Wheel => Vector2.Distance(cursor, PaintPicker.Anchor) <= CenterHitRadius(config),
+			WheelLayoutStyle.Bar => Vector2.Distance(cursor, geometry.PaletteButton) <= WheelLayout.BarPaletteRadius(settings.Swatch),
+			_ => MathF.Abs(cursor.X - geometry.PaletteButton.X) <= geometry.Cells.Cell * 0.5f
+				&& MathF.Abs(cursor.Y - geometry.PaletteButton.Y) <= geometry.Cells.Cell * 0.5f,
+		};
 
 		HoveredHeader = !overlaid && PaintPicker.MenuAvailable && settings.ShowHeader
 			&& geometry.HeaderBox.Contains((int)cursor.X, (int)cursor.Y);
 
 		if (PaintPicker.Overlay == PickerOverlay.Palettes) {
-			PaletteBoard.Place(geometry);
+			PaletteBoard.Place(geometry, config);
 			PaletteBoard.UpdateHover(cursor, config);
 			HoveredSwatch = -1;
 			HoveredCoating = -1;
@@ -398,9 +402,12 @@ internal static class PickerInput
 		return area.Center.ToVector2() + square * new Vector2(area.Width * 0.5f, area.Height * 0.5f);
 	}
 
-	/// <summary>How close to the anchor counts as the centre button.</summary>
+	/// <summary>
+	/// How close to the anchor counts as the centre button: as wide as its art is drawn, but never past
+	/// the dead zone, where a release picks nothing.
+	/// </summary>
 	private static float CenterHitRadius(PaintWheelConfig config)
-		=> MathF.Max(20f, MathF.Min(config.Appearance.DeadZoneRadius, config.Appearance.SwatchSize * 0.5f));
+		=> MathF.Max(20f, MathF.Min(config.Appearance.DeadZoneRadius, WheelLayout.CenterButtonRadius(config.Appearance.SwatchSize)));
 
 	private static int HitTestArrows(PaintWheelConfig config, in WheelLayout.Geometry geometry, Vector2 cursor)
 	{

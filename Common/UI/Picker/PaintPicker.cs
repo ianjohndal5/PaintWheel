@@ -148,6 +148,7 @@ public static class PaintPicker
 	/// </summary>
 	private static void ClearTransient()
 	{
+		PageTurn.Settle();
 		PaletteEditor.StopEditing();
 		PaletteBoard.Reset();
 		PickerInput.ClearHover();
@@ -258,6 +259,7 @@ public static class PaintPicker
 
 		float step = 1f / Math.Max(1, config.Appearance.OpenAnimationTicks);
 		Anim = MathHelper.Clamp(Anim + (active ? step : -step * 1.6f), 0f, 1f);
+		PageTurn.Update(config);
 
 		if (!active && Anim <= 0f)
 			ClearTransient();
@@ -532,7 +534,7 @@ public static class PaintPicker
 
 	internal static void ChangePage(int direction, PaintWheelConfig config)
 	{
-		if (!PickerContent.StepPage(direction, config))
+		if (!PageTurn.Turn(direction, config, () => PickerContent.StepPage(direction, config)))
 			return;
 
 		PickerInput.HoveredSwatch = -1;
@@ -693,7 +695,15 @@ public static class PaintPicker
 		if (PickerContent.Palettes.Count <= 1)
 			return;
 
-		SwitchPalette((PickerContent.PaletteIndex + direction + PickerContent.Palettes.Count) % PickerContent.Palettes.Count, config);
+		int index = (PickerContent.PaletteIndex + direction + PickerContent.Palettes.Count) % PickerContent.Palettes.Count;
+
+		// Turned like a page while the colours are on show; behind the board, or with the picker away,
+		// it simply changes.
+		if (active && Overlay == PickerOverlay.None)
+			PageTurn.Turn(direction, config, () => SwitchPalette(index, config));
+		else
+			SwitchPalette(index, config);
+
 		Play(SoundID.MenuTick, config);
 
 		// The board shows the palette in use, so it moves with it.
@@ -701,10 +711,13 @@ public static class PaintPicker
 			PaletteBoard.FollowActive(config);
 	}
 
-	private static void SwitchPalette(int index, PaintWheelConfig config)
+	private static bool SwitchPalette(int index, PaintWheelConfig config)
 	{
-		if (PickerContent.SelectPalette(index, config))
-			PickerInput.HoveredSwatch = -1;
+		if (!PickerContent.SelectPalette(index, config))
+			return false;
+
+		PickerInput.HoveredSwatch = -1;
+		return true;
 	}
 
 	internal static WheelLayout.Settings BuildSettings(PaintWheelConfig config, float progress) => new() {
@@ -719,6 +732,7 @@ public static class PaintPicker
 		CellWidth = config.Appearance.BarCellWidth,
 		CellHeight = config.Appearance.BarCellHeight,
 		LabelWidth = WheelDrawing.MeasureText(HeaderLabel(config), HeaderTextScale).X,
+		PaletteButton = MenuAvailable,
 		Progress = progress,
 	};
 

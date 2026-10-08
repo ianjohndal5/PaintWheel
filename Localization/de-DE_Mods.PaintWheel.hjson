@@ -31,7 +31,7 @@ UI: {
 	NewPalette: Neue Palette aus deinem Vorrat
 	DeletePalette: Diese Palette löschen
 	EditHint: Klicke eine Farbe an, um sie hinzuzufügen oder zu entfernen.
-	AutoPaletteHint: Füllt sich mit jeder Farbe, die du dabeihast. Klicke auf +, um eine eigene anzulegen.
+	AutoPaletteHint: Füllt sich mit jeder Farbe, die du dabeihast. Klicke eine Farbe an, um sie hinzuzufügen oder zu entfernen.
 	NewPaletteName: Palette
 	ConfirmDelete: Zum Löschen erneut klicken
 	PaletteHintNew: Klicken für Paletten
@@ -157,6 +157,7 @@ Configs: {
 		Headers: {
 			Wheel: Rad
 			Bar: Leiste
+			PaletteBoard: Palettentafel
 		}
 
 		ShowItemIcons: {
@@ -233,6 +234,7 @@ Configs: {
 			Tooltip:
 				'''
 				Wie lange das Rad zum Aufklappen braucht, in Ticks: 60 sind eine Sekunde, 0 ist sofort.
+				Ein Seiten- oder Palettenwechsel dauert anderthalbmal so lang.
 				Kurz halten, sonst wirkt es träge.
 				'''
 		}
@@ -250,6 +252,11 @@ Configs: {
 		BarSwatchesPerPage: {
 			Label: Bänder pro Seite
 			Tooltip: Wie viele Farben auf eine Seite der Leiste passen, bevor die Pfeile übernehmen.
+		}
+
+		PaletteBoardSize: {
+			Label: Tafelgröße
+			Tooltip: Größe der Palettentafel, die sich aus der Mitte des Rades öffnet, in Prozent. Bei 50, 100 und 150 bleibt ihre Pixelgrafik scharf.
 		}
 	}
 

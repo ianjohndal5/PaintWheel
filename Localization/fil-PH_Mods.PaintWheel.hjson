@@ -31,7 +31,7 @@ UI: {
 	NewPalette: Bagong palette mula sa dala mo
 	DeletePalette: Burahin ang palette na ito
 	EditHint: Pindutin ang kulay para idagdag o tanggalin.
-	AutoPaletteHint: Napupuno ito ng bawat pintura na dala mo. Pindutin ang + para gumawa ng sarili mo.
+	AutoPaletteHint: Napupuno ito ng bawat pintura na dala mo. Pindutin ang kulay para idagdag o tanggalin.
 	NewPaletteName: Palette
 	ConfirmDelete: Pindutin ulit para burahin
 	PaletteHintNew: Pindutin para sa mga palette
@@ -158,6 +158,7 @@ Configs: {
 		Headers: {
 			Wheel: Wheel
 			Bar: Bar
+			PaletteBoard: Palette board
 		}
 
 		ShowItemIcons: {
@@ -234,6 +235,7 @@ Configs: {
 			Tooltip:
 				'''
 				Gaano katagal bumukas ang wheel, sa ticks: 60 ay isang segundo, 0 ay agad-agad.
+				Ang paglipat ng pahina o palette ay kalahating mas matagal pa.
 				Panatilihing maikli, kung hindi ay mabagal ang pakiramdam.
 				'''
 		}
@@ -251,6 +253,11 @@ Configs: {
 		BarSwatchesPerPage: {
 			Label: Guhit bawat pahina
 			Tooltip: Ilang kulay ang kasya sa isang pahina ng bar bago gamitin ang mga arrow.
+		}
+
+		PaletteBoardSize: {
+			Label: Laki ng board
+			Tooltip: Laki ng palette board na bumubukas mula sa gitna ng wheel, sa porsiyento. Malinaw ang pixel art nito sa 50, 100 at 150.
 		}
 	}
 

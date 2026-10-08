@@ -31,7 +31,7 @@ UI: {
 	NewPalette: Nuova tavolozza da ciò che hai
 	DeletePalette: Elimina questa tavolozza
 	EditHint: Clicca un colore per aggiungerlo o toglierlo.
-	AutoPaletteHint: Si riempie con ogni vernice che hai. Clicca + per crearne una tua.
+	AutoPaletteHint: Si riempie con ogni vernice che hai. Clicca un colore per aggiungerlo o toglierlo.
 	NewPaletteName: Tavolozza
 	ConfirmDelete: Clicca di nuovo per eliminare
 	PaletteHintNew: Clicca per vedere le tavolozze
@@ -157,6 +157,7 @@ Configs: {
 		Headers: {
 			Wheel: Ruota
 			Bar: Barra
+			PaletteBoard: Pannello delle tavolozze
 		}
 
 		ShowItemIcons: {
@@ -233,6 +234,7 @@ Configs: {
 			Tooltip:
 				'''
 				Quanto ci mette la ruota ad aprirsi, in tick: 60 sono un secondo, 0 è istantaneo.
+				Cambiare pagina o tavolozza richiede la metà del tempo in più.
 				Tienila breve o sembrerà lenta.
 				'''
 		}
@@ -250,6 +252,11 @@ Configs: {
 		BarSwatchesPerPage: {
 			Label: Fasce per pagina
 			Tooltip: Quanti colori stanno in una pagina della barra prima delle frecce.
+		}
+
+		PaletteBoardSize: {
+			Label: Dimensione del pannello
+			Tooltip: Dimensione del pannello delle tavolozze che si apre dal centro della ruota, in percentuale. A 50, 100 e 150 la sua pixel art resta nitida.
 		}
 	}
 
