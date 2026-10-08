@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using PaintWheel.Common.Painting;
 using PaintWheel.Common.Systems;
@@ -42,6 +43,26 @@ public class PaintWheelPlayer : ModPlayer
 	public int ActivePage { get; private set; }
 
 	public void SetActivePage(int page) => ActivePage = Math.Max(0, page);
+
+	private readonly HashSet<int> autoAdded = new();
+	private readonly HashSet<int> autoRemoved = new();
+
+	/// <summary>Saved entries of either from a mod that is off right now, kept so they come back with it.</summary>
+	private readonly List<string> autoAddedUnloaded = new();
+	private readonly List<string> autoRemovedUnloaded = new();
+
+	/// <summary>Paints put into the automatic palette by hand, carried or not. Per character, like what it fills itself from.</summary>
+	public IReadOnlySet<int> AutoAdded => autoAdded;
+
+	/// <summary>Paints taken out of the automatic palette by hand, even while carried.</summary>
+	public IReadOnlySet<int> AutoRemoved => autoRemoved;
+
+	/// <summary>Puts a paint into the automatic palette, or takes it out, whether you carry it or not.</summary>
+	public void SetInAutoPalette(int type, bool include)
+	{
+		(include ? autoRemoved : autoAdded).Remove(type);
+		(include ? autoAdded : autoRemoved).Add(type);
+	}
 
 	/// <summary>Scrape mode and its target. Sticky: it stays on until left, across sessions.</summary>
 	public ScrapeMode Scrape { get; private set; } = ScrapeMode.Off;
@@ -198,6 +219,9 @@ public class PaintWheelPlayer : ModPlayer
 
 		if (PaintBoth)
 			tag["paintBoth"] = true;
+
+		StoreAll(tag, "autoAdded", autoAdded, autoAddedUnloaded);
+		StoreAll(tag, "autoRemoved", autoRemoved, autoRemovedUnloaded);
 	}
 
 	public override void LoadData(TagCompound tag)
@@ -219,6 +243,9 @@ public class PaintWheelPlayer : ModPlayer
 			: HandSwap.Swap.None;
 
 		PaintBoth = tag.ContainsKey("paintBoth");
+
+		RestoreAll(tag, "autoAdded", autoAdded, autoAddedUnloaded);
+		RestoreAll(tag, "autoRemoved", autoRemoved, autoRemovedUnloaded);
 	}
 
 	private static void Store(TagCompound tag, string key, int itemType)
@@ -229,6 +256,43 @@ public class PaintWheelPlayer : ModPlayer
 		string name = ItemID.Search.GetName(itemType);
 		if (!string.IsNullOrEmpty(name))
 			tag[key] = name;
+	}
+
+	/// <summary>A set of paints by content key, with the ones from mods that are off written back as they were read.</summary>
+	private static void StoreAll(TagCompound tag, string key, HashSet<int> types, List<string> unloaded)
+	{
+		var names = new List<string>(unloaded);
+
+		foreach (int type in types) {
+			if (type <= 0 || type >= ItemLoader.ItemCount)
+				continue;
+
+			string name = ItemID.Search.GetName(type);
+			if (!string.IsNullOrEmpty(name) && !names.Contains(name))
+				names.Add(name);
+		}
+
+		if (names.Count > 0)
+			tag[key] = names;
+	}
+
+	private static void RestoreAll(TagCompound tag, string key, HashSet<int> types, List<string> unloaded)
+	{
+		types.Clear();
+		unloaded.Clear();
+
+		if (!tag.ContainsKey(key))
+			return;
+
+		foreach (string name in tag.GetList<string>(key)) {
+			var definition = new ItemDefinition(name);
+			int type = definition.IsUnloaded ? 0 : definition.Type;
+
+			if (type > 0 && type < ItemLoader.ItemCount)
+				types.Add(type);
+			else
+				unloaded.Add(name);
+		}
 	}
 
 	private static int Restore(TagCompound tag, string key)

@@ -78,12 +78,16 @@ public class AppearanceSettings
 	[DefaultValue(true)]
 	public bool ShowCursorReadout { get; set; } = true;
 
+	/// <summary>
+	/// A floor, not a size: a ring with more paints widens itself to keep them apart - twelve take 104 -
+	/// so the default only sets how close a short palette sits round the middle.
+	/// </summary>
 	[Header("Wheel")]
-	[DefaultValue(104)]
+	[DefaultValue(65)]
 	[Range(50, 200)]
 	[Increment(5)]
 	[Slider]
-	public int WheelRadius { get; set; } = 104;
+	public int WheelRadius { get; set; } = 65;
 
 	[DefaultValue(40)]
 	[Range(24, 80)]
@@ -123,6 +127,14 @@ public class AppearanceSettings
 	[Range(4, 24)]
 	[Slider]
 	public int BarSwatchesPerPage { get; set; } = 16;
+
+	/// <summary>The palette board, in percent: 100 draws each pixel of its art as two on screen.</summary>
+	[Header("PaletteBoard")]
+	[DefaultValue(100)]
+	[Range(50, 150)]
+	[Increment(10)]
+	[Slider]
+	public int PaletteBoardSize { get; set; } = 100;
 }
 
 /// <summary>How a swatch shows what is left of that paint.</summary>
@@ -138,8 +150,9 @@ public class SupplySettings
 	[Slider]
 	public float MinimumSwatchOpacity { get; set; } = 0.35f;
 
-	[DefaultValue(true)]
-	public bool ShowDepletionRing { get; set; } = true;
+	/// <summary>Off by default: the fading swatch already says a stack is running down, and the pips crowd the art round it.</summary>
+	[DefaultValue(false)]
+	public bool ShowDepletionRing { get; set; } = false;
 
 	[DefaultValue(12)]
 	[Range(6, 24)]

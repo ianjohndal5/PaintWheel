@@ -31,7 +31,7 @@ UI: {
 	NewPalette: Nouvelle palette avec vos peintures
 	DeletePalette: Supprimer cette palette
 	EditHint: Cliquez une couleur pour l'ajouter ou la retirer.
-	AutoPaletteHint: Se remplit de toutes les peintures que vous avez. Cliquez sur + pour créer la vôtre.
+	AutoPaletteHint: Se remplit de toutes les peintures que vous avez. Cliquez une couleur pour l'ajouter ou la retirer.
 	NewPaletteName: Palette
 	ConfirmDelete: Cliquez encore pour supprimer
 	PaletteHintNew: Cliquez pour voir les palettes
@@ -157,6 +157,7 @@ Configs: {
 		Headers: {
 			Wheel: Roue
 			Bar: Barre
+			PaletteBoard: Tableau des palettes
 		}
 
 		ShowItemIcons: {
@@ -233,6 +234,7 @@ Configs: {
 			Tooltip:
 				'''
 				Le temps que met la roue à se déployer, en ticks : 60 font une seconde, 0 est instantané.
+				Changer de page ou de palette prend moitié plus de temps.
 				Gardez-le court, sinon elle paraît lente.
 				'''
 		}
@@ -250,6 +252,11 @@ Configs: {
 		BarSwatchesPerPage: {
 			Label: Bandes par page
 			Tooltip: Combien de couleurs tiennent sur une page de la barre avant les flèches.
+		}
+
+		PaletteBoardSize: {
+			Label: Taille du tableau
+			Tooltip: Taille du tableau des palettes qui s'ouvre au centre de la roue, en pourcentage. À 50, 100 et 150, son pixel art reste net.
 		}
 	}
 

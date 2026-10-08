@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using PaintWheel.Common.Configs;
 using PaintWheel.Common.Painting;
+using PaintWheel.Common.Players;
 using PaintWheel.Common.Systems;
 using ReLogic.Localization.IME;
 using ReLogic.OS;
@@ -29,11 +30,17 @@ internal static class PaletteBoard
 	// ---- Layout -----------------------------------------------------------------------------
 	// In the board art's own pixels: the board is 230 by 94, and everything sits where its art has room.
 
-	/// <summary>The board, pills, bar, buttons and brush. The paint slots are drawn smaller, as in the design.</summary>
-	private const float Scale = 2.5f;
+	/// <summary>Screen pixels to one of the art's at the size setting's 100%. Whole, so the art is crisp there.</summary>
+	private const float BaseScale = 2f;
+
+	/// <summary>
+	/// The board, pills, bar, buttons and brush, from the size setting - set each time the board is
+	/// placed. The paint slots are drawn smaller, as in the design.
+	/// </summary>
+	private static float Scale { get; set; } = BaseScale;
 
 	/// <summary>Three quarters of the board's: the size the design gives the paints' frames.</summary>
-	private const float SlotScale = Scale * 0.75f;
+	private static float SlotScale => Scale * 0.75f;
 
 	private const int BoardWidth = 230;
 	private const int BoardHeight = 94;
@@ -72,12 +79,18 @@ internal static class PaletteBoard
 	private static readonly Vector2 AddAt = new(211f, 22f);
 	private static readonly Vector2 DeleteAt = new(211f, 37f);
 	private static readonly Vector2 RenameAt = new(187f, 70f);
-	private static readonly Vector2 RowsUpAt = new(196f, 50f);
-	private static readonly Vector2 RowsDownAt = new(196f, 64f);
+	/// <summary>Top left of each 7 by 6 arrow beside the paints, on whole pixels of the board.</summary>
+	private static readonly Vector2 RowsUpAt = new(193f, 47f);
+	private static readonly Vector2 RowsDownAt = new(193f, 61f);
 
 	private const float InfoGap = 16f;
-	private const float PillTextScale = 0.68f;
-	private const float PillTextMinScale = 0.5f;
+	/// <summary>
+	/// A pill's name, in font scale per screen pixel of the art's, so it keeps its size on the pill -
+	/// down to a floor, below which a name is shortened rather than shrunk past reading.
+	/// </summary>
+	private static float PillTextScale => Math.Max(0.4f, 0.272f * Scale);
+
+	private static float PillTextMinScale => Math.Max(0.35f, 0.2f * Scale);
 
 	// ---- State ------------------------------------------------------------------------------
 
@@ -245,9 +258,14 @@ internal static class PaletteBoard
 
 	// ---- Geometry ---------------------------------------------------------------------------
 
-	/// <summary>Centres the board on the picker, kept on screen. Whole pixels, so its pixel art stays crisp.</summary>
-	internal static void Place(in WheelLayout.Geometry geometry)
+	/// <summary>
+	/// Sizes the board from the setting and centres it on the picker, kept on screen. Whole pixels, so
+	/// its pixel art stays crisp.
+	/// </summary>
+	internal static void Place(in WheelLayout.Geometry geometry, PaintWheelConfig config)
 	{
+		Scale = BaseScale * Math.Clamp(config.Appearance.PaletteBoardSize, 50, 150) / 100f;
+
 		float width = BoardWidth * Scale;
 		float height = BoardHeight * Scale;
 
@@ -322,10 +340,11 @@ internal static class PaletteBoard
 			return (Part.Track, -1);
 
 		if (Rows > RowsShown) {
-			if (Inside(p, RowsUpAt.X - 5f, RowsUpAt.Y - 5f, 10f, 10f))
+			// A little wider than the arrows themselves, which are small to hit.
+			if (Inside(p, RowsUpAt.X - 2f, RowsUpAt.Y - 2f, 11f, 10f))
 				return (Part.RowsUp, -1);
 
-			if (Inside(p, RowsDownAt.X - 5f, RowsDownAt.Y - 5f, 10f, 10f))
+			if (Inside(p, RowsDownAt.X - 2f, RowsDownAt.Y - 2f, 11f, 10f))
 				return (Part.RowsDown, -1);
 		}
 
@@ -470,19 +489,36 @@ internal static class PaletteBoard
 
 	private static void ToggleSlot(int index, PaintWheelConfig config)
 	{
-		// The automatic palette fills itself, so there is nothing to add or take out of it here.
-		if (Shown < 0 || index < 0 || index >= PaletteEditor.GridPaints.Count) {
+		if (index < 0 || index >= PaletteEditor.GridPaints.Count) {
 			PaintPicker.Play(Terraria.ID.SoundID.MenuClose, config);
 			return;
 		}
 
-		PaletteEditor.ToggleMember(PaletteEditor.GridPaints[index], config);
+		int type = PaletteEditor.GridPaints[index];
+
+		if (Shown >= 0) {
+			PaletteEditor.ToggleMember(type, config);
+		}
+		else {
+			// The automatic palette keeps its changes with the character. It keeps a paint at least, too:
+			// empty, the picker it is reached from would not open.
+			bool member = PaletteEditor.Members.Contains(type);
+			if (PaintSelection.Local is not PaintWheelPlayer state || (member && PaletteEditor.Members.Count <= 1)) {
+				PaintPicker.Play(Terraria.ID.SoundID.MenuClose, config);
+				return;
+			}
+
+			state.SetInAutoPalette(type, !member);
+		}
 
 		// The wheel follows at once: a palette that just got its first colour is now one it can use.
 		PickerContent.RebuildPalettes(config);
 		PickerContent.SelectPreset(Shown, config);
 		PickerContent.ApplyPage(config);
 		PickerContent.RefreshStacks();
+
+		if (Shown < 0)
+			PaletteEditor.ShowAutomatic();
 
 		PaintPicker.Play(Terraria.ID.SoundID.MenuTick, config);
 	}
@@ -644,34 +680,34 @@ internal static class PaletteBoard
 		if (IsRenaming)
 			ReadRenameInput();
 
-		Place(geometry);
+		Place(geometry, config);
 
 		// Pixel art, so no smoothing while it is drawn - then back to the layer's own settings for the
 		// text. The pills, and their names, are cut off at the edges of their well as they slide.
-		Restart(spriteBatch, SamplerState.PointClamp);
+		WheelDrawing.RestartBatch(spriteBatch, SamplerState.PointClamp);
 		DrawArt(spriteBatch, UITextures.PaletteBoard, At(0f, 0f), Scale, Color.White * opacity);
 
 		Rectangle oldClip = spriteBatch.GraphicsDevice.ScissorRectangle;
 		Rectangle clip = ScreenClip(spriteBatch.GraphicsDevice, PillWell);
 
 		if (clip.Width > 0 && clip.Height > 0) {
-			Restart(spriteBatch, SamplerState.PointClamp, clip);
+			WheelDrawing.RestartBatch(spriteBatch, SamplerState.PointClamp, clip);
 			DrawPills(spriteBatch, config, opacity);
 
-			Restart(spriteBatch, SamplerState.LinearClamp, clip);
+			WheelDrawing.RestartBatch(spriteBatch, SamplerState.LinearClamp, clip);
 			DrawPillNames(spriteBatch, config, opacity);
 		}
 
-		Restart(spriteBatch, SamplerState.PointClamp);
+		WheelDrawing.RestartBatch(spriteBatch, SamplerState.PointClamp);
 		spriteBatch.GraphicsDevice.ScissorRectangle = oldClip;
 
 		DrawArt(spriteBatch, UITextures.PaletteScrollThumb, At(ThumbLeft(config), TrackTop), Scale,
 			(dragging || Hovered is Part.Thumb ? Color.White : Rest) * opacity);
 		DrawSlots(spriteBatch, opacity);
 		DrawButtons(spriteBatch, opacity);
+		DrawRowArrows(spriteBatch, opacity);
 
-		Restart(spriteBatch, SamplerState.LinearClamp);
-		DrawRowMarks(spriteBatch, opacity);
+		WheelDrawing.RestartBatch(spriteBatch, SamplerState.LinearClamp);
 		DrawInfo(spriteBatch, config, opacity);
 
 		// The candidates of a word being composed, for Chinese and the other languages typed through an
@@ -680,23 +716,6 @@ internal static class PaletteBoard
 			Rectangle bounds = Bounds;
 			Main.instance.DrawWindowsIMEPanel(new Vector2(bounds.Center.X, bounds.Bottom + InfoGap + 40f), 0.5f);
 		}
-	}
-
-	private static readonly RasterizerState Clipped = new() { CullMode = CullMode.None, ScissorTestEnable = true };
-
-	/// <summary>
-	/// Ends the batch and starts it again with <paramref name="sampler"/>, otherwise as the interface
-	/// layer had it - cut to <paramref name="clip"/> when one is given.
-	/// </summary>
-	private static void Restart(SpriteBatch spriteBatch, SamplerState sampler, Rectangle? clip = null)
-	{
-		spriteBatch.End();
-
-		if (clip is Rectangle area)
-			spriteBatch.GraphicsDevice.ScissorRectangle = area;
-
-		spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, sampler, DepthStencilState.None,
-			clip is null ? RasterizerState.CullCounterClockwise : Clipped, null, Main.UIScaleMatrix);
 	}
 
 	/// <summary>
@@ -869,22 +888,18 @@ internal static class PaletteBoard
 		DrawArt(spriteBatch, texture, at, scale, color * opacity);
 	}
 
-	/// <summary>Small marks beside the paints when there are more rows than the board shows.</summary>
-	private static void DrawRowMarks(SpriteBatch spriteBatch, float opacity)
+	/// <summary>
+	/// The arrows beside the paints when there are more rows than the board shows. Lit like the buttons,
+	/// and faint at the end they cannot scroll past.
+	/// </summary>
+	private static void DrawRowArrows(SpriteBatch spriteBatch, float opacity)
 	{
 		if (Rows <= RowsShown)
 			return;
 
-		bool up = firstRow > 0;
-		bool down = firstRow < Rows - RowsShown;
-		float size = 4f * Scale;
-
-		WheelDrawing.DrawTriangleVertical(spriteBatch, At(RowsUpAt), size, -1, MarkColor(up, Part.RowsUp) * opacity);
-		WheelDrawing.DrawTriangleVertical(spriteBatch, At(RowsDownAt), size, 1, MarkColor(down, Part.RowsDown) * opacity);
+		DrawButton(spriteBatch, UITextures.PaletteArrowUp, At(RowsUpAt), Scale, Part.RowsUp, firstRow > 0, opacity);
+		DrawButton(spriteBatch, UITextures.PaletteArrowDown, At(RowsDownAt), Scale, Part.RowsDown, firstRow < Rows - RowsShown, opacity);
 	}
-
-	private static Color MarkColor(bool live, Part part)
-		=> !live ? new Color(120, 110, 96) * 0.5f : Hovered == part ? Color.White : new Color(232, 214, 176);
 
 	/// <summary>Under the board: what the cursor is on, or what the board is for.</summary>
 	private static void DrawInfo(SpriteBatch spriteBatch, PaintWheelConfig config, float opacity)

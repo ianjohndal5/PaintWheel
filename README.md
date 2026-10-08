@@ -62,18 +62,19 @@ it.
 
 ## What it does
 
-- **Three picker shapes,** switchable in the config: a radial **Wheel** of colour discs, a vertical
+- **Three picker shapes,** switchable in the config: a radial **Wheel** of colour rings, a vertical
   **Bar** of colour bands you sweep down, or a **Grid** that lays every swatch out in rows so nothing
   needs paging.
 - **Swatches are the paint's real colour,** not an item sprite in a box. Item sprites are an option if
   you want them.
-- **A supply gauge** appears on a swatch once that stack starts running down — the swatch fades and a
-  ring of pips around it drains.
+- **A swatch fades** once that stack starts running down. A supply gauge can go with it — a ring of
+  pips around the swatch that drains — turned on in the config.
 - **A paint you have run out of keeps its place,** dimmed and struck through, so a saved palette never
   comes up blank and the layout never shifts under your hand mid-build. The auto-filled palette does
   the same for anything you have carried since entering the world.
 - **Paging.** Arrows and the scroll wheel step through a palette holding more than one ring's worth, so
-  no colour is ever hidden.
+  no colour is ever hidden. The ring turns round to the next page, the old one turning out as the new
+  one turns in, and does the same when you switch palette with the picker open.
 - **Number keys pick directly.** While the picker is up, `1`–`0` choose the first ten swatches (or,
   on the palette board, the first ten palettes) instead of switching the hotbar, and a small digit on
   each swatch shows which is which. Stack counts on the swatches are an option too.
@@ -136,8 +137,9 @@ the auto-filled one first.
 
 ## Palettes
 
-Click the **centre of the wheel**, or the **palette name** above the picker in any shape, to open the
-**palette board** in its place. It opens on the palette you are using, with its colours already laid
+Click the **centre of the wheel** (the **palette button** over the bar's left arrow, or after the
+grid's last colour), or the **palette name** above the picker in any shape, to open the **palette
+board** in its place. It opens on the palette you are using, with its colours already laid
 out, so there is nothing more to click before you can change them.
 
 - **The blue pills** along the top are your palettes, one each, side by side. Click one to show it; the
@@ -150,8 +152,9 @@ out, so there is nothing more to click before you can change them.
   the rest.
 - There is always one auto-filled palette, **"Everything you own"**, first in the row. It holds every
   paint you are carrying, plus anything you have carried since entering the world (struck through once
-  used up, so the ring does not close up under your hand). It fills itself, so it cannot be edited,
-  renamed or deleted.
+  used up, so the ring does not close up under your hand). You can still click a paint to put it in
+  or take it out, as on any palette; those changes are kept with your character. It cannot be renamed
+  or deleted, and it always keeps at least one paint.
 - **+** makes a new palette from what you are carrying, or an empty one if you carry none. An empty
   new palette you leave without adding anything to is not kept.
 - **The red bin** deletes the palette shown. It takes a second click to confirm, since a deleted
@@ -167,7 +170,7 @@ laid out for you to click and add or remove. No item pickers full of swords.
 
 ## Scrape mode
 
-Click the scraper disc on the bottom row and the picker turns into the scrape wheel: a small wheel
+Click the scraper button on the bottom row and the picker turns into the scrape wheel: a small wheel
 of its own, drawn with a wood block and a wood wall.
 
 - **Blocks only** (top) — a wood block.
@@ -213,13 +216,14 @@ the front page; the rest live behind their own buttons.
 Show item sprites and a background panel (both off by default), number keys on the swatches (on),
 stack counts (off) and the cursor readout (on), plus the geometry: wheel radius,
 swatch size, centre dead zone, swatches per ring (capped at 12 — more than that stops being
-flickable), open animation length, and the bar layout's band width, height and bands per page.
+flickable), open animation length, the bar layout's band width, height and bands per page, and the
+palette board's size (100%; at 50, 100 and 150 its pixel art stays crisp).
 
 ### Supply readout
 
 How a swatch shows what is left of that paint: the stack size at which fading starts (default 60,
 counted across every slot holding that paint), how faint a nearly empty swatch may get, and the low
-supply ring and its pip count. **Hide empty swatches** is off by default, so an empty swatch keeps its
+supply ring (off by default) and its pip count. **Hide empty swatches** is off by default, so an empty swatch keeps its
 position rather than shifting the layout under your hand.
 
 ### Advanced
