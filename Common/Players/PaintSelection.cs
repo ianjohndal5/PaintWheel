@@ -61,6 +61,8 @@ public static class PaintSelection
 
 	public static void SelectCoating(int itemType) => Local?.SelectCoating(itemType);
 
+	public static void ToggleCoating(int itemType) => Local?.ToggleCoating(itemType);
+
 	/// <summary>Whether the brush and roller each reach both halves of a tile.</summary>
 	public static bool PaintBoth => Local?.PaintBoth ?? false;
 

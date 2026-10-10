@@ -85,14 +85,14 @@ it.
   roller each paint blocks *and* walls: the tool's own half first, then the other one once that is
   done, so holding the mouse on a tile lands both. Another key trades the brush in hand for the roller
   and back.
-- **A coating row** (none / Illuminant / Echo) sits underneath. With a paint *and* a coating picked,
-  painting applies whichever the target tile is still missing, so holding the mouse on a tile lands
-  both.
+- **Coatings** sit on the bottom row: Illuminant and Echo. Click one to put it on, and click it again
+  to take it off. With a paint *and* a coating picked, painting applies whichever the target tile is
+  still missing, so holding the mouse on a tile lands both.
 - **Paint Sprayer support.** Blocks you place take the colour you picked. No Sprayer? There is a
   setting that grants the same thing.
-- **Placing blocks bare.** A struck-through brush in the same row means "no paint", so blocks go down
-  unpainted without unequipping anything. Click it again to go back to the colour you were using. A
-  coating you picked still applies.
+- **Placing blocks bare.** The block button in the same row switches to "no paint", so blocks go down
+  unpainted without unequipping anything; its block turns from painted to bare while it is on. Click it
+  again to go back to the colour you were using. A coating you picked still applies.
 - **An eyedropper** that copies the paint off any tile or wall — or a paint or coating off your
   inventory or a chest, by hovering it and pressing the key, even while you are carrying a stack on the
   cursor. A dot of that colour sits beside the cursor while you hover, gold once it is the one you have

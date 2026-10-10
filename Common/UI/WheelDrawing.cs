@@ -234,19 +234,6 @@ public static class WheelDrawing
 			(int)(center.X - thickness * 0.5f), (int)(center.Y - size * 0.5f), (int)thickness, (int)size), color);
 	}
 
-	/// <summary>A small X built from pixel blocks.</summary>
-	public static void DrawCross(SpriteBatch spriteBatch, Vector2 center, float size, Color color)
-	{
-		float step = size / 4f;
-		float pip = MathF.Max(2f, size / 5f);
-
-		for (int i = -2; i <= 2; i++) {
-			DrawPixelSquare(spriteBatch, center + new Vector2(i * step, i * step), pip, color);
-			if (i != 0)
-				DrawPixelSquare(spriteBatch, center + new Vector2(i * step, -i * step), pip, color);
-		}
-	}
-
 	// ---- Content ----------------------------------------------------------------------------
 
 	/// <summary>Draws the real item sprite for a paint, sized the way vanilla sizes inventory icons.</summary>

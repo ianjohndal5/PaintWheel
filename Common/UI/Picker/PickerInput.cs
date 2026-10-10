@@ -159,9 +159,9 @@ internal static class PickerInput
 
 		// The bottom row is settings, not the choice the picker exists to make: none of it closes
 		// anything, so it answers a left click while right is still held, exactly like the scraper
-		// button beside it.
+		// button beside it. A coating is a switch: clicked again, it comes off.
 		if (HoveredCoating >= 0 && HoveredCoating < PickerContent.CoatingRow.Count) {
-			PaintSelection.SelectCoating(PickerContent.CoatingRow[HoveredCoating]);
+			PaintSelection.ToggleCoating(PickerContent.CoatingRow[HoveredCoating]);
 			PaintPicker.Play(SoundID.Grab, config);
 			Consume();
 			return;

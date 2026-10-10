@@ -14,7 +14,7 @@ Keybinds: {
 
 UI: {
 	AutoPreset: Tutto quello che hai
-	NoCoating: Nessun rivestimento
+	CoatingOff: Clicca di nuovo per toglierlo
 	NoPaint: Posiziona i blocchi senza vernice
 	NoPaintResume: Torna a verniciare i blocchi
 	NoPaintOn: Non verniciato

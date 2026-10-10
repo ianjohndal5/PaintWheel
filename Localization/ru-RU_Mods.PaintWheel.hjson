@@ -14,7 +14,7 @@ Keybinds: {
 
 UI: {
 	AutoPreset: Всё, что при вас
-	NoCoating: Без покрытия
+	CoatingOff: Нажмите ещё раз, чтобы снять
 	NoPaint: Ставить блоки без краски
 	NoPaintResume: Снова красить блоки
 	NoPaintOn: Без краски

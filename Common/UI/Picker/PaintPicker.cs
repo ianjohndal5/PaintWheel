@@ -380,7 +380,7 @@ public static class PaintPicker
 				selected = true;
 			}
 			else if (PickerInput.HoveredCoating >= 0 && PickerInput.HoveredCoating < PickerContent.CoatingRow.Count) {
-				PaintSelection.SelectCoating(PickerContent.CoatingRow[PickerInput.HoveredCoating]);
+				PaintSelection.ToggleCoating(PickerContent.CoatingRow[PickerInput.HoveredCoating]);
 				selected = true;
 			}
 			else if (PickerInput.HoveredSwatch >= 0 && PickerInput.HoveredSwatch < PickerContent.Swatches.Count) {

@@ -14,7 +14,7 @@ Keybinds: {
 
 UI: {
 	AutoPreset: Alles, was du dabeihast
-	NoCoating: Keine Beschichtung
+	CoatingOff: Erneut klicken, um sie zu entfernen
 	NoPaint: Blöcke unbemalt setzen
 	NoPaintResume: Blöcke wieder bemalen
 	NoPaintOn: Unbemalt
