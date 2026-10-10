@@ -60,13 +60,28 @@ public static class PaintToolSet
 
 	/// <summary>
 	/// Whether the picker may open for what is in hand, as far as the inventory goes: always while it is
-	/// shut, and with it open only for a paint tool in hand. Right click there already belongs to the
-	/// slots and to furniture, so a block - or anything "Only while holding a paint tool" off would let
-	/// through - does not open it. The held item, not one owned somewhere: an item carried on the cursor
-	/// is what the player holds while it is there.
+	/// shut, and with it open for a paint tool in hand, or a block or wall selected on the hotbar. Not
+	/// one picked up off the inventory below: carried on the cursor, it is on its way to another slot,
+	/// and right click there belongs to the slots. The held item, not one owned somewhere - an item on
+	/// the cursor is what the player holds while it is there. The rest of what may open it, "Only while
+	/// holding a paint tool" decides as it does with the inventory shut.
 	/// </summary>
 	public static bool InventoryAllows(Player player)
-		=> !Main.playerInventory || (player is not null && IsPaintTool(player.HeldItem));
+	{
+		if (!Main.playerInventory)
+			return true;
+
+		if (player is null)
+			return false;
+
+		Item held = player.HeldItem;
+
+		return IsPaintTool(held)
+			|| (IsPlaceable(held) && Main.mouseItem.IsAir && player.selectedItem >= 0 && player.selectedItem < HotbarSlots);
+	}
+
+	/// <summary>The top row of the inventory, which the number keys select from.</summary>
+	private const int HotbarSlots = 10;
 
 	/// <summary>Index of the Paint Sprayer's switch in <see cref="Player.builderAccStatus"/>; 0 means on.</summary>
 	private const int BuilderToggleSprayer = 3;
