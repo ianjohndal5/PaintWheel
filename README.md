@@ -11,7 +11,7 @@ Fully client side — no server install, no netcode, and by default nothing abou
 inventory.
 
 - **Author:** SugarDark
-- **Version:** 1.2
+- **Version:** 1.2.1
 - **Side:** Client
 
 ---
@@ -300,7 +300,7 @@ repository. tModLoader needs `build.txt` to build the mod, so create one before 
 ```
 displayName = Paint Wheel
 author = SugarDark
-version = 1.2
+version = 1.2.1
 side = Client
 
 buildIgnore = README.md, tools/*, Properties/*
