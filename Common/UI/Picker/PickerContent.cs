@@ -52,7 +52,7 @@ internal static class PickerContent
 	internal static int PageIndex;
 
 	/// <summary>
-	/// Discs on the bottom row: the coatings, then the mode buttons - bare placement and paint-both (when
+	/// Buttons on the bottom row: the coatings, then the mode buttons - bare placement and paint-both (when
 	/// there is any paint to apply), then the scraper when one is carried. The layout only counts them, so a button
 	/// costs nothing but an index.
 	/// </summary>
@@ -419,12 +419,13 @@ internal static class PickerContent
 		if (!config.Advanced.ShowCoatingRow)
 			return;
 
+		// Shown while one is on even when you carry none, so it can still be clicked off.
 		if (!PaintInventory.OwnsAnyCoating(Main.LocalPlayer) && PaintSelection.Coating <= 0)
 			return;
 
-		CoatingRow.Add(0);
+		// No "none" among them: the coating in use is clicked again to take it off.
 		foreach (int type in PaintCatalog.Coatings) {
-			if (CoatingRow.Count >= 5)
+			if (CoatingRow.Count >= 4)
 				break;
 
 			CoatingRow.Add(type);

@@ -721,14 +721,14 @@ internal static class PickerRenderer
 		if (PickerContent.IsPaintBothButton(index))
 			return (PaintSelection.PaintBoth, UITextures.PaintBoth, 0, false);
 
-		if (PickerContent.IsNoPaintButton(index))
-			return (PaintSelection.Paint == PaintSelection.NoPaint, UITextures.PickerPaintTarget, ItemID.Paintbrush, false);
+		// Its block shows the way blocks are going down: painted, or bare once it is on.
+		if (PickerContent.IsNoPaintButton(index)) {
+			bool bare = PaintSelection.Paint == PaintSelection.NoPaint;
+			return (bare, bare ? UITextures.PickerUnpaintedBlock : UITextures.PickerPaintedBlock, ItemID.Paintbrush, false);
+		}
 
 		int type = PickerContent.CoatingRow[index];
 		int chosen = PaintSelection.Coating;
-
-		if (type <= 0)
-			return (chosen <= 0, UITextures.PickerNoCoating, 0, false);
 
 		Texture2D icon = PaintCatalog.CoatingIdOf(type) switch {
 			PaintCoatingID.Glow => UITextures.PickerIlluminant,
@@ -764,18 +764,10 @@ internal static class PickerRenderer
 			}
 
 			int type = PickerContent.CoatingRow[i];
-			int total = type > 0 ? PaintInventory.TotalStack(player, type) : 1;
+			int total = PaintInventory.TotalStack(player, type);
 
 			Vector2 center = WheelLayout.CoatingCenter(settings, geometry, i);
 			float radius = geometry.CoatingSize * 0.5f * eased * (hovered ? WheelLayout.HoverScale : 1f);
-
-			// The "no coating" slot: a crossed-out disc reads better than an empty one.
-			if (type <= 0) {
-				DrawDiscBody(spriteBatch, center, radius, EmptyDiscFill, hovered, opacity);
-				DrawDiscMarks(spriteBatch, center, radius, type == chosen, hovered, opacity);
-				WheelDrawing.DrawCross(spriteBatch, center, radius * 0.9f, new Color(198, 198, 210) * opacity);
-				continue;
-			}
 
 			DrawDisc(spriteBatch, config, center, radius, type, total, hovered, type == chosen, opacity);
 		}
@@ -812,10 +804,7 @@ internal static class PickerRenderer
 			Color.White * (opacity * (on ? 1f : hovered ? 0.75f : 0.45f)));
 	}
 
-	/// <summary>
-	/// Bare placement: a brush struck through. A cross would read as the neighbouring "no coating" slot,
-	/// so the tool being refused is drawn instead of another empty disc.
-	/// </summary>
+	/// <summary>Bare placement: a brush struck through, the tool being refused rather than another empty disc.</summary>
 	private static void DrawNoPaintButton(SpriteBatch spriteBatch, Vector2 center, float radius,
 		bool hovered, float opacity)
 	{
@@ -884,11 +873,14 @@ internal static class PickerRenderer
 				: "Mods.PaintWheel.UI.NoPaint");
 		}
 
+		// The coating in use says how it comes off, there being no "none" button to find.
 		if (PickerInput.HoveredCoating >= 0 && PickerInput.HoveredCoating < PickerContent.CoatingRow.Count) {
 			int type = PickerContent.CoatingRow[PickerInput.HoveredCoating];
-			return type <= 0
-				? Language.GetTextValue("Mods.PaintWheel.UI.NoCoating")
-				: Describe(type, PaintInventory.TotalStack(Main.LocalPlayer, type));
+			string text = Describe(type, PaintInventory.TotalStack(Main.LocalPlayer, type));
+
+			return type == PaintSelection.Coating
+				? $"{text}   {Language.GetTextValue("Mods.PaintWheel.UI.CoatingOff")}"
+				: text;
 		}
 
 		if (PickerInput.HoveredSwatch >= 0 && PickerInput.HoveredSwatch < PickerContent.Swatches.Count) {

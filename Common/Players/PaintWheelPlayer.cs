@@ -149,6 +149,12 @@ public class PaintWheelPlayer : ModPlayer
 	public void SelectCoating(int itemType) => SelectedCoating = itemType;
 
 	/// <summary>
+	/// Puts a coating on, or takes it off again when it is the one already on. The picker has no "no
+	/// coating" button: the coating in use is clicked again instead.
+	/// </summary>
+	public void ToggleCoating(int itemType) => SelectedCoating = SelectedCoating == itemType ? 0 : itemType;
+
+	/// <summary>
 	/// Turns bare placement on, or off again by restoring the colour it interrupted. Without the second
 	/// half the only way back is to hunt down the swatch you were already using.
 	/// </summary>

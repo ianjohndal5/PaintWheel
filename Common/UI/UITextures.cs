@@ -70,14 +70,15 @@ public static class UITextures
 
 	public static Texture2D PickerRowInactive => Get("Picker/inactiverowbutton");
 
-	public static Texture2D PickerNoCoating => Get("Picker/nocoatingicon");
 
 	public static Texture2D PickerIlluminant => Get("Picker/illumunantcoatingicon");
 
 	public static Texture2D PickerEcho => Get("Picker/echocoatingicon");
 
-	/// <summary>Bare placement: a block with no paint on it.</summary>
-	public static Texture2D PickerPaintTarget => Get("Picker/painttargeticon");
+	/// <summary>The bare placement switch: a painted block while blocks are painted, a bare one while they go down unpainted.</summary>
+	public static Texture2D PickerPaintedBlock => Get("Picker/paintedblock");
+
+	public static Texture2D PickerUnpaintedBlock => Get("Picker/unpaintedblock");
 
 	public static Texture2D PickerScrape => Get("Picker/scrapemodeicon");
 

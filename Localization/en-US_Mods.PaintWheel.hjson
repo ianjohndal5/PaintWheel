@@ -14,7 +14,7 @@ Keybinds: {
 
 UI: {
 	AutoPreset: Everything you own
-	NoCoating: No coating
+	CoatingOff: Click again to take it off
 	NoPaint: Place blocks unpainted
 	NoPaintResume: Paint blocks again
 	NoPaintOn: Unpainted

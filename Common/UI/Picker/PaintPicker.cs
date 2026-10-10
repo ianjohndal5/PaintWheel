@@ -281,8 +281,10 @@ public static class PaintPicker
 		if (PaintSelection.Scrape != ScrapeMode.Off && !PickerContent.ScraperAvailable)
 			PaintSelection.ExitScrape();
 
-		// The one refusal worth explaining: over the inventory, what is in hand decides.
-		if (!PaintToolSet.InventoryAllows(Main.LocalPlayer)) {
+		// The one refusal worth explaining: over the inventory, what is in hand decides - a block there
+		// included, when "Only while holding a paint tool" turns it away, since the key that asked was
+		// let through whatever is in hand.
+		if (!PaintToolSet.InventoryAllows(Main.LocalPlayer) || (Main.playerInventory && HandBlocked(config))) {
 			Refuse("Mods.PaintWheel.UI.PaintToolNeeded");
 			return;
 		}
@@ -380,7 +382,7 @@ public static class PaintPicker
 				selected = true;
 			}
 			else if (PickerInput.HoveredCoating >= 0 && PickerInput.HoveredCoating < PickerContent.CoatingRow.Count) {
-				PaintSelection.SelectCoating(PickerContent.CoatingRow[PickerInput.HoveredCoating]);
+				PaintSelection.ToggleCoating(PickerContent.CoatingRow[PickerInput.HoveredCoating]);
 				selected = true;
 			}
 			else if (PickerInput.HoveredSwatch >= 0 && PickerInput.HoveredSwatch < PickerContent.Swatches.Count) {
@@ -794,8 +796,8 @@ public static class PaintPicker
 	/// <summary>
 	/// Everything about the world and the screen that means the picker must not be up - what is in hand
 	/// is checked apart (HandBlocked). The inventory is not one of them: over it the picker answers to a
-	/// paint tool in hand (PaintToolSet.InventoryAllows), and the HUD under it is kept out of the
-	/// mouse's reach meanwhile (PaintWheelUISystem).
+	/// paint tool in hand, or a block on the hotbar (PaintToolSet.InventoryAllows), and the HUD under it
+	/// is kept out of the mouse's reach meanwhile (PaintWheelUISystem).
 	/// </summary>
 	private static bool EnvironmentBlocked()
 	{

@@ -14,7 +14,7 @@ Keybinds: {
 
 UI: {
 	AutoPreset: Lahat ng dala mo
-	NoCoating: Walang coating
+	CoatingOff: Pindutin ulit para tanggalin
 	NoPaint: Maglagay ng blocks na walang pintura
 	NoPaintResume: Pinturahan ulit ang blocks
 	NoPaintOn: Walang pintura

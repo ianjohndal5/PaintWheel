@@ -14,7 +14,7 @@ Keybinds: {
 
 UI: {
 	AutoPreset: 你身上的全部
-	NoCoating: 不加涂层
+	CoatingOff: 再次点击即可取消
 	NoPaint: 放置方块时不上漆
 	NoPaintResume: 恢复给方块上漆
 	NoPaintOn: 不上漆

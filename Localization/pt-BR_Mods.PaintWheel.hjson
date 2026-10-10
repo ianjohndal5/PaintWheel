@@ -14,7 +14,7 @@ Keybinds: {
 
 UI: {
 	AutoPreset: Tudo o que você tem
-	NoCoating: Sem revestimento
+	CoatingOff: Clique de novo para tirar
 	NoPaint: Colocar blocos sem pintar
 	NoPaintResume: Voltar a pintar os blocos
 	NoPaintOn: Sem tinta

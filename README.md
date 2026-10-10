@@ -11,7 +11,7 @@ Fully client side — no server install, no netcode, and by default nothing abou
 inventory.
 
 - **Author:** SugarDark
-- **Version:** 1.2
+- **Version:** 1.2.3
 - **Side:** Client
 
 ---
@@ -54,11 +54,12 @@ Prefer not to hold the button? Set **Right click behaviour → Click to open** i
 leaves the picker up, and a colour closes it.
 
 It works with the inventory open too, as long as the item in your hand is a paint tool — a brush,
-roller or scraper. With anything else in hand it stays shut there, where right click belongs to the
-inventory, and trying to open it says "Paint tool needed". On the housing page right click is left
-to the NPC banners; the Open key still works. While the picker is up, the inventory, hotbar and the
-rest of the HUD under it ignore the mouse, so a click on a swatch never also moves the item beneath
-it.
+roller or scraper — or a block or wall selected on your hotbar. A block picked up off the inventory
+below does not count, nor does anything else in hand: the picker stays shut there, where right click
+belongs to the inventory, and trying to open it says "Paint tool needed". On the housing page right
+click is left to the NPC banners; the Open key still works. While the picker is up, the inventory,
+hotbar and the rest of the HUD under it ignore the mouse, so a click on a swatch never also moves the
+item beneath it.
 
 ## What it does
 
@@ -85,14 +86,14 @@ it.
   roller each paint blocks *and* walls: the tool's own half first, then the other one once that is
   done, so holding the mouse on a tile lands both. Another key trades the brush in hand for the roller
   and back.
-- **A coating row** (none / Illuminant / Echo) sits underneath. With a paint *and* a coating picked,
-  painting applies whichever the target tile is still missing, so holding the mouse on a tile lands
-  both.
+- **Coatings** sit on the bottom row: Illuminant and Echo. Click one to put it on, and click it again
+  to take it off. With a paint *and* a coating picked, painting applies whichever the target tile is
+  still missing, so holding the mouse on a tile lands both.
 - **Paint Sprayer support.** Blocks you place take the colour you picked. No Sprayer? There is a
   setting that grants the same thing.
-- **Placing blocks bare.** A struck-through brush in the same row means "no paint", so blocks go down
-  unpainted without unequipping anything. Click it again to go back to the colour you were using. A
-  coating you picked still applies.
+- **Placing blocks bare.** The block button in the same row switches to "no paint", so blocks go down
+  unpainted without unequipping anything; its block turns from painted to bare while it is on. Click it
+  again to go back to the colour you were using. A coating you picked still applies.
 - **An eyedropper** that copies the paint off any tile or wall — or a paint or coating off your
   inventory or a chest, by hovering it and pressing the key, even while you are carrying a stack on the
   cursor. A dot of that colour sits beside the cursor while you hover, gold once it is the one you have
@@ -102,8 +103,8 @@ it.
   paint-both switch on a brush or roller, and which half a restricted scraper takes.
 - **It tells you when nothing happens.** "Out of Red Paint" floats up the moment your chosen paint or
   coating runs dry, choosing a paint you do not carry says so, and so does a picker that cannot open
-  (no paint to offer, or no paint tool in hand with the inventory open) — rather than leaving the
-  button to seem dead.
+  (no paint to offer, or nothing it can open for in hand with the inventory open) — rather than
+  leaving the button to seem dead.
 
 ## Keybinds
 
@@ -112,8 +113,8 @@ in **Settings → Controls**. Right click on a paint tool opens the picker witho
 played an earlier version, the keys you already had are kept. Several let you work without opening the
 picker at all. With *Only while holding a paint tool* on (the default) they answer only while you hold
 one — or a block, with the Paint Sprayer's effect on — except the eyedropper on an inventory slot, and
-leaving scrape mode, which always work. With the inventory open, opening the picker takes a paint tool
-in hand whatever that setting says.
+leaving scrape mode, which always work. With the inventory open, opening the picker also takes a
+paint tool, or a block or wall selected on your hotbar, in hand.
 
 | Action | What it does |
 | --- | --- |
@@ -206,7 +207,7 @@ the front page; the rest live behind their own buttons.
 | Language | Automatic | Follows the game's language, or forces one. See [Languages](#languages). |
 | Open with right click | On | Turn off if another mod wants right click on paint tools. The keybind still works. |
 | Right click behaviour | Hold to open | Or *Click to open*, which leaves the picker up until you are done. |
-| Only while holding a paint tool | On | Restricts the wheel and its keybinds to paint tools (and to holding blocks with a Paint Sprayer equipped). With the inventory open, a paint tool is needed either way. |
+| Only while holding a paint tool | On | Restricts the wheel and its keybinds to paint tools (and to holding blocks with a Paint Sprayer equipped). With the inventory open, it takes a paint tool, or a block or wall selected on the hotbar. |
 | Play sounds | On | Menu ticks while flicking, and a grab sound on commit. |
 | Picker shape | Wheel | Wheel, Bar or Grid. |
 | Palettes | — | Your saved palettes. |
@@ -284,8 +285,9 @@ override method* to Inventory swap is worth trying if another mod is involved.
 or hotbar. The brush/roller swap is the same: it needs the other tool somewhere on you.
 
 **"Paint tool needed."** With the inventory open, the picker only opens while the item in your hand
-is a Paintbrush, Paint Roller or Paint Scraper, since right click there otherwise belongs to the
-inventory. Select the tool on your hotbar, or close the inventory.
+is a Paintbrush, Paint Roller or Paint Scraper, or a block or wall selected on your hotbar, since
+right click there otherwise belongs to the inventory. A block carried on the cursor does not count:
+put it on the hotbar and select it, or close the inventory.
 
 ## Building from source
 
@@ -300,7 +302,7 @@ repository. tModLoader needs `build.txt` to build the mod, so create one before 
 ```
 displayName = Paint Wheel
 author = SugarDark
-version = 1.2
+version = 1.2.3
 side = Client
 
 buildIgnore = README.md, tools/*, Properties/*
